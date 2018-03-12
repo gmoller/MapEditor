@@ -14,42 +14,56 @@ namespace MapEditor
             _images.Add(image);
         }
 
-        internal Bitmap CombineImagesIntoOne(PaletteImageList images, int maxWidth)
+        internal PaletteImage this[int i] => _images[i];
+
+        internal void DeterminePlacementOnPalette(int maxWidth)
         {
-            int width = DetermineWidth(images, maxWidth);
-            int height = DetermineHeight(images, maxWidth);
+            int xOffset = 0;
+            int yOffset = 0;
+            foreach (PaletteImage image in _images)
+            {
+                Rectangle rect;
+                if (xOffset + image.Width <= maxWidth)
+                {
+                    rect = new Rectangle(xOffset, yOffset, image.Width, image.Height);
+                    xOffset += image.Width + 1;
+                }
+                else
+                {
+                    xOffset = 0;
+                    yOffset += image.Height + 1;
+                    rect = new Rectangle(xOffset, yOffset, image.Width, image.Height);
+                    xOffset += image.Width + 1;
+                }
+
+                image.PlacementOnPalette = rect;
+            }
+        }
+
+        internal Bitmap CombineImagesIntoOne(int maxWidth)
+        {
+            int width = DetermineWidth(maxWidth);
+            int height = DetermineHeight(maxWidth);
 
             var finalImage = new Bitmap(width, height);
             using (Graphics g = Graphics.FromImage(finalImage))
             {
                 g.Clear(Color.Pink);
-                int xOffset = 0;
-                int yOffset = 0;
-                foreach (PaletteImage image in images)
+                foreach (PaletteImage image in _images)
                 {
-                    if (xOffset + image.Width <= maxWidth)
-                    {
-                        g.DrawImage(image.Bitmap, new Rectangle(xOffset, yOffset, image.Width, image.Height));
-                        xOffset += image.Width + 1;
-                    }
-                    else
-                    {
-                        xOffset = 0;
-                        yOffset += image.Height + 1;
-                        g.DrawImage(image.Bitmap, new Rectangle(xOffset, yOffset, image.Width, image.Height));
-                    }
+                    g.DrawImage(image.Bitmap, image.PlacementOnPalette);
                 }
             }
 
             return finalImage;
         }
 
-        private int DetermineWidth(PaletteImageList images, int maxWidth)
+        private int DetermineWidth(int maxWidth)
         {
             int width = 0;
             int xOffset = 0;
 
-            foreach (PaletteImage image in images)
+            foreach (PaletteImage image in _images)
             {
                 if (image.Width > maxWidth)
                 {
@@ -75,14 +89,14 @@ namespace MapEditor
             return width;
         }
 
-        private int DetermineHeight(PaletteImageList images, int maxWidth)
+        private int DetermineHeight(int maxWidth)
         {
             int width = 0;
             int height = 0;
             int xOffset = 0;
             int yOffset = 0;
 
-            foreach (PaletteImage image in images)
+            foreach (PaletteImage image in _images)
             {
                 if (image.Width > maxWidth)
                 {

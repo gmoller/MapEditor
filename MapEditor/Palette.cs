@@ -5,19 +5,35 @@ namespace MapEditor
 {
     internal class Palette
     {
-        internal string Name { get; private set; }
-        internal string Directory { get; private set; }
-        internal Bitmap Image { get; private set; }
+        internal byte Id { get; }
+        internal string Name { get; }
+        internal string Directory { get; }
+        internal Bitmap Image { get; }
 
-        private PaletteImageList _images;
+        internal PaletteImageList Images { get; }
 
-        internal Palette(string name, string directory)
+        internal Palette(byte id, string name, string directory)
         {
+            Id = id;
             Name = name;
             Directory = directory;
 
-            _images = LoadTilesForPalette(directory);
-            Image = _images.CombineImagesIntoOne(_images, 260);
+            Images = LoadTilesForPalette(directory);
+            Images.DeterminePlacementOnPalette(260);
+            Image = Images.CombineImagesIntoOne(260);
+        }
+
+        internal PaletteImage HitTest(Point location)
+        {
+            foreach (PaletteImage item in Images)
+            {
+                if (item.PlacementOnPalette.Contains(location))
+                {
+                    return item;
+                }
+            }
+
+            return null;
         }
 
         private PaletteImageList LoadTilesForPalette(string paletteDirectory)
@@ -26,11 +42,13 @@ namespace MapEditor
 
             var images = new PaletteImageList();
 
+            byte tileId = 0;
             foreach (string file in files)
             {
                 var bitmap = new Bitmap(file);
                 string name = Path.GetFileName(file);
-                images.Add(new PaletteImage(name, paletteDirectory, bitmap));
+                images.Add(new PaletteImage(tileId, name, paletteDirectory, bitmap));
+                tileId++;
             }
 
             return images;
