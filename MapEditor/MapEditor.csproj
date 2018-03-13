@@ -45,8 +45,11 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layer.cs" />
     <Compile Include="Map.cs" />
+    <Compile Include="MapLoader.cs" />
     <Compile Include="MapRenderer.cs" />
+    <Compile Include="MapSaver.cs" />
     <Compile Include="PaletteImageList.cs" />
     <Compile Include="Palette.cs" />
     <Compile Include="PaletteImage.cs" />
@@ -80,6 +83,15 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="Content\Tilesets\Base\conifer_forest_inner.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Tilesets\Base\hills_inner_1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Tilesets\Base\mountains_inner.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Tilesets\Oceans\ocean_east_1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -107,7 +119,7 @@
     <Content Include="Content\Tilesets\Oceans\ocean_east_southwest_inner_2.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Tilesets\Oceans\ocean_inner.png">
+    <Content Include="Content\Tilesets\Base\ocean_inner.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Tilesets\Oceans\ocean_northeast_inner_1.png">
@@ -359,40 +371,40 @@
     <Content Include="Content\Tilesets\Oceans\ocean_west_southeast_inner_2.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Tilesets\Plains\dark_plains_1.png">
+    <Content Include="Content\Tilesets\Base\dark_plains_1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Tilesets\Plains\dark_plains_2.png">
+    <Content Include="Content\Tilesets\Base\dark_plains_2.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Tilesets\Plains\dark_plains_3.png">
+    <Content Include="Content\Tilesets\Base\dark_plains_3.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Tilesets\Plains\dark_plains_4.png">
+    <Content Include="Content\Tilesets\Base\dark_plains_4.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Tilesets\Plains\dark_plains_5.png">
+    <Content Include="Content\Tilesets\Base\dark_plains_5.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Tilesets\Plains\dark_plains_extra_1.png">
+    <Content Include="Content\Tilesets\Base\dark_plains_extra_1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Tilesets\Plains\plains_1.png">
+    <Content Include="Content\Tilesets\Base\plains_1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Tilesets\Plains\plains_2.png">
+    <Content Include="Content\Tilesets\Base\plains_2.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Tilesets\Plains\plains_3.png">
+    <Content Include="Content\Tilesets\Base\plains_3.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Tilesets\Plains\plains_4.png">
+    <Content Include="Content\Tilesets\Base\plains_4.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Tilesets\Plains\plains_5.png">
+    <Content Include="Content\Tilesets\Base\plains_5.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Tilesets\Plains\plains_extra_1.png">
+    <Content Include="Content\Tilesets\Base\plains_extra_1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
@@ -11,24 +12,14 @@ namespace MapEditor
         private PaletteImage _selectedImage;
         private int _selectedLayer;
 
-        private readonly Map _map;
+        private Map _map;
 
         public Form1()
         {
             InitializeComponent();
 
-            _selectedLayer = 0;
             _palettes = LoadPalettes();
-            CreatePaletteMenus(_palettes);
-            SetPalette(_palettes[0]);
-
-            _map = new Map(2, 16, 16);
-            picMap.Image = MapRenderer.Render(_map, _palettes);
-        }
-
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
+            CreatePaletteCheckbox(_palettes);
         }
 
         private PaletteList LoadPalettes()
@@ -49,65 +40,72 @@ namespace MapEditor
             return palettes;
         }
 
-        private void CreatePaletteMenus(PaletteList palettes)
+        private void CreatePaletteCheckbox(PaletteList palettes)
         {
+            cboPalette.Items.Clear();
             foreach (Palette palette in palettes)
             {
-                ToolStripMenuItem item = new ToolStripMenuItem(palette.Name, null, toolstrip_click);
-                //item.CheckState = CheckState.Unchecked;
-                palletteToolStripMenuItem.DropDownItems.Add(item);
+                cboPalette.Items.Add(palette.Name);
             }
+
+            cboPalette.SelectedIndex = 0;
         }
 
-        private void toolstrip_click(object sender, EventArgs e)
+        private void CreateNewMap(int numberOfColumns, int numberOfRows)
         {
-            var menuItem = (ToolStripMenuItem) sender;
-            //menuItem.CheckState = CheckState.Checked;
-
-            SetPalette(_palettes[menuItem.Text]);
-        }
-
-        private void toolStripMenuItem3_Click(object sender, EventArgs e)
-        {
-            //var menuItem = (ToolStripMenuItem)sender;
-            //menuItem.CheckState = CheckState.Checked;
             _selectedLayer = 0;
-        }
-
-        private void toolStripMenuItem4_Click(object sender, EventArgs e)
-        {
-            //var menuItem = (ToolStripMenuItem)sender;
-            //menuItem.CheckState = CheckState.Checked;
-            _selectedLayer = 1;
+            _map = new Map(2, numberOfColumns, numberOfRows, 64, 64);
+            _map.Layer[0].Hidden = !chkLayer0.Checked;
+            _map.Layer[1].Hidden = !chkLayer1.Checked;
+            picMap.Image = MapRenderer.Render(_map, _palettes);
         }
 
         private void SetPalette(Palette palette)
         {
-            lblSelectedPalette.Text = $"Palette: {palette.Name}";
             picPalette.Width = palette.Image.Width;
             picPalette.Height = palette.Image.Height;
             picPalette.Image = palette.Image;
 
             _selectedPalette = palette;
+            SetSelectedImage(null);
+        }
+
+        private int DetermineClickedCell(int pos, int cellSize)
+        {
+            int cell = 0;
+            int test = pos - cellSize;
+            while (test > 0)
+            {
+                cell++;
+                test -= cellSize;
+            }
+
+            return cell;
+        }
+
+        private void SetSelectedImage(PaletteImage image)
+        {
+            picSelectedImage.Image = image?.Bitmap;
+            lblSelectedImage.Text = image?.Name;
+            _selectedImage = image;
+        }
+
+        private void cboPalette_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var control = (ComboBox)sender;
+            SetPalette(_palettes[control.Text]);
         }
 
         private void picPalette_Click(object sender, EventArgs e)
         {
-        }
-
-        private void picPalette_MouseDown(object sender, MouseEventArgs e)
-        {
-            MouseEventArgs mouseEventArgs = e;
+            var mouseEventArgs = (MouseEventArgs)e;
             PaletteImage image = _selectedPalette.HitTest(mouseEventArgs.Location);
-
-            picSelectedImage.Image = image?.Bitmap;
-            lblSelectedImage.Text = image?.Name;
-
-            _selectedImage = image;
+            SetSelectedImage(image);
         }
 
         private void picMap_Click(object sender, EventArgs e)
         {
+            if (_map == null) return;
             if (_selectedPalette == null) return;
             if (_selectedImage == null) return;
 
@@ -126,17 +124,132 @@ namespace MapEditor
             picMap.Image = MapRenderer.Render(_map, _palettes);
         }
 
-        private int DetermineClickedCell(int pos, int cellSize)
+        private void radLayer0_CheckedChanged(object sender, EventArgs e)
         {
-            int cell = 0;
-            int test = pos - cellSize;
-            while (test > 0)
-            {
-                cell++;
-                test -= cellSize;
-            }
+            _selectedLayer = 0;
+        }
 
-            return cell;
+        private void radLayer1_CheckedChanged(object sender, EventArgs e)
+        {
+            _selectedLayer = 1;
+        }
+
+        private void chkLayer0_CheckedChanged(object sender, EventArgs e)
+        {
+            if (_map == null) return;
+
+            var control = (CheckBox) sender;
+            _map.Layer[0].Hidden = !control.Checked;
+            picMap.Image = MapRenderer.Render(_map, _palettes);
+        }
+
+        private void chkLayer1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (_map == null) return;
+
+            var control = (CheckBox)sender;
+            _map.Layer[1].Hidden = !control.Checked;
+            picMap.Image = MapRenderer.Render(_map, _palettes);
+        }
+
+        private void increaseGridSizeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (_map == null) return;
+
+            _map.IncreaseGridSize();
+            picMap.Image = MapRenderer.Render(_map, _palettes);
+        }
+
+        private void decreaseGridSizeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (_map == null) return;
+
+            _map.DecreaseGridSize();
+            picMap.Image = MapRenderer.Render(_map, _palettes);
+        }
+
+        private void newToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string output = "32x32";
+            DialogResult result = ShowInputDialog("Enter Map Size", ref output);
+
+            if (result == DialogResult.OK)
+            {
+                string[] test = output.Split('x');
+                int numberOfColumns = Convert.ToInt32(test[0]);
+                int numberOfRows = Convert.ToInt32(test[1]);
+                CreateNewMap(numberOfColumns, numberOfRows);
+            }
+        }
+
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Cell[] mapState = MapLoader.Load();
+            _map = new Map(2, mapState.Length / 8, mapState.Length / 8, 64, 64);
+            _map.SetState(mapState);
+            picMap.Image = MapRenderer.Render(_map, _palettes);
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (_map == null) return;
+
+            Cell[] mapState = _map.GetState();
+            MapSaver.Save(mapState);
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private static DialogResult ShowInputDialog(string caption, ref string output)
+        {
+            Size size = new Size(200, 70);
+            Form inputBox = new Form
+            {
+                FormBorderStyle = FormBorderStyle.FixedToolWindow,
+                ClientSize = size,
+                Text = caption,
+                StartPosition = FormStartPosition.CenterParent
+            };
+
+
+            TextBox textBox = new TextBox
+            {
+                Size = new Size(size.Width - 10, 23),
+                Location = new Point(5, 5),
+                Text = output
+            };
+            inputBox.Controls.Add(textBox);
+
+            Button okButton = new Button
+            {
+                DialogResult = DialogResult.OK,
+                Name = "okButton",
+                Size = new Size(75, 23),
+                Text = @"&OK",
+                Location = new Point(size.Width - 80 - 80, 39)
+            };
+            inputBox.Controls.Add(okButton);
+
+            Button cancelButton = new Button
+            {
+                DialogResult = DialogResult.Cancel,
+                Name = "cancelButton",
+                Size = new Size(75, 23),
+                Text = @"&Cancel",
+                Location = new Point(size.Width - 80, 39)
+            };
+            inputBox.Controls.Add(cancelButton);
+
+            inputBox.AcceptButton = okButton;
+            inputBox.CancelButton = cancelButton;
+
+            DialogResult result = inputBox.ShowDialog();
+            output = textBox.Text;
+
+            return result;
         }
     }
 }

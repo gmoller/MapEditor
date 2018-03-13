@@ -2,16 +2,19 @@
 {
     internal struct Cell
     {
-        private readonly byte _data;
+        private readonly byte[] _data;
 
         internal int PaletteId
         {
             get
             {
-                //int high = _data >> 4;
-                int high = _data >> 6;
+                int high = _data[0];
 
                 return high;
+            }
+            set
+            {
+                _data[0] = (byte)value;
             }
         }
 
@@ -19,34 +22,34 @@
         {
             get
             {
-                //int low = _data & 0x80F;
-                int low = _data & 0x83F;
+                int low = _data[1];
 
                 return low;
             }
+            set
+            {
+                _data[1] = (byte)value;
+            }
         }
 
-        private Cell(byte data)
+        private Cell(byte paletteId, byte tileId)
         {
-            _data = data;
+            _data = new [] { paletteId , tileId};
         }
 
         internal static Cell EmptyCell()
         {
-            return new Cell(255);
+            return new Cell(255, 255);
         }
 
         internal static Cell NewCell(byte paletteId, byte tileId)
         {
-            //int data = paletteId * 16 + tileId;
-            int data = paletteId * 64 + tileId;
-
-            return new Cell((byte)data);
+            return new Cell(paletteId, tileId);
         }
 
         internal bool IsNull()
         {
-            bool isNull = PaletteId == 3 && TileId == 63;
+            bool isNull = PaletteId == 255 && TileId == 255;
 
             return isNull;
         }
