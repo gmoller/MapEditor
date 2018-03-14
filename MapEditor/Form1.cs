@@ -55,9 +55,16 @@ namespace MapEditor
         {
             _selectedLayer = 0;
             _map = new Map(2, numberOfColumns, numberOfRows, 64, 64);
-            _map.Layer[0].Hidden = !chkLayer0.Checked;
-            _map.Layer[1].Hidden = !chkLayer1.Checked;
+            _map.Layers[0].Hidden = false; //!chkLayer0.Checked;
+            _map.Layers[1].Hidden = false; //!chkLayer1.Checked;
+            SetLayers();
             picMap.Image = MapRenderer.Render(_map, _palettes);
+        }
+
+        private void SetLayers()
+        {
+            chkLayer0.Checked = !_map.Layers[0].Hidden;
+            chkLayer1.Checked = !_map.Layers[1].Hidden;
         }
 
         private void SetPalette(Palette palette)
@@ -72,13 +79,7 @@ namespace MapEditor
 
         private int DetermineClickedCell(int pos, int cellSize)
         {
-            int cell = 0;
-            int test = pos - cellSize;
-            while (test > 0)
-            {
-                cell++;
-                test -= cellSize;
-            }
+            int cell = pos / cellSize;
 
             return cell;
         }
@@ -115,7 +116,8 @@ namespace MapEditor
             if (mouseEventArgs.Y > _map.CellSize.Y * _map.NumberOfRows) return;
 
             int cellX = DetermineClickedCell(mouseEventArgs.X, _map.CellSize.X);
-            int cellY = DetermineClickedCell(mouseEventArgs.Y, _map.CellSize.Y);
+            //int cellY = DetermineClickedCell(mouseEventArgs.Y, _map.CellSize.Y);
+            int cellY = DetermineClickedCell(_map.NumberOfRows*_map.CellSize.Y - mouseEventArgs.Y, _map.CellSize.Y);
 
             // place selected image in that cell
             _map.SetCell(_selectedLayer, cellX, cellY, _selectedPalette.Id, _selectedImage.Id);
@@ -139,7 +141,7 @@ namespace MapEditor
             if (_map == null) return;
 
             var control = (CheckBox) sender;
-            _map.Layer[0].Hidden = !control.Checked;
+            _map.Layers[0].Hidden = !control.Checked;
             picMap.Image = MapRenderer.Render(_map, _palettes);
         }
 
@@ -148,7 +150,7 @@ namespace MapEditor
             if (_map == null) return;
 
             var control = (CheckBox)sender;
-            _map.Layer[1].Hidden = !control.Checked;
+            _map.Layers[1].Hidden = !control.Checked;
             picMap.Image = MapRenderer.Render(_map, _palettes);
         }
 
@@ -156,7 +158,7 @@ namespace MapEditor
         {
             if (_map == null) return;
 
-            _map.IncreaseGridSize();
+            _map.IncreaseCellSize();
             picMap.Image = MapRenderer.Render(_map, _palettes);
         }
 
@@ -164,7 +166,7 @@ namespace MapEditor
         {
             if (_map == null) return;
 
-            _map.DecreaseGridSize();
+            _map.DecreaseCellSize();
             picMap.Image = MapRenderer.Render(_map, _palettes);
         }
 
@@ -184,17 +186,16 @@ namespace MapEditor
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Cell[] mapState = MapLoader.Load();
-            _map = new Map(2, mapState.Length / 8, mapState.Length / 8, 64, 64);
-            _map.SetState(mapState);
+            _map = MapLoader.Load();
             picMap.Image = MapRenderer.Render(_map, _palettes);
+            SetLayers();
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (_map == null) return;
 
-            Cell[] mapState = _map.GetState();
+            byte[] mapState = _map.GetState();
             MapSaver.Save(mapState);
         }
 
