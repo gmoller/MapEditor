@@ -14,9 +14,15 @@ namespace MapEditor
 
         private Map _map;
 
+        private Point _mouseDownLocation = new Point(-1, -1);
+
         public Form1()
         {
             InitializeComponent();
+            WindowState = FormWindowState.Maximized;
+            MaximizeBox = false;
+            pnlMiddle.Size = new Size(1596, 939);
+            picMap.Size = new Size(1594, 937);
 
             _palettes = LoadPalettes();
             CreatePaletteCheckbox(_palettes);
@@ -106,24 +112,120 @@ namespace MapEditor
 
         private void picMap_Click(object sender, EventArgs e)
         {
+            //if (_map == null) return;
+
+            //// figure out which cell is clicked
+            //var mouseEventArgs = (MouseEventArgs)e;
+            //if (mouseEventArgs.X > _map.CellSize.X * _map.NumberOfColumns) return;
+            //if (mouseEventArgs.Y > _map.CellSize.Y * _map.NumberOfRows) return;
+
+            //FillCell(mouseEventArgs.Location);
+
+            //// redraw the map
+            //picMap.Image = MapRenderer.Render(_map, _palettes);
+        }
+
+        private void picMap_MouseDown(object sender, MouseEventArgs e)
+        {
             if (_map == null) return;
-            if (_selectedPalette == null) return;
-            if (_selectedImage == null) return;
 
-            // figure out which cell is clicked
-            var mouseEventArgs = (MouseEventArgs)e;
-            if (mouseEventArgs.X > _map.CellSize.X * _map.NumberOfColumns) return;
-            if (mouseEventArgs.Y > _map.CellSize.Y * _map.NumberOfRows) return;
+            // store location
+            _mouseDownLocation = e.Location;
+        }
 
-            int cellX = DetermineClickedCell(mouseEventArgs.X, _map.CellSize.X);
-            //int cellY = DetermineClickedCell(mouseEventArgs.Y, _map.CellSize.Y);
-            int cellY = DetermineClickedCell(_map.NumberOfRows*_map.CellSize.Y - mouseEventArgs.Y, _map.CellSize.Y);
+        private void picMap_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (_map == null) return;
 
-            // place selected image in that cell
-            _map.SetCell(_selectedLayer, cellX, cellY, _selectedPalette.Id, _selectedImage.Id);
+            int mouseEndCellX = DetermineClickedCell(e.X, _map.CellSize.X);
+            int mouseEndCellY = DetermineClickedCell(_map.NumberOfRows * _map.CellSize.Y - e.Y, _map.CellSize.Y);
+
+            int mouseStartCellX = DetermineClickedCell(_mouseDownLocation.X, _map.CellSize.X);
+            int mouseStartCellY = DetermineClickedCell(_map.NumberOfRows * _map.CellSize.Y - _mouseDownLocation.Y, _map.CellSize.Y);
+
+            int currentCellX = mouseStartCellX;
+            int currentCellY = mouseStartCellY;
+
+            if (mouseStartCellX == mouseEndCellX && mouseStartCellY == mouseEndCellY)
+            {
+                FillCell(currentCellX, currentCellY);
+            }
+            else
+            {
+                if (mouseStartCellX <= mouseEndCellX && mouseStartCellY >= mouseEndCellY) // SE
+                {
+                    do
+                    {
+                        do
+                        {
+                            FillCell(currentCellX, currentCellY);
+                            currentCellX++;
+                        } while (currentCellX <= mouseEndCellX);
+                        currentCellX = mouseStartCellX;
+                        currentCellY--;
+                    } while (currentCellY >= mouseEndCellY);
+                }
+                else if (mouseStartCellX >= mouseEndCellX && mouseStartCellY >= mouseEndCellY) // SW
+                {
+                    do
+                    {
+                        do
+                        {
+                            FillCell(currentCellX, currentCellY);
+                            currentCellX--;
+                        } while (currentCellX >= mouseEndCellX);
+                        currentCellX = mouseStartCellX;
+                        currentCellY--;
+                    } while (currentCellY >= mouseEndCellY);
+                }
+                else if (mouseStartCellX <= mouseEndCellX && mouseStartCellY <= mouseEndCellY) // NE
+                {
+                    do
+                    {
+                        do
+                        {
+                            FillCell(currentCellX, currentCellY);
+                            currentCellX++;
+                        } while (currentCellX <= mouseEndCellX);
+                        currentCellX = mouseStartCellX;
+                        currentCellY++;
+                    } while (currentCellY <= mouseEndCellY);
+                }
+                else if (mouseStartCellX >= mouseEndCellX && mouseStartCellY <= mouseEndCellY) // NW
+                {
+                    do
+                    {
+                        do
+                        {
+                            FillCell(currentCellX, currentCellY);
+                            currentCellX--;
+                        } while (currentCellX >= mouseEndCellX);
+                        currentCellX = mouseStartCellX;
+                        currentCellY++;
+                    } while (currentCellY <= mouseEndCellY);
+                }
+                else
+                {
+                    throw new Exception("Oh shit!");
+                }
+            }
 
             // redraw the map
             picMap.Image = MapRenderer.Render(_map, _palettes);
+        }
+
+        private void FillCell(int cellX, int cellY)
+        {
+            if (_selectedPalette != null && _selectedImage != null)
+            {
+                // place selected image in that cell
+                _map.SetCell(_selectedLayer, cellX, cellY, _selectedPalette.Id, _selectedImage.Id);
+            }
+            else
+            {
+                // place selected image in that cell
+                _map.SetCell(_selectedLayer, cellX, cellY, 0xFF, 0xFF);
+            }
         }
 
         private void radLayer0_CheckedChanged(object sender, EventArgs e)
@@ -251,6 +353,24 @@ namespace MapEditor
             output = textBox.Text;
 
             return result;
+        }
+
+        private void fillAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (_map == null) return;
+            if (_selectedPalette == null) return;
+            if (_selectedImage == null) return;
+
+            for (int i = 0; i < _map.NumberOfRows; ++i)
+            {
+                for (int j = 0; j < _map.NumberOfColumns; ++j)
+                {
+                    _map.SetCell(_selectedLayer, j, i, _selectedPalette.Id, _selectedImage.Id);
+                }
+            }
+
+            // redraw the map
+            picMap.Image = MapRenderer.Render(_map, _palettes);
         }
     }
 }
