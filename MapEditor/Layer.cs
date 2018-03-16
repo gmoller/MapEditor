@@ -2,11 +2,11 @@
 {
     internal class Layer
     {
-        internal bool Hidden { get; set; }
+        internal bool Visible { get; set; }
 
         internal Layer()
         {
-            Hidden = false;
+            Visible = true;
         }
     }
 }

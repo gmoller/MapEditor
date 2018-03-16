@@ -26,7 +26,7 @@ namespace MapEditor
             {
                 for (int layer = 0; layer < map.NumberOfLayers; ++layer)
                 {
-                    if (map.Layers[layer].Hidden) continue;
+                    if (!map.Layers[layer].Visible) continue;
 
                     for (int row = 0; row < map.NumberOfRows; ++row)
                     {

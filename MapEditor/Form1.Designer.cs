@@ -38,6 +38,8 @@
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.increaseGridSizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.decreaseGridSizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.actionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.fillAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pnlLeft = new System.Windows.Forms.Panel();
             this.pnlSelectedImage = new System.Windows.Forms.Panel();
             this.lblSelectedImage = new System.Windows.Forms.Label();
@@ -50,13 +52,10 @@
             this.pnlMiddle = new System.Windows.Forms.Panel();
             this.picMap = new System.Windows.Forms.PictureBox();
             this.pnlRight = new System.Windows.Forms.Panel();
-            this.lblShowLayer = new System.Windows.Forms.Label();
-            this.chkLayer1 = new System.Windows.Forms.CheckBox();
-            this.chkLayer0 = new System.Windows.Forms.CheckBox();
-            this.radLayer1 = new System.Windows.Forms.RadioButton();
-            this.radLayer0 = new System.Windows.Forms.RadioButton();
-            this.actionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.fillAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnAddLayer = new System.Windows.Forms.Button();
+            this.btnRemoveLayer = new System.Windows.Forms.Button();
+            this.lvwLayers = new System.Windows.Forms.ListView();
+            this.hdrName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.menuStrip1.SuspendLayout();
             this.pnlLeft.SuspendLayout();
             this.pnlSelectedImage.SuspendLayout();
@@ -149,6 +148,21 @@
             this.decreaseGridSizeToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.decreaseGridSizeToolStripMenuItem.Text = "Decrease Grid Size";
             this.decreaseGridSizeToolStripMenuItem.Click += new System.EventHandler(this.decreaseGridSizeToolStripMenuItem_Click);
+            // 
+            // actionsToolStripMenuItem
+            // 
+            this.actionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fillAllToolStripMenuItem});
+            this.actionsToolStripMenuItem.Name = "actionsToolStripMenuItem";
+            this.actionsToolStripMenuItem.Size = new System.Drawing.Size(59, 20);
+            this.actionsToolStripMenuItem.Text = "Actions";
+            // 
+            // fillAllToolStripMenuItem
+            // 
+            this.fillAllToolStripMenuItem.Name = "fillAllToolStripMenuItem";
+            this.fillAllToolStripMenuItem.Size = new System.Drawing.Size(106, 22);
+            this.fillAllToolStripMenuItem.Text = "Fill All";
+            this.fillAllToolStripMenuItem.Click += new System.EventHandler(this.fillAllToolStripMenuItem_Click);
             // 
             // pnlLeft
             // 
@@ -259,95 +273,62 @@
             this.picMap.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.picMap.TabIndex = 0;
             this.picMap.TabStop = false;
-            this.picMap.Click += new System.EventHandler(this.picMap_Click);
             this.picMap.MouseDown += new System.Windows.Forms.MouseEventHandler(this.picMap_MouseDown);
             this.picMap.MouseUp += new System.Windows.Forms.MouseEventHandler(this.picMap_MouseUp);
             // 
             // pnlRight
             // 
             this.pnlRight.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pnlRight.Controls.Add(this.lblShowLayer);
-            this.pnlRight.Controls.Add(this.chkLayer1);
-            this.pnlRight.Controls.Add(this.chkLayer0);
-            this.pnlRight.Controls.Add(this.radLayer1);
-            this.pnlRight.Controls.Add(this.radLayer0);
+            this.pnlRight.Controls.Add(this.lvwLayers);
+            this.pnlRight.Controls.Add(this.btnRemoveLayer);
+            this.pnlRight.Controls.Add(this.btnAddLayer);
             this.pnlRight.Dock = System.Windows.Forms.DockStyle.Right;
             this.pnlRight.Location = new System.Drawing.Point(1254, 24);
             this.pnlRight.Name = "pnlRight";
             this.pnlRight.Size = new System.Drawing.Size(123, 696);
             this.pnlRight.TabIndex = 4;
             // 
-            // lblShowLayer
+            // btnAddLayer
             // 
-            this.lblShowLayer.AutoSize = true;
-            this.lblShowLayer.Location = new System.Drawing.Point(78, 6);
-            this.lblShowLayer.Name = "lblShowLayer";
-            this.lblShowLayer.Size = new System.Drawing.Size(40, 13);
-            this.lblShowLayer.TabIndex = 4;
-            this.lblShowLayer.Text = "Show?";
+            this.btnAddLayer.Location = new System.Drawing.Point(-1, 660);
+            this.btnAddLayer.Name = "btnAddLayer";
+            this.btnAddLayer.Size = new System.Drawing.Size(60, 23);
+            this.btnAddLayer.TabIndex = 5;
+            this.btnAddLayer.Text = "Add";
+            this.btnAddLayer.UseVisualStyleBackColor = true;
+            this.btnAddLayer.Click += new System.EventHandler(this.btnAddLayer_Click);
             // 
-            // chkLayer1
+            // btnRemoveLayer
             // 
-            this.chkLayer1.AutoSize = true;
-            this.chkLayer1.Checked = true;
-            this.chkLayer1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkLayer1.Location = new System.Drawing.Point(86, 46);
-            this.chkLayer1.Name = "chkLayer1";
-            this.chkLayer1.Size = new System.Drawing.Size(15, 14);
-            this.chkLayer1.TabIndex = 3;
-            this.chkLayer1.UseVisualStyleBackColor = true;
-            this.chkLayer1.CheckedChanged += new System.EventHandler(this.chkLayer1_CheckedChanged);
+            this.btnRemoveLayer.Location = new System.Drawing.Point(62, 660);
+            this.btnRemoveLayer.Name = "btnRemoveLayer";
+            this.btnRemoveLayer.Size = new System.Drawing.Size(60, 23);
+            this.btnRemoveLayer.TabIndex = 6;
+            this.btnRemoveLayer.Text = "Remove";
+            this.btnRemoveLayer.UseVisualStyleBackColor = true;
+            this.btnRemoveLayer.Click += new System.EventHandler(this.btnRemoveLayer_Click);
             // 
-            // chkLayer0
+            // lvwLayers
             // 
-            this.chkLayer0.AutoSize = true;
-            this.chkLayer0.Checked = true;
-            this.chkLayer0.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkLayer0.Location = new System.Drawing.Point(86, 23);
-            this.chkLayer0.Name = "chkLayer0";
-            this.chkLayer0.Size = new System.Drawing.Size(15, 14);
-            this.chkLayer0.TabIndex = 2;
-            this.chkLayer0.UseVisualStyleBackColor = true;
-            this.chkLayer0.CheckedChanged += new System.EventHandler(this.chkLayer0_CheckedChanged);
+            this.lvwLayers.CheckBoxes = true;
+            this.lvwLayers.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.hdrName});
+            this.lvwLayers.GridLines = true;
+            this.lvwLayers.HideSelection = false;
+            this.lvwLayers.Location = new System.Drawing.Point(7, 6);
+            this.lvwLayers.MultiSelect = false;
+            this.lvwLayers.Name = "lvwLayers";
+            this.lvwLayers.Size = new System.Drawing.Size(103, 639);
+            this.lvwLayers.TabIndex = 7;
+            this.lvwLayers.UseCompatibleStateImageBehavior = false;
+            this.lvwLayers.View = System.Windows.Forms.View.Details;
+            this.lvwLayers.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.lvwLayers_ItemChecked);
+            this.lvwLayers.SelectedIndexChanged += new System.EventHandler(this.lvwLayers_SelectedIndexChanged);
             // 
-            // radLayer1
+            // hdrName
             // 
-            this.radLayer1.AutoSize = true;
-            this.radLayer1.Location = new System.Drawing.Point(11, 44);
-            this.radLayer1.Name = "radLayer1";
-            this.radLayer1.Size = new System.Drawing.Size(60, 17);
-            this.radLayer1.TabIndex = 1;
-            this.radLayer1.Text = "Layer 1";
-            this.radLayer1.UseVisualStyleBackColor = true;
-            this.radLayer1.CheckedChanged += new System.EventHandler(this.radLayer1_CheckedChanged);
-            // 
-            // radLayer0
-            // 
-            this.radLayer0.AutoSize = true;
-            this.radLayer0.Checked = true;
-            this.radLayer0.Location = new System.Drawing.Point(11, 21);
-            this.radLayer0.Name = "radLayer0";
-            this.radLayer0.Size = new System.Drawing.Size(60, 17);
-            this.radLayer0.TabIndex = 0;
-            this.radLayer0.TabStop = true;
-            this.radLayer0.Text = "Layer 0";
-            this.radLayer0.UseVisualStyleBackColor = true;
-            this.radLayer0.CheckedChanged += new System.EventHandler(this.radLayer0_CheckedChanged);
-            // 
-            // actionsToolStripMenuItem
-            // 
-            this.actionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fillAllToolStripMenuItem});
-            this.actionsToolStripMenuItem.Name = "actionsToolStripMenuItem";
-            this.actionsToolStripMenuItem.Size = new System.Drawing.Size(59, 20);
-            this.actionsToolStripMenuItem.Text = "Actions";
-            // 
-            // fillAllToolStripMenuItem
-            // 
-            this.fillAllToolStripMenuItem.Name = "fillAllToolStripMenuItem";
-            this.fillAllToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.fillAllToolStripMenuItem.Text = "Fill All";
-            this.fillAllToolStripMenuItem.Click += new System.EventHandler(this.fillAllToolStripMenuItem_Click);
+            this.hdrName.Text = "Layers";
+            this.hdrName.Width = 90;
             // 
             // Form1
             // 
@@ -374,7 +355,6 @@
             this.pnlMiddle.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picMap)).EndInit();
             this.pnlRight.ResumeLayout(false);
-            this.pnlRight.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -399,18 +379,17 @@
         private System.Windows.Forms.Label lblSelectedImage;
         private System.Windows.Forms.PictureBox picMap;
         private System.Windows.Forms.Panel pnlRight;
-        private System.Windows.Forms.RadioButton radLayer1;
-        private System.Windows.Forms.RadioButton radLayer0;
         private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
-        private System.Windows.Forms.CheckBox chkLayer1;
-        private System.Windows.Forms.CheckBox chkLayer0;
-        private System.Windows.Forms.Label lblShowLayer;
         private System.Windows.Forms.ComboBox cboPalette;
         private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem increaseGridSizeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem decreaseGridSizeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem actionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem fillAllToolStripMenuItem;
+        private System.Windows.Forms.Button btnRemoveLayer;
+        private System.Windows.Forms.Button btnAddLayer;
+        private System.Windows.Forms.ListView lvwLayers;
+        private System.Windows.Forms.ColumnHeader hdrName;
     }
 }
 

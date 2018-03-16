@@ -60,17 +60,23 @@ namespace MapEditor
         private void CreateNewMap(int numberOfColumns, int numberOfRows)
         {
             _selectedLayer = 0;
-            _map = new Map(2, numberOfColumns, numberOfRows, 64, 64);
-            _map.Layers[0].Hidden = false; //!chkLayer0.Checked;
-            _map.Layers[1].Hidden = false; //!chkLayer1.Checked;
+            _map = new Map(1, numberOfColumns, numberOfRows, 64, 64);
+            _map.Layers[0].Visible = true;
             SetLayers();
             picMap.Image = MapRenderer.Render(_map, _palettes);
         }
 
         private void SetLayers()
         {
-            chkLayer0.Checked = !_map.Layers[0].Hidden;
-            chkLayer1.Checked = !_map.Layers[1].Hidden;
+            lvwLayers.Items.Clear();
+
+            int cnt = 1;
+            foreach (Layer layer in _map.Layers)
+            {
+                ListViewItem item = lvwLayers.Items.Add($"{cnt}");
+                item.Checked = layer.Visible;
+                cnt++;
+            }
         }
 
         private void SetPalette(Palette palette)
@@ -110,21 +116,6 @@ namespace MapEditor
             SetSelectedImage(image);
         }
 
-        private void picMap_Click(object sender, EventArgs e)
-        {
-            //if (_map == null) return;
-
-            //// figure out which cell is clicked
-            //var mouseEventArgs = (MouseEventArgs)e;
-            //if (mouseEventArgs.X > _map.CellSize.X * _map.NumberOfColumns) return;
-            //if (mouseEventArgs.Y > _map.CellSize.Y * _map.NumberOfRows) return;
-
-            //FillCell(mouseEventArgs.Location);
-
-            //// redraw the map
-            //picMap.Image = MapRenderer.Render(_map, _palettes);
-        }
-
         private void picMap_MouseDown(object sender, MouseEventArgs e)
         {
             if (_map == null) return;
@@ -143,89 +134,11 @@ namespace MapEditor
             int mouseStartCellX = DetermineClickedCell(_mouseDownLocation.X, _map.CellSize.X);
             int mouseStartCellY = DetermineClickedCell(_map.NumberOfRows * _map.CellSize.Y - _mouseDownLocation.Y, _map.CellSize.Y);
 
-            int currentCellX = mouseStartCellX;
-            int currentCellY = mouseStartCellY;
-
-            if (mouseStartCellX == mouseEndCellX && mouseStartCellY == mouseEndCellY)
-            {
-                FillCell(currentCellX, currentCellY);
-            }
-            else
-            {
-                if (mouseStartCellX <= mouseEndCellX && mouseStartCellY >= mouseEndCellY) // SE
-                {
-                    do
-                    {
-                        do
-                        {
-                            FillCell(currentCellX, currentCellY);
-                            currentCellX++;
-                        } while (currentCellX <= mouseEndCellX);
-                        currentCellX = mouseStartCellX;
-                        currentCellY--;
-                    } while (currentCellY >= mouseEndCellY);
-                }
-                else if (mouseStartCellX >= mouseEndCellX && mouseStartCellY >= mouseEndCellY) // SW
-                {
-                    do
-                    {
-                        do
-                        {
-                            FillCell(currentCellX, currentCellY);
-                            currentCellX--;
-                        } while (currentCellX >= mouseEndCellX);
-                        currentCellX = mouseStartCellX;
-                        currentCellY--;
-                    } while (currentCellY >= mouseEndCellY);
-                }
-                else if (mouseStartCellX <= mouseEndCellX && mouseStartCellY <= mouseEndCellY) // NE
-                {
-                    do
-                    {
-                        do
-                        {
-                            FillCell(currentCellX, currentCellY);
-                            currentCellX++;
-                        } while (currentCellX <= mouseEndCellX);
-                        currentCellX = mouseStartCellX;
-                        currentCellY++;
-                    } while (currentCellY <= mouseEndCellY);
-                }
-                else if (mouseStartCellX >= mouseEndCellX && mouseStartCellY <= mouseEndCellY) // NW
-                {
-                    do
-                    {
-                        do
-                        {
-                            FillCell(currentCellX, currentCellY);
-                            currentCellX--;
-                        } while (currentCellX >= mouseEndCellX);
-                        currentCellX = mouseStartCellX;
-                        currentCellY++;
-                    } while (currentCellY <= mouseEndCellY);
-                }
-                else
-                {
-                    throw new Exception("Oh shit!");
-                }
-            }
+            CellPainter cellPainter = CellPainterFactory.GetCellPainter(new Point(mouseStartCellX, mouseStartCellY), new Point(mouseEndCellX, mouseEndCellY));
+            cellPainter.Paint(_selectedLayer, _selectedPalette?.Id, _selectedImage?.Id, _map);
 
             // redraw the map
             picMap.Image = MapRenderer.Render(_map, _palettes);
-        }
-
-        private void FillCell(int cellX, int cellY)
-        {
-            if (_selectedPalette != null && _selectedImage != null)
-            {
-                // place selected image in that cell
-                _map.SetCell(_selectedLayer, cellX, cellY, _selectedPalette.Id, _selectedImage.Id);
-            }
-            else
-            {
-                // place selected image in that cell
-                _map.SetCell(_selectedLayer, cellX, cellY, 0xFF, 0xFF);
-            }
         }
 
         private void radLayer0_CheckedChanged(object sender, EventArgs e)
@@ -243,7 +156,7 @@ namespace MapEditor
             if (_map == null) return;
 
             var control = (CheckBox) sender;
-            _map.Layers[0].Hidden = !control.Checked;
+            _map.Layers[0].Visible = control.Checked;
             picMap.Image = MapRenderer.Render(_map, _palettes);
         }
 
@@ -252,7 +165,7 @@ namespace MapEditor
             if (_map == null) return;
 
             var control = (CheckBox)sender;
-            _map.Layers[1].Hidden = !control.Checked;
+            _map.Layers[1].Visible = control.Checked;
             picMap.Image = MapRenderer.Render(_map, _palettes);
         }
 
@@ -371,6 +284,37 @@ namespace MapEditor
 
             // redraw the map
             picMap.Image = MapRenderer.Render(_map, _palettes);
+        }
+
+        private void btnAddLayer_Click(object sender, EventArgs e)
+        {
+            _map.AddLayer();
+            SetLayers();
+        }
+
+        private void btnRemoveLayer_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lvwLayers_ItemChecked(object sender, ItemCheckedEventArgs e)
+        {
+            if (lvwLayers.FocusedItem != null)
+            {
+                int i = Convert.ToInt32(e.Item.Text);
+                _map.Layers[i - 1].Visible = e.Item.Checked;
+
+                // redraw the map
+                picMap.Image = MapRenderer.Render(_map, _palettes);
+            }
+        }
+
+        private void lvwLayers_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lvwLayers.SelectedIndices.Count > 0)
+            {
+                _selectedLayer = lvwLayers.SelectedIndices[0];
+            }
         }
     }
 }

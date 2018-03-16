@@ -18,7 +18,7 @@ namespace MapEditor
         internal Map(int numberOfLayers, int numberOfColumns, int numberOfRows, int cellSizeX, int cellSizeY)
         {
             _cells = Initialize(numberOfLayers, numberOfColumns, numberOfRows);
-            Layers = SetLayers(numberOfLayers);
+            Layers = CreateLayers(numberOfLayers);
             CellSize = new Point(cellSizeX, cellSizeY);
         }
 
@@ -42,6 +42,25 @@ namespace MapEditor
         internal void DecreaseCellSize()
         {
             CellSize = new Point(CellSize.X - 8, CellSize.Y - 8);
+        }
+
+        internal void AddLayer()
+        {
+            Layers.Add(new Layer());
+            Cell[,,] newCells = Initialize(NumberOfLayers + 1, NumberOfColumns, NumberOfRows);
+
+            for (int layer = 0; layer < NumberOfLayers; ++layer)
+            {
+                for (int column = 0; column < NumberOfColumns; ++column)
+                {
+                    for (int row = 0; row < NumberOfRows; ++row)
+                    {
+                        newCells[layer, column, row] = GetCell(layer, column, row);
+                    }
+                }
+            }
+
+            _cells = newCells;
         }
 
         internal byte[] GetState()
@@ -81,13 +100,13 @@ namespace MapEditor
             // layers
             foreach (Layer layer in Layers)
             {
-                if (layer.Hidden)
+                if (layer.Visible)
                 {
-                    bytes.Add(0x01);
+                    bytes.Add(0x00);
                 }
                 else
                 {
-                    bytes.Add(0x00);
+                    bytes.Add(0x01);
                 }
             }
 
@@ -108,7 +127,7 @@ namespace MapEditor
             int numberOfRows = BitConverter.ToInt32(bytes, 7);
 
             _cells = Initialize(numberOfLayers, numberOfColumns, numberOfRows);
-            Layers = SetLayers(numberOfLayers);
+            Layers = CreateLayers(numberOfLayers);
 
             // cells
             int cursor = 11;
@@ -140,7 +159,7 @@ namespace MapEditor
             // layers
             for (int i = 0; i < NumberOfLayers; ++i)
             {
-                Layers[i].Hidden = bytes[cursor] == 1;
+                Layers[i].Visible = bytes[cursor] == 0;
                 cursor++;
             }
         }
@@ -163,7 +182,7 @@ namespace MapEditor
             return array;
         }
 
-        private List<Layer> SetLayers(int numberOfLayers)
+        private List<Layer> CreateLayers(int numberOfLayers)
         {
             var layers = new List<Layer>();
             for (int i = 0; i < numberOfLayers; ++i)
