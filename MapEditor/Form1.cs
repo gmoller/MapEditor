@@ -137,12 +137,17 @@ namespace MapEditor
             int mouseStartCellX = DetermineClickedCell(_mouseDownLocation.X, _map.CellSize.X);
             int mouseStartCellY = DetermineClickedCell(_map.NumberOfRows * _map.CellSize.Y - _mouseDownLocation.Y, _map.CellSize.Y);
 
-            CellPainter cellPainter = CellPainterFactory.GetCellPainter(new Point(mouseStartCellX, mouseStartCellY), new Point(mouseEndCellX, mouseEndCellY));
-            PaintActionList paintActions = cellPainter.Paint(_selectedLayer, _selectedPalette?.Id, _selectedImage?.Id, _map);
-            _undoLog.Push(paintActions);
+            FillBetween(new Point(mouseStartCellX, mouseStartCellY), new Point(mouseEndCellX, mouseEndCellY));
 
             // redraw the map
             picMap.Image = MapRenderer.Render(_map, _palettes);
+        }
+
+        private void FillBetween(Point start, Point end)
+        {
+            CellPainter cellPainter = CellPainterFactory.GetCellPainter(start, end);
+            PaintActionList paintActions = cellPainter.Paint(_selectedLayer, _selectedPalette?.Id, _selectedImage?.Id, _map);
+            _undoLog.Push(paintActions);
         }
 
         private void increaseGridSizeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -172,6 +177,8 @@ namespace MapEditor
                 int numberOfColumns = Convert.ToInt32(test[0]);
                 int numberOfRows = Convert.ToInt32(test[1]);
                 CreateNewMap(numberOfColumns, numberOfRows);
+                _undoLog.Clear();
+                _redoLog.Clear();
             }
         }
 
@@ -250,13 +257,7 @@ namespace MapEditor
             if (_selectedPalette == null) return;
             if (_selectedImage == null) return;
 
-            for (int i = 0; i < _map.NumberOfRows; ++i)
-            {
-                for (int j = 0; j < _map.NumberOfColumns; ++j)
-                {
-                    _map.SetCell(_selectedLayer, j, i, _selectedPalette.Id, _selectedImage.Id);
-                }
-            }
+            FillBetween(new Point(0, 0), new Point(_map.NumberOfColumns - 1, _map.NumberOfRows - 1));
 
             // redraw the map
             picMap.Image = MapRenderer.Render(_map, _palettes);
