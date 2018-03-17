@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -13,6 +14,8 @@ namespace MapEditor
         private int _selectedLayer;
 
         private Map _map;
+        private readonly Stack<PaintActionList> _undoLog = new Stack<PaintActionList>();
+        private readonly Stack<PaintActionList> _redoLog = new Stack<PaintActionList>();
 
         private Point _mouseDownLocation = new Point(-1, -1);
 
@@ -25,7 +28,7 @@ namespace MapEditor
             picMap.Size = new Size(1594, 937);
 
             _palettes = LoadPalettes();
-            CreatePaletteCheckbox(_palettes);
+            CreatePaletteCombobox(_palettes);
         }
 
         private PaletteList LoadPalettes()
@@ -46,7 +49,7 @@ namespace MapEditor
             return palettes;
         }
 
-        private void CreatePaletteCheckbox(PaletteList palettes)
+        private void CreatePaletteCombobox(PaletteList palettes)
         {
             cboPalette.Items.Clear();
             foreach (Palette palette in palettes)
@@ -135,37 +138,10 @@ namespace MapEditor
             int mouseStartCellY = DetermineClickedCell(_map.NumberOfRows * _map.CellSize.Y - _mouseDownLocation.Y, _map.CellSize.Y);
 
             CellPainter cellPainter = CellPainterFactory.GetCellPainter(new Point(mouseStartCellX, mouseStartCellY), new Point(mouseEndCellX, mouseEndCellY));
-            cellPainter.Paint(_selectedLayer, _selectedPalette?.Id, _selectedImage?.Id, _map);
+            PaintActionList paintActions = cellPainter.Paint(_selectedLayer, _selectedPalette?.Id, _selectedImage?.Id, _map);
+            _undoLog.Push(paintActions);
 
             // redraw the map
-            picMap.Image = MapRenderer.Render(_map, _palettes);
-        }
-
-        private void radLayer0_CheckedChanged(object sender, EventArgs e)
-        {
-            _selectedLayer = 0;
-        }
-
-        private void radLayer1_CheckedChanged(object sender, EventArgs e)
-        {
-            _selectedLayer = 1;
-        }
-
-        private void chkLayer0_CheckedChanged(object sender, EventArgs e)
-        {
-            if (_map == null) return;
-
-            var control = (CheckBox) sender;
-            _map.Layers[0].Visible = control.Checked;
-            picMap.Image = MapRenderer.Render(_map, _palettes);
-        }
-
-        private void chkLayer1_CheckedChanged(object sender, EventArgs e)
-        {
-            if (_map == null) return;
-
-            var control = (CheckBox)sender;
-            _map.Layers[1].Visible = control.Checked;
             picMap.Image = MapRenderer.Render(_map, _palettes);
         }
 
@@ -294,7 +270,7 @@ namespace MapEditor
 
         private void btnRemoveLayer_Click(object sender, EventArgs e)
         {
-
+            throw new NotImplementedException();
         }
 
         private void lvwLayers_ItemChecked(object sender, ItemCheckedEventArgs e)
@@ -314,6 +290,51 @@ namespace MapEditor
             if (lvwLayers.SelectedIndices.Count > 0)
             {
                 _selectedLayer = lvwLayers.SelectedIndices[0];
+            }
+        }
+
+        private void undoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // pop most recent action off stack
+            if (_undoLog.Count > 0)
+            {
+                PaintActionList paintActions = _undoLog.Pop();
+
+                PaintActionList redoActionList = new PaintActionList();
+                // undo that action
+                foreach (PaintAction paintAction in paintActions)
+                {
+                    CellPainter cellPainter = CellPainterFactory.GetCellPainter(new Point(paintAction.X, paintAction.Y), new Point(paintAction.X, paintAction.Y));
+                    PaintActionList paintActionList = cellPainter.Paint(paintAction.Layer, paintAction.PaletteId, paintAction.ImageId, _map);
+                    redoActionList.Add(paintActionList);
+                }
+
+                _redoLog.Push(redoActionList);
+
+                // redraw the map
+                picMap.Image = MapRenderer.Render(_map, _palettes);
+            }
+        }
+
+        private void redoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (_redoLog.Count > 0)
+            {
+                PaintActionList paintActions = _redoLog.Pop();
+
+                PaintActionList undoActionList = new PaintActionList();
+                // undo that action
+                foreach (PaintAction paintAction in paintActions)
+                {
+                    CellPainter cellPainter = CellPainterFactory.GetCellPainter(new Point(paintAction.X, paintAction.Y), new Point(paintAction.X, paintAction.Y));
+                    PaintActionList paintActionList = cellPainter.Paint(paintAction.Layer, paintAction.PaletteId, paintAction.ImageId, _map);
+                    undoActionList.Add(paintActionList);
+                }
+
+                _undoLog.Push(undoActionList);
+
+                // redraw the map
+                picMap.Image = MapRenderer.Render(_map, _palettes);
             }
         }
     }

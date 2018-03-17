@@ -52,10 +52,12 @@
             this.pnlMiddle = new System.Windows.Forms.Panel();
             this.picMap = new System.Windows.Forms.PictureBox();
             this.pnlRight = new System.Windows.Forms.Panel();
-            this.btnAddLayer = new System.Windows.Forms.Button();
-            this.btnRemoveLayer = new System.Windows.Forms.Button();
             this.lvwLayers = new System.Windows.Forms.ListView();
             this.hdrName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.btnRemoveLayer = new System.Windows.Forms.Button();
+            this.btnAddLayer = new System.Windows.Forms.Button();
+            this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.pnlLeft.SuspendLayout();
             this.pnlSelectedImage.SuspendLayout();
@@ -152,7 +154,9 @@
             // actionsToolStripMenuItem
             // 
             this.actionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fillAllToolStripMenuItem});
+            this.fillAllToolStripMenuItem,
+            this.undoToolStripMenuItem,
+            this.redoToolStripMenuItem});
             this.actionsToolStripMenuItem.Name = "actionsToolStripMenuItem";
             this.actionsToolStripMenuItem.Size = new System.Drawing.Size(59, 20);
             this.actionsToolStripMenuItem.Text = "Actions";
@@ -160,7 +164,7 @@
             // fillAllToolStripMenuItem
             // 
             this.fillAllToolStripMenuItem.Name = "fillAllToolStripMenuItem";
-            this.fillAllToolStripMenuItem.Size = new System.Drawing.Size(106, 22);
+            this.fillAllToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.fillAllToolStripMenuItem.Text = "Fill All";
             this.fillAllToolStripMenuItem.Click += new System.EventHandler(this.fillAllToolStripMenuItem_Click);
             // 
@@ -288,26 +292,6 @@
             this.pnlRight.Size = new System.Drawing.Size(123, 696);
             this.pnlRight.TabIndex = 4;
             // 
-            // btnAddLayer
-            // 
-            this.btnAddLayer.Location = new System.Drawing.Point(-1, 660);
-            this.btnAddLayer.Name = "btnAddLayer";
-            this.btnAddLayer.Size = new System.Drawing.Size(60, 23);
-            this.btnAddLayer.TabIndex = 5;
-            this.btnAddLayer.Text = "Add";
-            this.btnAddLayer.UseVisualStyleBackColor = true;
-            this.btnAddLayer.Click += new System.EventHandler(this.btnAddLayer_Click);
-            // 
-            // btnRemoveLayer
-            // 
-            this.btnRemoveLayer.Location = new System.Drawing.Point(62, 660);
-            this.btnRemoveLayer.Name = "btnRemoveLayer";
-            this.btnRemoveLayer.Size = new System.Drawing.Size(60, 23);
-            this.btnRemoveLayer.TabIndex = 6;
-            this.btnRemoveLayer.Text = "Remove";
-            this.btnRemoveLayer.UseVisualStyleBackColor = true;
-            this.btnRemoveLayer.Click += new System.EventHandler(this.btnRemoveLayer_Click);
-            // 
             // lvwLayers
             // 
             this.lvwLayers.CheckBoxes = true;
@@ -329,6 +313,42 @@
             // 
             this.hdrName.Text = "Layers";
             this.hdrName.Width = 90;
+            // 
+            // btnRemoveLayer
+            // 
+            this.btnRemoveLayer.Location = new System.Drawing.Point(62, 660);
+            this.btnRemoveLayer.Name = "btnRemoveLayer";
+            this.btnRemoveLayer.Size = new System.Drawing.Size(60, 23);
+            this.btnRemoveLayer.TabIndex = 6;
+            this.btnRemoveLayer.Text = "Remove";
+            this.btnRemoveLayer.UseVisualStyleBackColor = true;
+            this.btnRemoveLayer.Click += new System.EventHandler(this.btnRemoveLayer_Click);
+            // 
+            // btnAddLayer
+            // 
+            this.btnAddLayer.Location = new System.Drawing.Point(-1, 660);
+            this.btnAddLayer.Name = "btnAddLayer";
+            this.btnAddLayer.Size = new System.Drawing.Size(60, 23);
+            this.btnAddLayer.TabIndex = 5;
+            this.btnAddLayer.Text = "Add";
+            this.btnAddLayer.UseVisualStyleBackColor = true;
+            this.btnAddLayer.Click += new System.EventHandler(this.btnAddLayer_Click);
+            // 
+            // undoToolStripMenuItem
+            // 
+            this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
+            this.undoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
+            this.undoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.undoToolStripMenuItem.Text = "Undo";
+            this.undoToolStripMenuItem.Click += new System.EventHandler(this.undoToolStripMenuItem_Click);
+            // 
+            // redoToolStripMenuItem
+            // 
+            this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
+            this.redoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
+            this.redoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.redoToolStripMenuItem.Text = "Redo";
+            this.redoToolStripMenuItem.Click += new System.EventHandler(this.redoToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -390,6 +410,8 @@
         private System.Windows.Forms.Button btnAddLayer;
         private System.Windows.Forms.ListView lvwLayers;
         private System.Windows.Forms.ColumnHeader hdrName;
+        private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
     }
 }
 

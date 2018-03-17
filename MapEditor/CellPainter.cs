@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace MapEditor
@@ -59,20 +60,25 @@ namespace MapEditor
             EndCell = endCell;
         }
 
-        internal abstract void Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map);
+        internal abstract PaintActionList Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map);
 
-        protected void FillCell(Point cell, int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
+        protected Cell FillCell(Point cell, int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
         {
+            Cell oldCell;
             if (selectedPaletteId != null && selectedImageId != null)
             {
                 // place selected image in that cell
+                oldCell = map.GetCell(layer, cell.X, cell.Y);
                 map.SetCell(layer, cell.X, cell.Y, selectedPaletteId.Value, selectedImageId.Value);
             }
             else
             {
                 // place nothing in that cell
+                oldCell = map.GetCell(layer, cell.X, cell.Y);
                 map.SetCell(layer, cell.X, cell.Y, 0xFF, 0xFF);
             }
+
+            return oldCell;
         }
     }
 
@@ -82,9 +88,13 @@ namespace MapEditor
         {
         }
 
-        internal override void Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
+        internal override PaintActionList Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
         {
-            FillCell(StartCell, layer, selectedPaletteId, selectedImageId, map);
+            PaintActionList paintActionList = new PaintActionList();
+            Cell oldCell = FillCell(StartCell, layer, selectedPaletteId, selectedImageId, map);
+            paintActionList.Add(layer, StartCell.X, StartCell.Y, (byte)oldCell.PaletteId, (byte)oldCell.TileId);
+
+            return paintActionList;
         }
     }
 
@@ -94,15 +104,19 @@ namespace MapEditor
         {
         }
 
-        internal override void Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
+        internal override PaintActionList Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
         {
+            PaintActionList paintActionList = new PaintActionList();
             Point currentCell = StartCell;
 
             do
             {
-                FillCell(currentCell, layer, selectedPaletteId, selectedImageId, map);
+                Cell oldCell = FillCell(currentCell, layer, selectedPaletteId, selectedImageId, map);
+                paintActionList.Add(layer, currentCell.X, currentCell.Y, (byte)oldCell.PaletteId, (byte)oldCell.TileId);
                 currentCell.Y++;
             } while (currentCell.Y <= EndCell.Y);
+
+            return paintActionList;
         }
     }
 
@@ -112,15 +126,19 @@ namespace MapEditor
         {
         }
 
-        internal override void Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
+        internal override PaintActionList Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
         {
+            PaintActionList paintActionList = new PaintActionList();
             Point currentCell = StartCell;
 
             do
             {
-                FillCell(currentCell, layer, selectedPaletteId, selectedImageId, map);
+                Cell oldCell = FillCell(currentCell, layer, selectedPaletteId, selectedImageId, map);
+                paintActionList.Add(layer, currentCell.X, currentCell.Y, (byte)oldCell.PaletteId, (byte)oldCell.TileId);
                 currentCell.X++;
             } while (currentCell.X <= EndCell.X);
+
+            return paintActionList;
         }
     }
 
@@ -130,15 +148,19 @@ namespace MapEditor
         {
         }
 
-        internal override void Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
+        internal override PaintActionList Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
         {
+            PaintActionList paintActionList = new PaintActionList();
             Point currentCell = StartCell;
 
             do
             {
-                FillCell(currentCell, layer, selectedPaletteId, selectedImageId, map);
+                Cell oldCell = FillCell(currentCell, layer, selectedPaletteId, selectedImageId, map);
+                paintActionList.Add(layer, currentCell.X, currentCell.Y, (byte)oldCell.PaletteId, (byte)oldCell.TileId);
                 currentCell.Y--;
             } while (currentCell.Y >= EndCell.Y);
+
+            return paintActionList;
         }
     }
 
@@ -148,15 +170,19 @@ namespace MapEditor
         {
         }
 
-        internal override void Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
+        internal override PaintActionList Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
         {
+            PaintActionList paintActionList = new PaintActionList();
             Point currentCell = StartCell;
 
             do
             {
-                FillCell(currentCell, layer, selectedPaletteId, selectedImageId, map);
+                Cell oldCell = FillCell(currentCell, layer, selectedPaletteId, selectedImageId, map);
+                paintActionList.Add(layer, currentCell.X, currentCell.Y, (byte)oldCell.PaletteId, (byte)oldCell.TileId);
                 currentCell.X--;
             } while (currentCell.X >= EndCell.X);
+
+            return paintActionList;
         }
     }
 
@@ -166,20 +192,24 @@ namespace MapEditor
         {
         }
 
-        internal override void Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
+        internal override PaintActionList Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
         {
+            PaintActionList paintActionList = new PaintActionList();
             Point currentCell = StartCell;
 
             do
             {
                 do
                 {
-                    FillCell(currentCell, layer, selectedPaletteId, selectedImageId, map);
+                    Cell oldCell = FillCell(currentCell, layer, selectedPaletteId, selectedImageId, map);
+                    paintActionList.Add(layer, currentCell.X, currentCell.Y, (byte)oldCell.PaletteId, (byte)oldCell.TileId);
                     currentCell.X++;
                 } while (currentCell.X <= EndCell.X);
                 currentCell.X = StartCell.X;
                 currentCell.Y--;
             } while (currentCell.Y >= EndCell.Y);
+
+            return paintActionList;
         }
     }
 
@@ -189,20 +219,24 @@ namespace MapEditor
         {
         }
 
-        internal override void Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
+        internal override PaintActionList Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
         {
+            PaintActionList paintActionList = new PaintActionList();
             Point currentCell = StartCell;
 
             do
             {
                 do
                 {
-                    FillCell(currentCell, layer, selectedPaletteId, selectedImageId, map);
+                    Cell oldCell = FillCell(currentCell, layer, selectedPaletteId, selectedImageId, map);
+                    paintActionList.Add(layer, currentCell.X, currentCell.Y, (byte)oldCell.PaletteId, (byte)oldCell.TileId);
                     currentCell.X--;
                 } while (currentCell.X >= EndCell.X);
                 currentCell.X = StartCell.X;
                 currentCell.Y--;
             } while (currentCell.Y >= EndCell.Y);
+
+            return paintActionList;
         }
     }
 
@@ -212,20 +246,24 @@ namespace MapEditor
         {
         }
 
-        internal override void Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
+        internal override PaintActionList Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
         {
+            PaintActionList paintActionList = new PaintActionList();
             Point currentCell = StartCell;
 
             do
             {
                 do
                 {
-                    FillCell(currentCell, layer, selectedPaletteId, selectedImageId, map);
+                    Cell oldCell = FillCell(currentCell, layer, selectedPaletteId, selectedImageId, map);
+                    paintActionList.Add(layer, currentCell.X, currentCell.Y, (byte)oldCell.PaletteId, (byte)oldCell.TileId);
                     currentCell.X++;
                 } while (currentCell.X <= EndCell.X);
                 currentCell.X = StartCell.X;
                 currentCell.Y++;
             } while (currentCell.Y <= EndCell.Y);
+
+            return paintActionList;
         }
     }
 
@@ -235,20 +273,24 @@ namespace MapEditor
         {
         }
 
-        internal override void Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
+        internal override PaintActionList Paint(int layer, byte? selectedPaletteId, byte? selectedImageId, Map map)
         {
+            PaintActionList paintActionList = new PaintActionList();
             Point currentCell = StartCell;
 
             do
             {
                 do
                 {
-                    FillCell(currentCell, layer, selectedPaletteId, selectedImageId, map);
+                    Cell oldCell = FillCell(currentCell, layer, selectedPaletteId, selectedImageId, map);
+                    paintActionList.Add(layer, currentCell.X, currentCell.Y, (byte)oldCell.PaletteId, (byte)oldCell.TileId);
                     currentCell.X--;
                 } while (currentCell.X >= EndCell.X);
                 currentCell.X = StartCell.X;
                 currentCell.Y++;
             } while (currentCell.Y <= EndCell.Y);
+
+            return paintActionList;
         }
     }
 }

@@ -51,6 +51,7 @@
     <Compile Include="MapLoader.cs" />
     <Compile Include="MapRenderer.cs" />
     <Compile Include="MapSaver.cs" />
+    <Compile Include="PaintAction.cs" />
     <Compile Include="PaletteImageList.cs" />
     <Compile Include="Palette.cs" />
     <Compile Include="PaletteImage.cs" />
