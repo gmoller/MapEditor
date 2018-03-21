@@ -4,9 +4,9 @@ namespace MapEditor
 {
     internal static class MapSaver
     {
-        internal static void Save(byte[] bytes)
+        internal static void Save(string filename, byte[] bytes)
         {
-            File.WriteAllBytes("Map.txt", bytes);
+            File.WriteAllBytes(filename, bytes);
         }
     }
 }

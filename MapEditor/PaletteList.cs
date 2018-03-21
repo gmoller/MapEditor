@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 namespace MapEditor
 {
@@ -8,9 +9,19 @@ namespace MapEditor
     {
         private readonly List<Palette> _palettes = new List<Palette>();
 
-        internal void Add(Palette palette)
+        internal void Load()
         {
-            _palettes.Add(palette);
+            string[] directories = Directory.GetDirectories(@"Content\Tilesets\");
+
+            byte paletteId = 0;
+            foreach (string directory in directories)
+            {
+                string name = Path.GetFileName(directory);
+                var palette = new Palette(paletteId, name, directory);
+
+                _palettes.Add(palette);
+                paletteId++;
+            }
         }
 
         internal Palette this[int i] => _palettes[i];

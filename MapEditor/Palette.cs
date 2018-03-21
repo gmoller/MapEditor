@@ -19,8 +19,8 @@ namespace MapEditor
             Directory = directory;
 
             Images = LoadTilesForPalette(directory);
-            Images.DeterminePlacementOnPalette(32, 32, 6);
-            Image = Images.CombineImagesIntoOne(32, 32, 6);
+            Images.DeterminePlacementOnPalette(32, 32, 5);
+            Image = Images.CombineImagesIntoOne(32, 32, 5);
         }
 
         internal PaletteImage HitTest(Point location)

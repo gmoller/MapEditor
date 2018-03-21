@@ -8,6 +8,9 @@ namespace MapEditor
     {
         private Cell[,,] _cells; // layer, column, row
 
+        private readonly Stack<PaintActionList> _undoLog = new Stack<PaintActionList>();
+        private readonly Stack<PaintActionList> _redoLog = new Stack<PaintActionList>();
+
         internal List<Layer> Layers { get; private set; }
 
         internal int NumberOfLayers => _cells.GetLength(0);
@@ -34,6 +37,13 @@ namespace MapEditor
             _cells[layer, column, row] = Cell.NewCell(paletteId, tileId);
         }
 
+        internal void FillBetween(int layerId, byte? paletteId, byte? imageId, Point start, Point end)
+        {
+            CellPainter cellPainter = CellPainterFactory.GetCellPainter(start, end);
+            PaintActionList paintActions = cellPainter.Paint(layerId, paletteId, imageId, this);
+            _undoLog.Push(paintActions);
+        }
+
         internal void IncreaseCellSize()
         {
             CellSize = new Point(CellSize.X + 8, CellSize.Y + 8);
@@ -44,24 +54,63 @@ namespace MapEditor
             CellSize = new Point(CellSize.X - 8, CellSize.Y - 8);
         }
 
-        internal void AddLayer()
+        internal void Undo()
         {
-            Layers.Add(new Layer());
-            Cell[,,] newCells = Initialize(NumberOfLayers + 1, NumberOfColumns, NumberOfRows);
-
-            for (int layer = 0; layer < NumberOfLayers; ++layer)
+            // pop most recent action off stack
+            if (_undoLog.Count > 0)
             {
-                for (int column = 0; column < NumberOfColumns; ++column)
-                {
-                    for (int row = 0; row < NumberOfRows; ++row)
-                    {
-                        newCells[layer, column, row] = GetCell(layer, column, row);
-                    }
-                }
-            }
+                PaintActionList paintActions = _undoLog.Pop();
 
-            _cells = newCells;
+                PaintActionList redoActionList = new PaintActionList();
+                // undo that action
+                foreach (PaintAction paintAction in paintActions)
+                {
+                    CellPainter cellPainter = CellPainterFactory.GetCellPainter(new Point(paintAction.X, paintAction.Y), new Point(paintAction.X, paintAction.Y));
+                    PaintActionList paintActionList = cellPainter.Paint(paintAction.Layer, paintAction.PaletteId, paintAction.ImageId, this);
+                    redoActionList.Add(paintActionList);
+                }
+
+                _redoLog.Push(redoActionList);
+            }
         }
+
+        internal void Redo()
+        {
+            if (_redoLog.Count > 0)
+            {
+                PaintActionList paintActions = _redoLog.Pop();
+
+                PaintActionList undoActionList = new PaintActionList();
+                // undo that action
+                foreach (PaintAction paintAction in paintActions)
+                {
+                    CellPainter cellPainter = CellPainterFactory.GetCellPainter(new Point(paintAction.X, paintAction.Y), new Point(paintAction.X, paintAction.Y));
+                    PaintActionList paintActionList = cellPainter.Paint(paintAction.Layer, paintAction.PaletteId, paintAction.ImageId, this);
+                    undoActionList.Add(paintActionList);
+                }
+
+                _undoLog.Push(undoActionList);
+            }
+        }
+
+        //internal void AddLayer()
+        //{
+        //    Layers.Add(new Layer());
+        //    Cell[,,] newCells = Initialize(NumberOfLayers + 1, NumberOfColumns, NumberOfRows);
+
+        //    for (int layer = 0; layer < NumberOfLayers; ++layer)
+        //    {
+        //        for (int column = 0; column < NumberOfColumns; ++column)
+        //        {
+        //            for (int row = 0; row < NumberOfRows; ++row)
+        //            {
+        //                newCells[layer, column, row] = GetCell(layer, column, row);
+        //            }
+        //        }
+        //    }
+
+        //    _cells = newCells;
+        //}
 
         internal byte[] GetState()
         {
