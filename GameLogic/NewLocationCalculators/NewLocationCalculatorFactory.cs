@@ -2,7 +2,7 @@
 
 namespace GameLogic.NewLocationCalculators
 {
-    internal class NewLocationCalculatorFactory
+    public class NewLocationCalculatorFactory
     {
         private static readonly Dictionary<CompassDirection, INewLocationCalculator> Calculators;
 
@@ -21,7 +21,7 @@ namespace GameLogic.NewLocationCalculators
             };
         }
 
-        internal static INewLocationCalculator GetNewLocationCalculator(CompassDirection direction)
+        public static INewLocationCalculator GetNewLocationCalculator(CompassDirection direction)
         {
             return Calculators[direction];
         }

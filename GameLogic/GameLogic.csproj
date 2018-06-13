@@ -45,6 +45,7 @@
     <Compile Include="NewLocationCalculators\NorthEastCalculator.cs" />
     <Compile Include="NewLocationCalculators\NorthWestCalculator.cs" />
     <Compile Include="Point.cs" />
+    <Compile Include="Processors\MovementProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NewLocationCalculators\SouthCalculator.cs" />
     <Compile Include="NewLocationCalculators\SouthEastCalculator.cs" />

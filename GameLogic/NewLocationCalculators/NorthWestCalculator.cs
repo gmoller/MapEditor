@@ -1,6 +1,6 @@
 ﻿namespace GameLogic.NewLocationCalculators
 {
-    internal class NorthWestCalculator : INewLocationCalculator
+    public class NorthWestCalculator : INewLocationCalculator
     {
         public Point Calculate(Point location)
         {

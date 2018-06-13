@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using GameLogic;
+using GameLogic.Processors;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTestProject1
@@ -23,12 +24,13 @@ namespace UnitTestProject1
                 TerrainType.Create(11, "Ocean", -1)
             };
 
-        private static GameWorld _gameWorld;
+        private static MovementProcessor _movementProcessor;
 
         [ClassInitialize]
         public static void Setup(TestContext context)
         {
-            _gameWorld = GameWorld.Create(3, 3, new[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, TerrainTypeList);
+            GameWorld gameWorld = GameWorld.Create(3, 3, new[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, TerrainTypeList);
+            _movementProcessor = new MovementProcessor(gameWorld);
         }
 
         [TestMethod]
@@ -106,14 +108,14 @@ namespace UnitTestProject1
 
         private Unit CreateUnit(Point startLocation)
         {
-            var unit = Unit.Create(_gameWorld, startLocation, 2.0f);
+            var unit = Unit.Create(startLocation, 2.0f);
 
             return unit;
         }
 
         private Unit MoveUnit(Unit unit, CompassDirection compassDirection, Point expectedLocation, float expectedMovementPoints = 1.0f)
         {
-            unit = unit.Move(compassDirection);
+            unit = unit.Move(_movementProcessor, compassDirection);
 
             Assert.AreEqual(expectedLocation, unit.Location);
             Assert.AreEqual(unit.Location.X, expectedLocation.X);

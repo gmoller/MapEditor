@@ -1,4 +1,5 @@
 ﻿using GameLogic.NewLocationCalculators;
+using GameLogic.Processors;
 
 namespace GameLogic
 {
@@ -9,63 +10,30 @@ namespace GameLogic
     /// </summary>
     public struct Unit
     {
-        private const float Half = 0.5f;
-
-        private readonly GameWorld _gameWorld;
         public Point Location { get; }
         public float MovementPoints { get; }
 
-        private Unit(GameWorld gameWorld, Point location, float movementPoints)
+        private Unit(Point location, float movementPoints)
         {
-            _gameWorld = gameWorld;
             Location = location;
             MovementPoints = movementPoints;
         }
 
-        public static Unit Create(GameWorld gameWorld, Point newLocation, float movementPoints)
+        public static Unit Create(Point newLocation, float movementPoints)
         {
-            var unit = new Unit(gameWorld, newLocation, movementPoints);
+            var unit = new Unit(newLocation, movementPoints);
 
             return unit;
         }
 
-        public Unit Move(CompassDirection direction)
+        public Unit Move(MovementProcessor movementProcessor, CompassDirection compassDirection)
         {
-            // get new location
-            // IDEA: make factory injectable?
-            INewLocationCalculator newLocationCalculator =
-                NewLocationCalculatorFactory.GetNewLocationCalculator(direction);
-            Point newLocation = newLocationCalculator.Calculate(Location);
+            INewLocationCalculator newLocationCalculator = NewLocationCalculatorFactory.GetNewLocationCalculator(compassDirection);
+            ProcessResponse response = movementProcessor.Process(new ProcessRequest { Location = Location, MovementPoints = MovementPoints }, newLocationCalculator);
 
-            int movementCostCurrent = GetMovementCostForTerrain(Location);
-            int movementCostNew = GetMovementCostForTerrain(newLocation);
-            float movementCost = (movementCostCurrent + movementCostNew) * Half;
+            Unit unit = Create(response.NewLocation, response.NewMovementPoints);
 
-            if (UnitHasEnoughMovementPoints(movementCost))
-            {
-                Unit unit = Create(_gameWorld, newLocation, MovementPoints - movementCost);
-
-                return unit;
-            }
-
-            return this;
-        }
-
-        private int GetMovementCostForTerrain(Point location)
-        {
-            // get terrain type for location
-            Cell cell = _gameWorld.Board.GetCell(location);
-
-            // get movement cost for that terrain type
-            TerrainType terrainType = _gameWorld.TerrainTypes[cell.TerrainTypeId];
-            int movementCost = terrainType.MovementCost;
-
-            return movementCost;
-        }
-
-        private bool UnitHasEnoughMovementPoints(float movementCost)
-        {
-            return MovementPoints - movementCost >= 0.0f;
+            return unit;
         }
 
         internal void FoundCity()

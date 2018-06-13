@@ -1,6 +1,6 @@
 ﻿namespace GameLogic.NewLocationCalculators
 {
-    internal interface INewLocationCalculator
+    public interface INewLocationCalculator
     {
         Point Calculate(Point location);
     }
