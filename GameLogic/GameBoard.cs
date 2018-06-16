@@ -2,6 +2,9 @@
 
 namespace GameLogic
 {
+    /// <summary>
+    /// This class is immutable.
+    /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class GameBoard
     {
@@ -30,8 +33,8 @@ namespace GameLogic
         {
             if (location.X < 0 ||
                 location.Y < 0 ||
-                location.X > _numberOfColumns ||
-                location.Y > _numberOfRows)
+                location.X > _numberOfColumns - 1 ||
+                location.Y > _numberOfRows - 1)
             {
                 return Cell.Null;
             }

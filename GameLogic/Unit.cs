@@ -1,4 +1,5 @@
-﻿using GameLogic.NewLocationCalculators;
+﻿using System.Diagnostics;
+using GameLogic.NewLocationCalculators;
 using GameLogic.Processors;
 
 namespace GameLogic
@@ -7,21 +8,36 @@ namespace GameLogic
     /// A unit is a game entity that can be controlled by the player/AI to do
     /// things such as move around and explore the map, attack and start a new
     /// city.
+    /// This class is immutable.
     /// </summary>
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct Unit
     {
+        private readonly GameWorld _gameWorld;
+
+        public int UnitType { get; }
         public Point Location { get; }
         public float MovementPoints { get; }
 
-        private Unit(Point location, float movementPoints)
+        private Unit(int unitType, Point location, float movementPoints, GameWorld gameWorld)
         {
+            _gameWorld = gameWorld;
+            UnitType = unitType;
             Location = location;
             MovementPoints = movementPoints;
         }
 
-        public static Unit Create(Point newLocation, float movementPoints)
+        public static Unit CreateNew(int unitType, Point location, GameWorld gameWorld)
         {
-            var unit = new Unit(newLocation, movementPoints);
+            float movementPoints = gameWorld.UnitTypes[unitType].Moves;
+            var unit = new Unit(unitType, location, movementPoints, gameWorld);
+
+            return unit;
+        }
+
+        public static Unit Create(int unitType, Point newLocation, float movementPoints, GameWorld gameWorld)
+        {
+            var unit = new Unit(unitType, newLocation, movementPoints, gameWorld);
 
             return unit;
         }
@@ -29,23 +45,27 @@ namespace GameLogic
         public Unit Move(MovementProcessor movementProcessor, CompassDirection compassDirection)
         {
             INewLocationCalculator newLocationCalculator = NewLocationCalculatorFactory.GetNewLocationCalculator(compassDirection);
-            ProcessResponse response = movementProcessor.Process(new ProcessRequest { Location = Location, MovementPoints = MovementPoints }, newLocationCalculator);
+            ProcessResponse response = movementProcessor.Process(new ProcessRequest(Location, MovementPoints), newLocationCalculator);
 
-            Unit unit = Create(response.NewLocation, response.NewMovementPoints);
+            Unit unit = Create(UnitType, response.NewLocation, response.NewMovementPoints, _gameWorld);
 
             return unit;
         }
 
-        internal void FoundCity()
+        public void FoundCity()
         {
-            // change state
-            //MovementPoints = 0;
+            // if movemenet points >= 1 and this unit is a settler, create city
+            // kill this unit -> MarkForDeath
         }
 
-        internal void Reset()
+        public Unit StartNewTurn()
         {
-            // change state
-            //MovementPoints = 2;
+            float movementPoints = _gameWorld.UnitTypes[UnitType].Moves;
+            Unit unit = Create(UnitType, Location, movementPoints, _gameWorld);
+
+            return unit;
         }
+
+        private string DebuggerDisplay => $"{{UnitType={_gameWorld.UnitTypes[UnitType].Name},Location={Location},MovementPoints={MovementPoints}/{_gameWorld.UnitTypes[UnitType].Moves}}}";
     }
 }

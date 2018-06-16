@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using GameLogic;
+using GameLogic.Loaders;
 using GameLogic.Processors;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -8,29 +9,16 @@ namespace UnitTestProject1
     [TestClass]
     public class UnitTests
     {
-        private static readonly List<TerrainType> TerrainTypeList = new List<TerrainType>
-            {
-                TerrainType.Create(0, "Grassland", 1),
-                TerrainType.Create(1, "Forest", 2),
-                TerrainType.Create(2, "Desert", 1),
-                TerrainType.Create(3, "Swamp", 3),
-                TerrainType.Create(4, "River", 2),
-                TerrainType.Create(5, "River Mouth", 2),
-                TerrainType.Create(6, "Hills", 3),
-                TerrainType.Create(7, "Mountain", 4),
-                TerrainType.Create(8, "Volcano", 4),
-                TerrainType.Create(9, "Tundra", 2),
-                TerrainType.Create(10, "Shore", -1),
-                TerrainType.Create(11, "Ocean", -1)
-            };
-
+        private static GameWorld _gameWorld;
         private static MovementProcessor _movementProcessor;
 
         [ClassInitialize]
         public static void Setup(TestContext context)
         {
-            GameWorld gameWorld = GameWorld.Create(3, 3, new[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, TerrainTypeList);
-            _movementProcessor = new MovementProcessor(gameWorld);
+            List<TerrainType> terrainTypes = TerrainTypesLoader.GetTerrainTypes();
+            List<UnitType> unitTypes = UnitTypesLoader.GetUnitTypes();
+            _gameWorld = GameWorld.Create(3, 3, new[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, terrainTypes, unitTypes);
+            _movementProcessor = new MovementProcessor(_gameWorld);
         }
 
         [TestMethod]
@@ -108,7 +96,7 @@ namespace UnitTestProject1
 
         private Unit CreateUnit(Point startLocation)
         {
-            var unit = Unit.Create(startLocation, 2.0f);
+            var unit = Unit.CreateNew(4, startLocation, _gameWorld);
 
             return unit;
         }
@@ -117,10 +105,10 @@ namespace UnitTestProject1
         {
             unit = unit.Move(_movementProcessor, compassDirection);
 
-            Assert.AreEqual(expectedLocation, unit.Location);
-            Assert.AreEqual(unit.Location.X, expectedLocation.X);
-            Assert.AreEqual(unit.Location.Y, expectedLocation.Y);
-            Assert.AreEqual(expectedMovementPoints, unit.MovementPoints);
+            Assert.AreEqual(expectedLocation, unit.Location, "Location incorrect.");
+            Assert.AreEqual(expectedLocation.X, unit.Location.X, "Location.X incorrect.");
+            Assert.AreEqual(expectedLocation.Y, unit.Location.Y, "Location.Y inocrrect.");
+            Assert.AreEqual(expectedMovementPoints, unit.MovementPoints, "MovementPoints incorrect.");
 
             return unit;
         }

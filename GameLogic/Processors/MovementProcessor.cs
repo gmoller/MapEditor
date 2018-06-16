@@ -3,6 +3,9 @@ using GameLogic.NewLocationCalculators;
 
 namespace GameLogic.Processors
 {
+    /// <summary>
+    /// This class is immutable.
+    /// </summary>
     public class MovementProcessor
     {
         private readonly GameWorld _gameWorld;
@@ -38,10 +41,10 @@ namespace GameLogic.Processors
             {
                 float newMovementPoints = request.MovementPoints - movementCost;
 
-                return new ProcessResponse { NewLocation = newLocation, NewMovementPoints = newMovementPoints };
+                return new ProcessResponse(newLocation, newMovementPoints);
             }
 
-            return new ProcessResponse { NewLocation = request.Location, NewMovementPoints = request.MovementPoints };
+            return new ProcessResponse(request.Location, request.MovementPoints);
         }
 
         private Point DetermineNewPosition(Point currentLocation, INewLocationCalculator newLocationCalculator)
@@ -76,15 +79,33 @@ namespace GameLogic.Processors
         }
     }
 
+    /// <summary>
+    /// This struct is immutable.
+    /// </summary>
     public struct ProcessRequest
     {
-        public Point Location { get; set; }
-        public float MovementPoints { get; set; }
+        public Point Location { get; }
+        public float MovementPoints { get; }
+
+        public ProcessRequest(Point location, float movementPoints)
+        {
+            Location = location;
+            MovementPoints = movementPoints;
+        }
     }
 
+    /// <summary>
+    /// This struct is immutable.
+    /// </summary>
     public struct ProcessResponse
     {
-        public Point NewLocation { get; set; }
-        public float NewMovementPoints { get; set; }
+        public Point NewLocation { get; }
+        public float NewMovementPoints { get; }
+
+        public ProcessResponse(Point newLocation, float newMovementPoints)
+        {
+            NewLocation = newLocation;
+            NewMovementPoints = newMovementPoints;
+        }
     }
 }

@@ -2,6 +2,9 @@
 
 namespace GameLogic
 {
+    /// <summary>
+    /// This struct is immutable.
+    /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct TerrainType
     {

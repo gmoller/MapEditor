@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using GameLogic;
+using GameLogic.Loaders;
 using GameLogic.NewLocationCalculators;
 using GameLogic.Processors;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -11,28 +12,14 @@ namespace UnitTestProject1
     [TestClass]
     public class MovementProcessorTests
     {
-        private static readonly List<TerrainType> TerrainTypeList = new List<TerrainType>
-            {
-                TerrainType.Create(0, "Grassland", 1),
-                TerrainType.Create(1, "Forest", 2),
-                TerrainType.Create(2, "Desert", 1),
-                TerrainType.Create(3, "Swamp", 3),
-                TerrainType.Create(4, "River", 2),
-                TerrainType.Create(5, "River Mouth", 2),
-                TerrainType.Create(6, "Hills", 3),
-                TerrainType.Create(7, "Mountain", 4),
-                TerrainType.Create(8, "Volcano", 4),
-                TerrainType.Create(9, "Tundra", 2),
-                TerrainType.Create(10, "Shore", -1),
-                TerrainType.Create(11, "Ocean", -1)
-            };
-
         private static GameWorld _gameWorld;
 
         [ClassInitialize]
         public static void Setup(TestContext context)
         {
-            _gameWorld = GameWorld.Create(3, 3, new[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, TerrainTypeList);
+            List<TerrainType> terrainTypes = TerrainTypesLoader.GetTerrainTypes();
+            List<UnitType> unitTypes = UnitTypesLoader.GetUnitTypes();
+            _gameWorld = GameWorld.Create(3, 3, new[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, terrainTypes, unitTypes);
         }
 
         [TestMethod]
@@ -43,14 +30,14 @@ namespace UnitTestProject1
             INewLocationCalculator newLocationCalculator = NewLocationCalculatorFactory.GetNewLocationCalculator(CompassDirection.East);
 
             Stopwatch sw = Stopwatch.StartNew();
-            ProcessResponse response = movementProcessor.Process(new ProcessRequest { Location = Point.Empty, MovementPoints = 2.0f }, newLocationCalculator);
+            ProcessResponse response = movementProcessor.Process(new ProcessRequest(Point.Empty, 2.0f), newLocationCalculator);
             sw.Stop();
             Console.WriteLine($"Time taken: {sw.ElapsedMilliseconds} ms");
 
-            Unit unit = Unit.Create(response.NewLocation, response.NewMovementPoints);
+            Unit unit = Unit.Create(0, response.NewLocation, response.NewMovementPoints, _gameWorld);
 
-            Assert.AreEqual(Point.Create(1, 0), unit.Location);
-            Assert.AreEqual(1.0f, unit.MovementPoints);
+            Assert.AreEqual(Point.Create(1, 0), unit.Location, "Location incorrect.");
+            Assert.AreEqual(1.0f, unit.MovementPoints, "MovementPoints incorrect.");
         }
 
         [TestMethod]
@@ -65,9 +52,7 @@ namespace UnitTestProject1
             Stopwatch sw = Stopwatch.StartNew();
             for (int i = 0; i < repetitions; i++)
             {
-                ProcessResponse response =
-                    movementProcessor.Process(new ProcessRequest { Location = Point.Empty, MovementPoints = 2.0f },
-                        newLocationCalculator);
+                movementProcessor.Process(new ProcessRequest(Point.Empty, 2.0f), newLocationCalculator);
             }
             sw.Stop();
 
@@ -81,15 +66,15 @@ namespace UnitTestProject1
 
             INewLocationCalculator newLocationCalculator = NewLocationCalculatorFactory.GetNewLocationCalculator(CompassDirection.East);
 
-            ProcessRequest[] requests = { new ProcessRequest { Location = Point.Empty, MovementPoints = 2.0f } };
+            ProcessRequest[] requests = { new ProcessRequest(Point.Empty, 2.0f) };
 
             Stopwatch sw = Stopwatch.StartNew();
             ProcessResponse[] response = movementProcessor.Process(requests, newLocationCalculator);
             sw.Stop();
             Console.WriteLine($"Time taken: {sw.ElapsedMilliseconds} ms");
 
-            Assert.AreEqual(Point.Create(1, 0), response[0].NewLocation);
-            Assert.AreEqual(1.0f, response[0].NewMovementPoints);
+            Assert.AreEqual(Point.Create(1, 0), response[0].NewLocation, "NewLocation incorrect.");
+            Assert.AreEqual(1.0f, response[0].NewMovementPoints, "NewMovementPoints incorrect.");
         }
 
         [TestMethod]
@@ -105,7 +90,7 @@ namespace UnitTestProject1
 
             for (int i = 0; i < repetitions; i++)
             {
-                requests[i] = new ProcessRequest { Location = Point.Empty, MovementPoints = 2.0f + i };
+                requests[i] = new ProcessRequest(Point.Empty, 2.0f + i);
             }
 
             Stopwatch sw = Stopwatch.StartNew();
@@ -116,7 +101,7 @@ namespace UnitTestProject1
             int cnt = 0;
             foreach (ProcessResponse item in response)
             {
-                Assert.AreEqual(1.0f + cnt, item.NewMovementPoints);
+                Assert.AreEqual(1.0f + cnt, item.NewMovementPoints, "NewMovementPoints incorrect.");
                 cnt++;
             }
         }

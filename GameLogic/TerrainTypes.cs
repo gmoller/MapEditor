@@ -3,6 +3,9 @@ using System.Diagnostics;
 
 namespace GameLogic
 {
+    /// <summary>
+    /// This class is immutable.
+    /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class TerrainTypes
     {
