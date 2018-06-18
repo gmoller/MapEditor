@@ -10,7 +10,7 @@ namespace GameLogic
     /// city.
     /// This class is immutable.
     /// </summary>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
     public struct Unit
     {
         private readonly GameWorld _gameWorld;
@@ -64,6 +64,11 @@ namespace GameLogic
             Unit unit = Create(UnitType, Location, movementPoints, _gameWorld);
 
             return unit;
+        }
+
+        public override string ToString()
+        {
+            return DebuggerDisplay;
         }
 
         private string DebuggerDisplay => $"{{UnitType={_gameWorld.UnitTypes[UnitType].Name},Location={Location},MovementPoints={MovementPoints}/{_gameWorld.UnitTypes[UnitType].Moves}}}";

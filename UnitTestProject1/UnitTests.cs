@@ -71,6 +71,13 @@ namespace UnitTestProject1
         }
 
         [TestMethod]
+        public void Unit_can_not_move_west()
+        {
+            Unit unit = CreateUnit(Point.Create(0, 0));
+            MoveUnit(unit, CompassDirection.West, Point.Create(0, 0), 2.0f);
+        }
+
+        [TestMethod]
         public void Unit_can_move_northwest()
         {
             Unit unit = CreateUnit(Point.Create(1, 1));

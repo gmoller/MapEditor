@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject1", "UnitTes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameLogic", "GameLogic\GameLogic.csproj", "{1364BC83-91E5-47B7-8E43-4346FF978FC0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsGui", "WinFormsGui\WinFormsGui.csproj", "{4598B0A7-9319-4568-B211-3253CAA7DC6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{1364BC83-91E5-47B7-8E43-4346FF978FC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1364BC83-91E5-47B7-8E43-4346FF978FC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1364BC83-91E5-47B7-8E43-4346FF978FC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4598B0A7-9319-4568-B211-3253CAA7DC6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4598B0A7-9319-4568-B211-3253CAA7DC6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4598B0A7-9319-4568-B211-3253CAA7DC6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4598B0A7-9319-4568-B211-3253CAA7DC6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,13 @@
+﻿--Id,Name,MovementCost--
+0,Grassland,1
+1,Forest,2
+2,Desert,1
+3,Swamp,3
+4,River,2
+5,River Mouth,2
+6,Hills,3
+7,Mountain,4
+8,Volcano,4
+9,Tundra,2
+10,Shore,-1
+11,Ocean,-1

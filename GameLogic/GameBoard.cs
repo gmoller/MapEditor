@@ -5,20 +5,21 @@ namespace GameLogic
     /// <summary>
     /// This class is immutable.
     /// </summary>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
     public class GameBoard
     {
-        private readonly int _numberOfRows;
-        private readonly int _numberOfColumns;
         private readonly Cell[] _cells;
+
+        public int NumberOfRows { get; }
+        public int NumberOfColumns { get; }
 
         private GameBoard(int numberOfColumns, int numberOfRows, int[] terrainTypes)
         {
-            _numberOfRows = numberOfRows;
-            _numberOfColumns = numberOfColumns;
+            NumberOfRows = numberOfRows;
+            NumberOfColumns = numberOfColumns;
 
             _cells = new Cell[numberOfRows * numberOfColumns];
-            for (int i = 0; i < _numberOfRows * _numberOfColumns; ++i)
+            for (int i = 0; i < NumberOfRows * NumberOfColumns; ++i)
             {
                 _cells[i] = Cell.Create(terrainTypes[i]);
             }
@@ -33,18 +34,18 @@ namespace GameLogic
         {
             if (location.X < 0 ||
                 location.Y < 0 ||
-                location.X > _numberOfColumns - 1 ||
-                location.Y > _numberOfRows - 1)
+                location.X > NumberOfColumns - 1 ||
+                location.Y > NumberOfRows - 1)
             {
                 return Cell.Null;
             }
 
-            int index = location.Y * _numberOfColumns + location.X;
+            int index = location.Y * NumberOfColumns + location.X;
             //Console.WriteLine($"Index: {index}, X: {location.X}, Y: {location.Y}");
 
             return _cells[index];
         }
 
-        private string DebuggerDisplay => $"{{Rows={_numberOfRows},Columns={_numberOfColumns}}}";
+        private string DebuggerDisplay => $"{{Rows={NumberOfRows},Columns={NumberOfColumns}}}";
     }
 }

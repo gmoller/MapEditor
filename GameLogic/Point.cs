@@ -26,7 +26,7 @@ namespace GameLogic
 
         public override string ToString()
         {
-            return $"{{X={X},Y={Y}}}";
+            return DebuggerDisplay;
         }
 
         private string DebuggerDisplay => $"{{X={X},Y={Y}}}";

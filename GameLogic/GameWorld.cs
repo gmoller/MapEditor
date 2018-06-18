@@ -9,12 +9,14 @@ namespace GameLogic
     public class GameWorld
     {
         public GameBoard Board { get; }
+        public Player Player { get; }
         public TerrainTypes TerrainTypes { get; }
         public UnitTypes UnitTypes { get; }
 
         private GameWorld(int numberOfColumns, int numberOfRows, int[] terrainTypes, List<TerrainType> terrainTypeList, List<UnitType> unitTypeList)
         {
             Board = GameBoard.Create(numberOfColumns, numberOfRows, terrainTypes);
+            Player = new Player(this);
             TerrainTypes = TerrainTypes.Create(terrainTypeList);
             UnitTypes = UnitTypes.Create(unitTypeList);
         }

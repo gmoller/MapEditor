@@ -6,7 +6,7 @@ namespace GameLogic
     /// <summary>
     /// This class is immutable.
     /// </summary>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
     public class TerrainTypes
     {
         private readonly Dictionary<int, TerrainType> _terrainTypes;
@@ -24,6 +24,8 @@ namespace GameLogic
         {
             return new TerrainTypes(terrainTypes);
         }
+
+        public int Count => _terrainTypes.Count;
 
         public TerrainType this[int index]
         {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GameLogic;
 using GameLogic.Loaders;
 using GameLogic.Processors;
@@ -19,6 +20,72 @@ namespace UnitTestProject1
             List<UnitType> unitTypes = UnitTypesLoader.GetUnitTypes();
             _gameWorld = GameWorld.Create(3, 3, new[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, terrainTypes, unitTypes);
             _movementProcessor = new MovementProcessor(_gameWorld);
+        }
+
+        [TestMethod]
+        public void Two_turns()
+        {
+            var player = new Player(_gameWorld);
+            player.AddUnit(0, Point.Create(0, 0), _gameWorld);
+
+            PrintGameBoard(_gameWorld.Board, player);
+
+            for (int i = 0; i < 2; ++i)
+            {
+                player.DoTurn();
+                player.EndTurn();
+                PrintGameBoard(_gameWorld.Board, player);
+            }
+        }
+
+        private void PrintGameBoard(GameBoard gameBoard, Player player)
+        {
+            for (int rowIndex = gameBoard.NumberOfRows - 1; rowIndex >= 0; --rowIndex)
+            {
+                PrintRow(" +", "-+");
+                PrintRow2(rowIndex, player);
+            }
+
+            PrintRow(" +", "-+");
+            PrintRowFinal();
+            Console.WriteLine();
+        }
+
+        private void PrintRow(string s1, string s2)
+        {
+            Console.Write(s1);
+            for (int colIndex = 0; colIndex < _gameWorld.Board.NumberOfColumns; ++colIndex)
+            {
+                Console.Write(s2);
+            }
+            Console.WriteLine();
+        }
+
+        private void PrintRow2(int rowIndex, Player player)
+        {
+            Console.Write($"{rowIndex}|");
+            for (int colIndex = 0; colIndex < _gameWorld.Board.NumberOfColumns; ++colIndex)
+            {
+                string s = " ";
+                if (player.UnitInCell(colIndex, rowIndex))
+                {
+                    s = "@";
+                }
+
+                Console.Write(s);
+                Console.Write("|");
+            }
+            Console.WriteLine();
+        }
+
+        private void PrintRowFinal()
+        {
+            Console.Write("  ");
+            for (int colIndex = 0; colIndex < _gameWorld.Board.NumberOfColumns; ++colIndex)
+            {
+                Console.Write($"{colIndex} ");
+            }
+            Console.WriteLine();
         }
 
         [TestMethod]
@@ -51,7 +118,7 @@ namespace UnitTestProject1
 
             for (int i = 0; i < 10; ++i)
             {
-                var unit = Unit.CreateNew(4, startLocation, _gameWorld);
+                Unit unit = Unit.CreateNew(4, startLocation, _gameWorld);
                 units.Add(unit);
             }
 
