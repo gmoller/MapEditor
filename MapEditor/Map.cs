@@ -183,7 +183,7 @@ namespace MapEditor
             int layer = 0;
             int column = 0;
             int row = 0;
-            for (int i = 11; i < bytes.Length - NumberOfLayers; i += 2)
+            for (int i = cursor; i < bytes.Length - NumberOfLayers; i += 2)
             {
                 byte b1 = bytes[i];
                 byte b2 = bytes[i + 1];

@@ -69,7 +69,8 @@ namespace GameLogic.Processors
         private int GetMovementCostForTerrain(Point location)
         {
             // get terrain type for location
-            Cell cell = _gameWorld.Board.GetCell(location);
+            Cell cell = _gameWorld.Map.GetCell(location);
+            //Cell cell = _gameWorld.Board.GetCell(location);
 
             // get movement cost for that terrain type
             TerrainType terrainType = _gameWorld.TerrainTypes[cell.TerrainTypeId];

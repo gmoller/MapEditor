@@ -10,12 +10,16 @@ namespace WinFormsGui
 {
     public partial class Form1 : Form
     {
-        private const int CellWidth = 40;
-        private const int CellHeight = 40;
+        private const int CellWidth = 20;
+        private const int CellHeight = 20;
 
         private GameWorld _gameWorld;
         private int _turn;
-        private List<string> _events = new List<string>();
+        private readonly SlidingBuffer<string> _events = new SlidingBuffer<string>(30);
+        private List<string> _texts;
+
+        private Panel _panelStatusBar;
+        private Panel _panelEventsBar;
 
         private BufferedGraphics _bufferedGraphics;
         private Graphics _graphicsBuffer;
@@ -31,13 +35,23 @@ namespace WinFormsGui
             List<TerrainType> terrainTypes = TerrainTypesLoader.GetTerrainTypes();
             List<UnitType> unitTypes = UnitTypesLoader.GetUnitTypes();
 
+            _texts = new List<string>();
+            foreach (TerrainType terrainType in terrainTypes)
+            {
+                string text = $"{terrainType.Id} - {terrainType.Name}";
+                _texts.Add(text);
+            }
+
             // Create map
-            _gameWorld = GameWorld.Create(5, 5, new[] {
-                0, 1, 2, 3, 4,
-                5, 6, 7, 8, 9,
-                0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0}, terrainTypes, unitTypes);
+            //_gameWorld = GameWorld.Create(5, 5, new[] {
+            //    0, 1, 2, 3, 4,
+            //    5, 6, 7, 8, 9,
+            //    0, 0, 0, 0, 0,
+            //    0, 0, 0, 0, 0,
+            //    0, 0, 0, 0, 0}, terrainTypes, unitTypes);
+
+            Map testMap = MapLoader.Load("Map.txt");
+            _gameWorld = GameWorld.Create(testMap, terrainTypes, unitTypes);
 
             // Add unit
             _gameWorld.Player.AddUnit(4, GameLogic.Point.Create(0, 0), _gameWorld);
@@ -51,11 +65,21 @@ namespace WinFormsGui
             BufferedGraphicsContext currentContext = BufferedGraphicsManager.Current;
             _bufferedGraphics = currentContext.Allocate(CreateGraphics(), DisplayRectangle);
             _graphicsBuffer = _bufferedGraphics.Graphics;
+
+            int margin = 5;
+            int width = 100;
+            _panelStatusBar = new Panel(_graphicsBuffer, ClientRectangle.Width - width - margin, 0 + margin, width, ClientRectangle.Height - margin * 2, Color.LightBlue);
+
+            //int height = 200;
+            //_panelEventsBar = new Panel(_graphicsBuffer, 0 + margin, ClientRectangle.Height - height - margin, ClientRectangle.Width - margin * 2 - 100 - margin, height, Color.LightGray);
+            width = 400;
+            _panelEventsBar = new Panel(_graphicsBuffer, ClientRectangle.Width - width - margin - 100 - margin, 0 + margin, width, ClientRectangle.Height - margin * 2, Color.LightGray); // 100 is width of statusbar
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            _events.Add(_gameWorld.Player.DoTurn());
+            string result = _gameWorld.Player.DoTurn();
+            _events.Add($"Turn {_turn + 1}: {result}");
             _gameWorld.Player.EndTurn();
             RenderScreen();
         }
@@ -80,43 +104,32 @@ namespace WinFormsGui
 
         private void DrawStatusBar()
         {
-            const int margin = 5;
-            const int width = 100;
+            _panelStatusBar.DrawPanel();
+            _panelStatusBar.DrawText(new Point(0, 0), $"Turn: {_turn}", Font, Color.Red, Color.Transparent, Color.Blue);
 
-            int x = ClientRectangle.Width - width - margin;
-            int y = 0 + margin;
-            int height = ClientRectangle.Height - margin * 2;
-
-            _graphicsBuffer.FillRectangle(new Rectangle(x, y, width, height), Color.LightBlue);
-
-            // turns
-            _graphicsBuffer.DrawText(new Rectangle(x, y, width-1, 13), $"Turn: {_turn}", Font, Color.Red, Color.Transparent, Color.Blue);
-
-            // key
-            y += 30;
-            for (int i = 0; i < _gameWorld.TerrainTypes.Count; ++i)
+            int y = 35;
+            foreach (string item in _texts)
             {
-                TerrainType terrainType = _gameWorld.TerrainTypes[i];
-                string text = $"{terrainType.Id} - {terrainType.Name}";
-                _graphicsBuffer.DrawText(new Point(x, y), text, Font, Color.AliceBlue, Color.Transparent, Color.Transparent);
+                _panelStatusBar.DrawText(new Point(0, y), item, Font, Color.AliceBlue, Color.Transparent, Color.Transparent);
                 y += 15;
             }
         }
 
         private void DrawEventsBar()
         {
-            const int margin = 5;
-            const int height = 200;
+            _panelEventsBar.DrawPanel();
 
-            int x =  0 + margin;
-            int y = ClientRectangle.Height - height - margin;
-            int width = ClientRectangle.Width - margin * 2 - 100 - margin;
-
-            _graphicsBuffer.FillRectangle(new Rectangle(x, y, width, height), Color.LightGray);
-
+            List<string> events = new List<string>(30);
             foreach (string item in _events)
             {
-                _graphicsBuffer.DrawText(new Point(x, y), item, Font, Color.White, Color.Transparent, Color.Transparent);
+                events.Add(item);
+            }
+            events.Reverse();
+
+            int y = 0;
+            foreach (string item in events)
+            {
+                _panelEventsBar.DrawText(new Point(0, y), item, Font, Color.White, Color.Transparent, Color.Transparent);
                 y += 15;
             }
         }
@@ -125,15 +138,15 @@ namespace WinFormsGui
         {
             int x = 0;
             int y = 0;
-            for (int rowIndex = _gameWorld.Board.NumberOfRows - 1; rowIndex >= 0; --rowIndex)
+            for (int rowIndex = _gameWorld.Map.NumberOfRows - 1; rowIndex >= 0; --rowIndex)
             {
-                for (int colIndex = 0; colIndex < _gameWorld.Board.NumberOfColumns; ++colIndex)
+                for (int colIndex = 0; colIndex < _gameWorld.Map.NumberOfColumns; ++colIndex)
                 {
                     var rectangle = new Rectangle(x, y, CellWidth, CellHeight);
                     _graphicsBuffer.DrawRectangle(rectangle, Color.LightBlue);
                     _graphicsBuffer.DrawText(rectangle, $"{colIndex};{rowIndex}", Font, Color.Chartreuse, Color.Transparent, Color.Transparent, TextFormatFlags.Right);
 
-                    Cell cell = _gameWorld.Board.GetCell(GameLogic.Point.Create(colIndex, rowIndex));
+                    Cell cell = _gameWorld.Map.GetCell(GameLogic.Point.Create(colIndex, rowIndex));
                     _graphicsBuffer.DrawText(rectangle, $"{cell.TerrainTypeId}", Font, Color.BlueViolet, Color.Transparent, Color.Transparent, TextFormatFlags.Left | TextFormatFlags.Bottom);
 
                     x += CellWidth;
@@ -149,7 +162,7 @@ namespace WinFormsGui
             foreach (Unit item in _gameWorld.Player.Units)
             {
                 int x = item.Location.X * CellWidth;
-                int y = CellWidth * (_gameWorld.Board.NumberOfRows - 1) - item.Location.Y * CellHeight;
+                int y = CellWidth * (_gameWorld.Map.NumberOfRows - 1) - item.Location.Y * CellHeight;
                 Font font = new Font(Font.FontFamily, 16.5f);
                 _graphicsBuffer.DrawText(new Rectangle(x, y, CellWidth, CellHeight), "@", font, Color.Red, Color.Transparent, Color.Transparent, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
             }

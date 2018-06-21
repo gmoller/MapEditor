@@ -5,7 +5,7 @@ namespace GameLogic
     /// <summary>
     /// This struct is immutable.
     /// </summary>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
     public struct Cell
     {
         public static readonly Cell Null = new Cell(-1);

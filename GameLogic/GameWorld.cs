@@ -8,6 +8,7 @@ namespace GameLogic
     /// </summary>
     public class GameWorld
     {
+        public Map Map { get; }
         public GameBoard Board { get; }
         public Player Player { get; }
         public TerrainTypes TerrainTypes { get; }
@@ -21,9 +22,22 @@ namespace GameLogic
             UnitTypes = UnitTypes.Create(unitTypeList);
         }
 
+        private GameWorld(Map map, List<TerrainType> terrainTypeList, List<UnitType> unitTypeList)
+        {
+            Map = map;
+            Player = new Player(this);
+            TerrainTypes = TerrainTypes.Create(terrainTypeList);
+            UnitTypes = UnitTypes.Create(unitTypeList);
+        }
+
         public static GameWorld Create(int numberOfColumns, int numberOfRows, int[] terrainTypes, List<TerrainType> terrainTypeList, List<UnitType> unitTypeList)
         {
             return new GameWorld(numberOfColumns, numberOfRows, terrainTypes, terrainTypeList, unitTypeList);
+        }
+
+        public static GameWorld Create(Map map, List<TerrainType> terrainTypeList, List<UnitType> unitTypeList)
+        {
+            return new GameWorld(map, terrainTypeList, unitTypeList);
         }
     }
 }
