@@ -6,7 +6,7 @@ namespace GameLogic
     /// <summary>
     /// This class is immutable.
     /// </summary>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
     public class UnitTypes
     {
         private readonly Dictionary<int, UnitType> _unitTypes;

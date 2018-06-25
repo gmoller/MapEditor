@@ -39,7 +39,7 @@
     <Compile Include="CompassDirection.cs" />
     <Compile Include="GameBoard.cs" />
     <Compile Include="GameWorld.cs" />
-    <Compile Include="MapLoader.cs" />
+    <Compile Include="GameBoardLoader.cs" />
     <Compile Include="NewLocationCalculators\EastCalculator.cs" />
     <Compile Include="NewLocationCalculators\INewLocationCalculator.cs" />
     <Compile Include="NewLocationCalculators\NewLocationCalculatorFactory.cs" />

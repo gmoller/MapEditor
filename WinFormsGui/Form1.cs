@@ -42,19 +42,12 @@ namespace WinFormsGui
                 _texts.Add(text);
             }
 
-            // Create map
-            //_gameWorld = GameWorld.Create(5, 5, new[] {
-            //    0, 1, 2, 3, 4,
-            //    5, 6, 7, 8, 9,
-            //    0, 0, 0, 0, 0,
-            //    0, 0, 0, 0, 0,
-            //    0, 0, 0, 0, 0}, terrainTypes, unitTypes);
-
-            Map testMap = MapLoader.Load("Map.txt");
+            // Create gameboard
+            GameBoard testMap = GameBoardLoader.Load("Map.txt");
             _gameWorld = GameWorld.Create(testMap, terrainTypes, unitTypes);
 
             // Add unit
-            _gameWorld.Player.AddUnit(4, GameLogic.Point.Create(0, 0), _gameWorld);
+            _gameWorld.AddUnitForPlayer(4, GameLogic.Point.Create(2, 3), _gameWorld);
 
             // Start timer
             timer1.Start();
@@ -78,9 +71,10 @@ namespace WinFormsGui
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            string result = _gameWorld.Player.DoTurn();
+            //string result = _gameWorld.Player.DoTurn();
+            string result = _gameWorld.DoTurnForPlayer();
             _events.Add($"Turn {_turn + 1}: {result}");
-            _gameWorld.Player.EndTurn();
+            _gameWorld.EndTurnForPlayer();
             RenderScreen();
         }
 
@@ -138,15 +132,15 @@ namespace WinFormsGui
         {
             int x = 0;
             int y = 0;
-            for (int rowIndex = _gameWorld.Map.NumberOfRows - 1; rowIndex >= 0; --rowIndex)
+            for (int rowIndex = _gameWorld.GameBoard.NumberOfRows - 1; rowIndex >= 0; --rowIndex)
             {
-                for (int colIndex = 0; colIndex < _gameWorld.Map.NumberOfColumns; ++colIndex)
+                for (int colIndex = 0; colIndex < _gameWorld.GameBoard.NumberOfColumns; ++colIndex)
                 {
                     var rectangle = new Rectangle(x, y, CellWidth, CellHeight);
                     _graphicsBuffer.DrawRectangle(rectangle, Color.LightBlue);
                     _graphicsBuffer.DrawText(rectangle, $"{colIndex};{rowIndex}", Font, Color.Chartreuse, Color.Transparent, Color.Transparent, TextFormatFlags.Right);
 
-                    Cell cell = _gameWorld.Map.GetCell(GameLogic.Point.Create(colIndex, rowIndex));
+                    Cell cell = _gameWorld.GameBoard.GetCell(GameLogic.Point.Create(colIndex, rowIndex));
                     _graphicsBuffer.DrawText(rectangle, $"{cell.TerrainTypeId}", Font, Color.BlueViolet, Color.Transparent, Color.Transparent, TextFormatFlags.Left | TextFormatFlags.Bottom);
 
                     x += CellWidth;
@@ -159,10 +153,10 @@ namespace WinFormsGui
 
         private void DrawUnits()
         {
-            foreach (Unit item in _gameWorld.Player.Units)
+            foreach (Unit item in _gameWorld.PlayerUnits)
             {
                 int x = item.Location.X * CellWidth;
-                int y = CellWidth * (_gameWorld.Map.NumberOfRows - 1) - item.Location.Y * CellHeight;
+                int y = CellWidth * (_gameWorld.GameBoard.NumberOfRows - 1) - item.Location.Y * CellHeight;
                 Font font = new Font(Font.FontFamily, 16.5f);
                 _graphicsBuffer.DrawText(new Rectangle(x, y, CellWidth, CellHeight), "@", font, Color.Red, Color.Transparent, Color.Transparent, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
             }

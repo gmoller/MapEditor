@@ -5,7 +5,7 @@ namespace GameLogic
     /// <summary>
     /// This struct is immutable.
     /// </summary>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
     public struct UnitType
     {
         public static readonly UnitType Invalid = new UnitType(-1, "Invalid", 0);

@@ -56,6 +56,7 @@ namespace GameLogic.Processors
         {
             int movementCostCurrent = GetMovementCostForTerrain(currentLocation);
             int movementCostNew = GetMovementCostForTerrain(newLocation);
+            if (movementCostNew == -1) return float.MaxValue;
             float movementCost = (movementCostCurrent + movementCostNew) * 0.5f;
 
             return movementCost;
@@ -69,8 +70,7 @@ namespace GameLogic.Processors
         private int GetMovementCostForTerrain(Point location)
         {
             // get terrain type for location
-            Cell cell = _gameWorld.Map.GetCell(location);
-            //Cell cell = _gameWorld.Board.GetCell(location);
+            Cell cell = _gameWorld.GetCell(location);
 
             // get movement cost for that terrain type
             TerrainType terrainType = _gameWorld.TerrainTypes[cell.TerrainTypeId];

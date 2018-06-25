@@ -17,7 +17,8 @@ namespace UnitTestProject1
         {
             List<TerrainType> terrainTypes = TerrainTypesLoader.GetTerrainTypes();
             List<UnitType> unitTypes = UnitTypesLoader.GetUnitTypes();
-            _gameWorld = GameWorld.Create(3, 3, new[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, terrainTypes, unitTypes);
+            GameBoard gameBoard = GameBoardLoader.Load(3, 3);
+            _gameWorld = GameWorld.Create(gameBoard, terrainTypes, unitTypes);
             _movementProcessor = new MovementProcessor(_gameWorld);
         }
 

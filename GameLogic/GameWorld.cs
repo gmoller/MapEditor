@@ -8,36 +8,44 @@ namespace GameLogic
     /// </summary>
     public class GameWorld
     {
-        public Map Map { get; }
-        public GameBoard Board { get; }
-        public Player Player { get; }
+        private Player Player { get; }
+
+        public GameBoard GameBoard { get; }
         public TerrainTypes TerrainTypes { get; }
         public UnitTypes UnitTypes { get; }
+        public IEnumerable<Unit> PlayerUnits => Player.Units;
 
-        private GameWorld(int numberOfColumns, int numberOfRows, int[] terrainTypes, List<TerrainType> terrainTypeList, List<UnitType> unitTypeList)
+        private GameWorld(GameBoard map, List<TerrainType> terrainTypeList, List<UnitType> unitTypeList)
         {
-            Board = GameBoard.Create(numberOfColumns, numberOfRows, terrainTypes);
+            GameBoard = map;
             Player = new Player(this);
             TerrainTypes = TerrainTypes.Create(terrainTypeList);
             UnitTypes = UnitTypes.Create(unitTypeList);
         }
 
-        private GameWorld(Map map, List<TerrainType> terrainTypeList, List<UnitType> unitTypeList)
+        public static GameWorld Create(GameBoard gameBoard, List<TerrainType> terrainTypeList, List<UnitType> unitTypeList)
         {
-            Map = map;
-            Player = new Player(this);
-            TerrainTypes = TerrainTypes.Create(terrainTypeList);
-            UnitTypes = UnitTypes.Create(unitTypeList);
+            return new GameWorld(gameBoard, terrainTypeList, unitTypeList);
         }
 
-        public static GameWorld Create(int numberOfColumns, int numberOfRows, int[] terrainTypes, List<TerrainType> terrainTypeList, List<UnitType> unitTypeList)
+        public string DoTurnForPlayer()
         {
-            return new GameWorld(numberOfColumns, numberOfRows, terrainTypes, terrainTypeList, unitTypeList);
+            return Player.DoTurn();
         }
 
-        public static GameWorld Create(Map map, List<TerrainType> terrainTypeList, List<UnitType> unitTypeList)
+        public void EndTurnForPlayer()
         {
-            return new GameWorld(map, terrainTypeList, unitTypeList);
+            Player.EndTurn();
+        }
+
+        public void AddUnitForPlayer(int unitType, Point startLocation, GameWorld gameWorld)
+        {
+            Player.AddUnit(unitType, startLocation, gameWorld);
+        }
+
+        public Cell GetCell(Point location)
+        {
+            return GameBoard.GetCell(location);
         }
     }
 }
