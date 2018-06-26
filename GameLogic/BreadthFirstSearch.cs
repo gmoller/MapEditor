@@ -31,12 +31,12 @@ namespace GameLogic
             return array;
         }
 
-        internal static Dictionary<Point, Point?> CalculateCameFrom(Point start, GameWorld gameWorld)
+        internal static Dictionary<Point, Point> CalculateCameFrom(Point start, GameWorld gameWorld)
         {
             Queue<Point> frontier = new Queue<Point>();
             frontier.Enqueue(start);
-            var cameFrom = new Dictionary<Point, Point?>();
-            cameFrom[start] = null;
+            var cameFrom = new Dictionary<Point, Point>();
+            cameFrom[start] = Point.Null;
 
             while (frontier.Count > 0)
             {
@@ -56,7 +56,7 @@ namespace GameLogic
             return cameFrom;
         }
 
-        internal static Point[] GetPath(Point start, Point goal, Dictionary<Point, Point?> cameFrom)
+        internal static Point[] GetPath(Point start, Point goal, Dictionary<Point, Point> cameFrom)
         {
             Point current = goal;
             var path = new List<Point>();

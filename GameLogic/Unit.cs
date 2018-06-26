@@ -58,8 +58,8 @@ namespace GameLogic
         public Unit Explore()
         {
             // find closest non-visible cell
-            Dictionary<Point, Point?> cameFrom = BreadthFirstSearch.CalculateCameFrom(Location, _gameWorld);
-            Point closest = FindClosestNonVisibleCell(Location, cameFrom, _gameWorld);
+            Dictionary<Point, Point> cameFrom = BreadthFirstSearch.CalculateCameFrom(Location, _gameWorld);
+            Point closest = FindClosestNonVisibleCell(cameFrom, _gameWorld);
 
             if (closest != Point.Null)
             {
@@ -78,7 +78,7 @@ namespace GameLogic
             return this;
         }
 
-        private Point FindClosestNonVisibleCell(Point location, Dictionary<Point, Point?> cameFrom, GameWorld gameWorld)
+        private Point FindClosestNonVisibleCell(Dictionary<Point, Point> cameFrom, GameWorld gameWorld)
         {
             foreach (Point item in cameFrom.Keys)
             {
