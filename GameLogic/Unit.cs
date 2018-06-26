@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using GameLogic.NewLocationCalculators;
 using GameLogic.Processors;
 
@@ -31,6 +32,7 @@ namespace GameLogic
         {
             float movementPoints = gameWorld.UnitTypes[unitType].Moves;
             var unit = new Unit(unitType, location, movementPoints, gameWorld);
+            CellVisibilitySetter.SetCellVisibility(unit.Location, gameWorld);
 
             return unit;
         }
@@ -48,8 +50,46 @@ namespace GameLogic
             ProcessResponse response = movementProcessor.Process(new ProcessRequest(Location, MovementPoints), newLocationCalculator);
 
             Unit unit = Create(UnitType, response.NewLocation, response.NewMovementPoints, _gameWorld);
+            CellVisibilitySetter.SetCellVisibility(unit.Location, _gameWorld);
 
             return unit;
+        }
+
+        public Unit Explore()
+        {
+            // find closest non-visible cell
+            Dictionary<Point, Point?> cameFrom = BreadthFirstSearch.CalculateCameFrom(Location, _gameWorld);
+            Point closest = FindClosestNonVisibleCell(Location, cameFrom, _gameWorld);
+
+            if (closest != Point.Null)
+            {
+                Point[] path = BreadthFirstSearch.GetPath(Location, closest, cameFrom);
+
+                // move towards there
+                if (path.Length > 0)
+                {
+                    Unit unit = Create(UnitType, path[0], MovementPoints - 1, _gameWorld);
+                    CellVisibilitySetter.SetCellVisibility(unit.Location, _gameWorld);
+
+                    return unit;
+                }
+            }
+
+            return this;
+        }
+
+        private Point FindClosestNonVisibleCell(Point location, Dictionary<Point, Point?> cameFrom, GameWorld gameWorld)
+        {
+            foreach (Point item in cameFrom.Keys)
+            {
+                if (!gameWorld.IsCellVisible(item))
+                {
+                    // the location to move towards
+                    return item;
+                }
+            }
+
+            return Point.Null;
         }
 
         public void FoundCity()

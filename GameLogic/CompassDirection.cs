@@ -9,6 +9,7 @@
         South,
         SouthWest,
         West,
-        NorthWest
+        NorthWest,
+        Direct
     }
 }

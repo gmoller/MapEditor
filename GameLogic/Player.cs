@@ -50,17 +50,18 @@ namespace GameLogic
                 //if (num > 7) continue; // do nothing
 
                 // do it
-                if (num == 0 || num == 2 || num == 4 || num == 6)
+                //if (num == 0 || num == 2 || num == 4 || num == 6)
                 {
-                    Unit unit = item.Move(_movementProcessor, (CompassDirection) num);
+                    //Unit unit = item.Move(_movementProcessor, (CompassDirection) num);
+                    Unit unit = item.Explore();
                     units.Add(unit);
                     result = $"{item.ToString()} -> {unit.ToString()}";
                 }
-                else
-                {
-                    units.Add(item);
-                    result = "Nothing";
-                }
+                //else
+                //{
+                //    units.Add(item);
+                //    result = "Nothing";
+                //}
             }
 
             _units = units;

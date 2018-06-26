@@ -7,7 +7,7 @@ namespace GameLogic
         public static GameBoard Load(string filename)
         {
             byte[] bytes = File.ReadAllBytes(filename);
-            var gameBoard = new GameBoard(0, 0, 0);
+            GameBoard gameBoard = GameBoard.Create(0, 0, 0);
             gameBoard.SetState(bytes);
 
             return gameBoard;
@@ -15,7 +15,7 @@ namespace GameLogic
 
         public static GameBoard Load(int numberOfColumns, int numberOfRows)
         {
-            var gameBoard = new GameBoard(1, numberOfColumns, numberOfRows);
+            GameBoard gameBoard = GameBoard.Create(1, numberOfColumns, numberOfRows);
 
             return gameBoard;
         }

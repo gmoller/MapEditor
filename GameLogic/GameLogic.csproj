@@ -34,7 +34,9 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BreadthFirstSearch.cs" />
     <Compile Include="Cell.cs" />
+    <Compile Include="CellVisibiltySetter.cs" />
     <Compile Include="City.cs" />
     <Compile Include="CompassDirection.cs" />
     <Compile Include="GameBoard.cs" />

@@ -50,6 +50,7 @@ namespace WinFormsGui
             _gameWorld.AddUnitForPlayer(4, GameLogic.Point.Create(2, 3), _gameWorld);
 
             // Start timer
+            timer1.Interval = 1;
             timer1.Start();
         }
 
@@ -137,11 +138,21 @@ namespace WinFormsGui
                 for (int colIndex = 0; colIndex < _gameWorld.GameBoard.NumberOfColumns; ++colIndex)
                 {
                     var rectangle = new Rectangle(x, y, CellWidth, CellHeight);
+
+                    GameLogic.Point p = GameLogic.Point.Create(colIndex, rowIndex);
+                    Cell cell = _gameWorld.GetCell(p);
+                    if (_gameWorld.IsCellVisible(p))
+                    {
+                        _graphicsBuffer.DrawText(rectangle, $"{cell.TerrainTypeId}", Font, Color.BlueViolet,
+                            Color.Transparent, Color.Transparent, TextFormatFlags.Left | TextFormatFlags.Bottom);
+                    }
+                    else
+                    {
+                        _graphicsBuffer.FillRectangle(rectangle, Color.Black);
+                    }
+
                     _graphicsBuffer.DrawRectangle(rectangle, Color.LightBlue);
                     _graphicsBuffer.DrawText(rectangle, $"{colIndex};{rowIndex}", Font, Color.Chartreuse, Color.Transparent, Color.Transparent, TextFormatFlags.Right);
-
-                    Cell cell = _gameWorld.GameBoard.GetCell(GameLogic.Point.Create(colIndex, rowIndex));
-                    _graphicsBuffer.DrawText(rectangle, $"{cell.TerrainTypeId}", Font, Color.BlueViolet, Color.Transparent, Color.Transparent, TextFormatFlags.Left | TextFormatFlags.Bottom);
 
                     x += CellWidth;
                 }

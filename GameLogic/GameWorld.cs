@@ -11,8 +11,8 @@ namespace GameLogic
         private Player Player { get; }
 
         public GameBoard GameBoard { get; }
-        public TerrainTypes TerrainTypes { get; }
-        public UnitTypes UnitTypes { get; }
+        internal TerrainTypes TerrainTypes { get; }
+        internal UnitTypes UnitTypes { get; }
         public IEnumerable<Unit> PlayerUnits => Player.Units;
 
         private GameWorld(GameBoard map, List<TerrainType> terrainTypeList, List<UnitType> unitTypeList)
@@ -46,6 +46,24 @@ namespace GameLogic
         public Cell GetCell(Point location)
         {
             return GameBoard.GetCell(location);
+        }
+
+        internal List<Point> GetCellNeighbors(Point location)
+        {
+            return GameBoard.GetCellNeighbors(location);
+        }
+
+        public bool IsCellVisible(Point location)
+        {
+            return GameBoard.IsCellVisible(location);
+        }
+
+        internal void SetCellVisible(Point location)
+        {
+            if (location.X < 0 || location.X > 31) return;
+            if (location.Y < 0 || location.Y > 31) return;
+
+            GameBoard.SetCellVisible(location);
         }
     }
 }
