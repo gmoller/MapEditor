@@ -65,5 +65,10 @@ namespace GameLogic
 
             GameBoard.SetCellVisible(location);
         }
+
+        internal void SetAllCellsInvisible()
+        {
+            GameBoard.SetAllCellsInvisible();
+        }
     }
 }

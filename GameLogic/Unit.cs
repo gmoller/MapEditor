@@ -61,7 +61,12 @@ namespace GameLogic
             Dictionary<Point, Point> cameFrom = BreadthFirstSearch.CalculateCameFrom(Location, _gameWorld);
             Point closest = FindClosestNonVisibleCell(cameFrom, _gameWorld);
 
-            if (closest != Point.Null)
+            if (closest == Point.Null)
+            {
+                CellVisibilitySetter.SetAllCellsInvisible(_gameWorld);
+                CellVisibilitySetter.SetCellVisibility(Location, _gameWorld);
+            }
+            else
             {
                 Point[] path = BreadthFirstSearch.GetPath(Location, closest, cameFrom);
 

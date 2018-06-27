@@ -9,7 +9,7 @@ namespace GameLogic
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
     public class GameBoard
     {
-        private Random _random = new Random();
+        private readonly Random _random = new Random();
 
         private Cell[,,] _cells; // layer-z, column-x, row-y
         private bool[,] _isVisible;
@@ -96,14 +96,6 @@ namespace GameLogic
                 return Cell.Null;
             }
 
-            //if (location.X < 0 ||
-            //    location.Y < 0 ||
-            //    location.X > NumberOfColumns - 1 ||
-            //    location.Y > NumberOfRows - 1)
-            //{
-            //    return Cell.Null;
-            //}
-
             return _cells[0, location.X, location.Y];
         }
 
@@ -128,60 +120,37 @@ namespace GameLogic
             Point c = Point.Create(location.X, location.Y - 1); // south
             Point d = Point.Create(location.X + 1, location.Y); // east
 
-            int i = _random.Next(1, 25);
-            if (i == 1)
-                AddCellsIfItsOnBoard(neighbors, a, b, c, d);
-            else if (i == 2)
-                AddCellsIfItsOnBoard(neighbors, a, b, d, c);
-            else if (i == 3)
-                AddCellsIfItsOnBoard(neighbors, a, c, b, d);
-            else if (i == 4)
-                AddCellsIfItsOnBoard(neighbors, a, c, d, b);
-            else if (i == 5)
-                AddCellsIfItsOnBoard(neighbors, a, d, b, c);
-            else if (i == 6)
-                AddCellsIfItsOnBoard(neighbors, a, d, c, b);
-            else if (i == 7)
-                AddCellsIfItsOnBoard(neighbors, b, a, c, d);
-            else if (i == 8)
-                AddCellsIfItsOnBoard(neighbors, b, a, d, c);
-            else if (i == 9)
-                AddCellsIfItsOnBoard(neighbors, b, c, a, d);
-            else if (i == 10)
-                AddCellsIfItsOnBoard(neighbors, b, c, d, a);
-            else if (i == 11)
-                AddCellsIfItsOnBoard(neighbors, b, d, a, c);
-            else if (i == 12)
-                AddCellsIfItsOnBoard(neighbors, b, d, c, a);
-            else if (i == 13)
-                AddCellsIfItsOnBoard(neighbors, c, a, b, d);
-            else if (i == 14)
-                AddCellsIfItsOnBoard(neighbors, c, a, d, b);
-            else if (i == 15)
-                AddCellsIfItsOnBoard(neighbors, c, b, a, d);
-            else if (i == 16)
-                AddCellsIfItsOnBoard(neighbors, c, b, d, a);
-            else if (i == 17)
-                AddCellsIfItsOnBoard(neighbors, c, d, a, b);
-            else if (i == 18)
-                AddCellsIfItsOnBoard(neighbors, c, d, b, a);
-            else if (i == 19)
-                AddCellsIfItsOnBoard(neighbors, d, a, b, c);
-            else if (i == 20)
-                AddCellsIfItsOnBoard(neighbors, d, a, c, b);
-            else if (i == 21)
-                AddCellsIfItsOnBoard(neighbors, d, b, a, c);
-            else if (i == 22)
-                AddCellsIfItsOnBoard(neighbors, d, b, c, a);
-            else if (i == 23)
-                AddCellsIfItsOnBoard(neighbors, d, c, a, b);
-            else if (i == 24)
-                AddCellsIfItsOnBoard(neighbors, d, c, b, a);
+            var dic = new Dictionary<int, Point[]>
+            {
+                {1, new[] {a, b, c, d}},
+                {2, new[] {a, b, d, c}},
+                {3, new[] {a, c, b, d}},
+                {4, new[] {a, c, d, b}},
+                {5, new[] {a, d, b, c}},
+                {6, new[] {a, d, c, b}},
+                {7, new[] {b, a, c, d}},
+                {8, new[] {b, a, d, c}},
+                {9, new[] {b, c, a, d}},
+                {10, new[] {b, c, d, a}},
+                {11, new[] {b, d, a, c}},
+                {12, new[] {b, d, c, a}},
+                {13, new[] {c, a, b, d}},
+                {14, new[] {c, a, d, b}},
+                {15, new[] {c, b, a, d}},
+                {16, new[] {c, b, d, a}},
+                {17, new[] {c, d, a, b}},
+                {18, new[] {c, d, b, a}},
+                {19, new[] {d, a, b, c}},
+                {20, new[] {d, a, c, b}},
+                {21, new[] {d, b, a, c}},
+                {22, new[] {d, b, c, a}},
+                {23, new[] {d, c, a, b}},
+                {24, new[] {d, c, b, a}}
+            };
 
-            //AddCellIfItsOnBoard(a, neighbors);
-            //AddCellIfItsOnBoard(b, neighbors);
-            //AddCellIfItsOnBoard(c, neighbors);
-            //AddCellIfItsOnBoard(d, neighbors);
+            int i = _random.Next(1, 25);
+            Point[] points = dic[i];
+            AddCellsIfItsOnBoard(neighbors, points);
 
             return neighbors;
         }
@@ -196,14 +165,6 @@ namespace GameLogic
             }
         }
 
-        private void AddCellIfItsOnBoard(Point p, List<Point> neighbors)
-        {
-            if (IsCellOnBoard(p))
-            {
-                neighbors.Add(p);
-            }
-        }
-
         internal bool IsCellVisible(Point location)
         {
             return _isVisible[location.X, location.Y];
@@ -212,6 +173,11 @@ namespace GameLogic
         internal void SetCellVisible(Point location)
         {
             _isVisible[location.X, location.Y] = true;
+        }
+
+        internal void SetAllCellsInvisible()
+        {
+            _isVisible = new bool[NumberOfColumns, NumberOfRows];
         }
 
         private string DebuggerDisplay => $"{{NumberOfLayers={NumberOfLayers}, NumberOfColumns={NumberOfColumns}, NumberOfRows={NumberOfRows}}}";

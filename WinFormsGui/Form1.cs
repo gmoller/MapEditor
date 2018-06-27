@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using GameLogic;
@@ -10,8 +11,8 @@ namespace WinFormsGui
 {
     public partial class Form1 : Form
     {
-        private const int CellWidth = 20;
-        private const int CellHeight = 20;
+        private const int CellWidth = 25;
+        private const int CellHeight = 25;
 
         private GameWorld _gameWorld;
         private int _turn;
@@ -23,6 +24,11 @@ namespace WinFormsGui
 
         private BufferedGraphics _bufferedGraphics;
         private Graphics _graphicsBuffer;
+
+        private readonly Stopwatch _stopwatch = new Stopwatch();
+        private Images _images;
+
+        private bool _showGrid = true;
 
         public Form1()
         {
@@ -41,6 +47,8 @@ namespace WinFormsGui
                 string text = $"{terrainType.Id} - {terrainType.Name}";
                 _texts.Add(text);
             }
+
+            _images = new Images();
 
             // Create gameboard
             GameBoard testMap = GameBoardLoader.Load("Map.txt");
@@ -66,21 +74,25 @@ namespace WinFormsGui
 
             //int height = 200;
             //_panelEventsBar = new Panel(_graphicsBuffer, 0 + margin, ClientRectangle.Height - height - margin, ClientRectangle.Width - margin * 2 - 100 - margin, height, Color.LightGray);
-            width = 400;
+            width = 200;
             _panelEventsBar = new Panel(_graphicsBuffer, ClientRectangle.Width - width - margin - 100 - margin, 0 + margin, width, ClientRectangle.Height - margin * 2, Color.LightGray); // 100 is width of statusbar
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            //string result = _gameWorld.Player.DoTurn();
+            _stopwatch.Restart();
             string result = _gameWorld.DoTurnForPlayer();
-            _events.Add($"Turn {_turn + 1}: {result}");
             _gameWorld.EndTurnForPlayer();
+            _stopwatch.Stop();
+            //_events.Add($"Turn {_turn + 1}: {result}");
+            _events.Add($"Time taken: {_stopwatch.ElapsedMilliseconds} ms.");
+
             RenderScreen();
         }
 
         private void RenderScreen()
         {
+            _stopwatch.Restart();
             _turn++;
 
             ClearScreen();
@@ -90,6 +102,9 @@ namespace WinFormsGui
             DrawUnits();
 
             FlipBuffer();
+            _stopwatch.Stop();
+
+            Text = $@"Time taken: {_stopwatch.ElapsedMilliseconds} ms.";
         }
 
         private void ClearScreen()
@@ -131,6 +146,7 @@ namespace WinFormsGui
 
         private void DrawBoard()
         {
+            Rectangle sourceRectangle = _images.GetImageSize();
             int x = 0;
             int y = 0;
             for (int rowIndex = _gameWorld.GameBoard.NumberOfRows - 1; rowIndex >= 0; --rowIndex)
@@ -143,16 +159,21 @@ namespace WinFormsGui
                     Cell cell = _gameWorld.GetCell(p);
                     if (_gameWorld.IsCellVisible(p))
                     {
-                        _graphicsBuffer.DrawText(rectangle, $"{cell.TerrainTypeId}", Font, Color.BlueViolet,
-                            Color.Transparent, Color.Transparent, TextFormatFlags.Left | TextFormatFlags.Bottom);
+                        //_graphicsBuffer.DrawText(rectangle, $"{cell.TerrainTypeId}", Font, Color.BlueViolet,
+                        //    Color.Transparent, Color.Transparent, TextFormatFlags.Left | TextFormatFlags.Bottom);
+                        _graphicsBuffer.DrawImage(_images.GetImage(cell.TerrainTypeId), rectangle, sourceRectangle, GraphicsUnit.Pixel); // GraphicsUnit.Document looks kind of nice
+
                     }
                     else
                     {
                         _graphicsBuffer.FillRectangle(rectangle, Color.Black);
                     }
 
-                    _graphicsBuffer.DrawRectangle(rectangle, Color.LightBlue);
-                    _graphicsBuffer.DrawText(rectangle, $"{colIndex};{rowIndex}", Font, Color.Chartreuse, Color.Transparent, Color.Transparent, TextFormatFlags.Right);
+                    if (_showGrid)
+                    {
+                        _graphicsBuffer.DrawRectangle(rectangle, Color.DimGray);
+                        //_graphicsBuffer.DrawText(rectangle, $"{colIndex};{rowIndex}", Font, Color.Chartreuse, Color.Transparent, Color.Transparent, TextFormatFlags.Right);
+                    }
 
                     x += CellWidth;
                 }
@@ -176,6 +197,55 @@ namespace WinFormsGui
         private void FlipBuffer()
         {
             _bufferedGraphics.Render();
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.Escape)
+            {
+                Close();
+                return true;
+            }
+
+            if (keyData == Keys.F1)
+            {
+                _showGrid = !_showGrid;
+                return true;
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+    }
+
+    public class Images
+    {
+        private readonly Dictionary<int, Image> _dictionary;
+
+        public Images()
+        {
+            _dictionary = new Dictionary<int, Image>();
+
+            AddImage(0, "00-plains_1.png");
+            AddImage(1, "01-conifer_forest_inner.png");
+            AddImage(6, "06-hills_inner_1.png");
+            AddImage(7, "07-mountains_inner.png");
+            AddImage(11, "11-ocean_inner.png");
+        }
+
+        private void AddImage(int index, string filename)
+        {
+            Image image = Image.FromFile($"Images/{filename}");
+            _dictionary.Add(index, image);
+        }
+
+        internal Image GetImage(int imageId)
+        {
+            return _dictionary[imageId];
+        }
+
+        internal Rectangle GetImageSize()
+        {
+            return new Rectangle(0, 0, 64, 64);
         }
     }
 }
