@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="GameBoardTests.cs" />
     <Compile Include="MovementProcessorTests.cs" />
+    <Compile Include="NoiseTests.cs" />
     <Compile Include="PointTests.cs" />
     <Compile Include="Tests.cs" />
     <Compile Include="UnitTests.cs" />
@@ -62,6 +63,10 @@
     <ProjectReference Include="..\GameLogic\GameLogic.csproj">
       <Project>{1364bc83-91e5-47b7-8e43-4346ff978fc0}</Project>
       <Name>GameLogic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noise\Noise.csproj">
+      <Project>{aec160e5-c4db-4b2c-a16c-edeb6b1bd2c4}</Project>
+      <Name>Noise</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

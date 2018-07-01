@@ -6,6 +6,7 @@ namespace GameLogic
 {
     public class Player
     {
+        private readonly GameWorld _gameWorld;
         private List<Unit> _units = new List<Unit>();
         private readonly MovementProcessor _movementProcessor;
 
@@ -13,6 +14,7 @@ namespace GameLogic
 
         public Player(GameWorld gameWorld)
         {
+            _gameWorld = gameWorld;
             _movementProcessor = new MovementProcessor(gameWorld);
         }
 
@@ -32,9 +34,15 @@ namespace GameLogic
             {
                 Unit unit = item.StartNewTurn();
                 units.Add(unit);
+                CellVisibilitySetter.SetCellVisibility(unit.Location, _gameWorld);
             }
 
             _units = units;
+
+            if (_gameWorld.AreAllCellsVisible())
+            {
+                //_gameWorld.SetAllCellsInvisible();
+            }
         }
 
         public string DoTurn()
@@ -53,20 +61,39 @@ namespace GameLogic
                 //if (num == 0 || num == 2 || num == 4 || num == 6)
                 {
                     //Unit unit = item.Move(_movementProcessor, (CompassDirection) num);
-                    Unit unit = item.Explore();
+                    //item.Actions["Move"].Execute(item, gameWorld);
+                    //or perhaps: item.DoAction("Move");
+
+                    Unit unit = Explore(item);
                     units.Add(unit);
-                    result = $"{item.ToString()} -> {unit.ToString()}";
                 }
-                //else
-                //{
-                //    units.Add(item);
-                //    result = "Nothing";
-                //}
             }
 
             _units = units;
 
             return result;
+        }
+
+        private Unit Explore(Unit item)
+        {
+            Point newLocation = item.Explore();
+
+            Cell cell = _gameWorld.GetCell(newLocation);
+            TerrainType terrainType = _gameWorld.TerrainTypes[cell.TerrainTypeId];
+            int movementCost = terrainType.MovementCost;
+
+            if (item.MovementPoints - movementCost >= 0)
+            {
+                Unit unit = Unit.Create(item.UnitType, newLocation, item.MovementPoints - movementCost, _gameWorld);
+                return unit;
+                //result = $"{item.ToString()} -> {unit.ToString()}";
+            }
+            else // can't move, not enough points
+            {
+                // TODO: fix bug where if not enough movement points, unit keeps to trying to move to same spot and gets stuck!
+                return item;
+                //result = "Nothing";
+            }
         }
 
         public bool UnitInCell(int colIndex, int rowIndex)

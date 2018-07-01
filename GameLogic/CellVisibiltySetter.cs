@@ -14,10 +14,5 @@
             gameWorld.SetCellVisible(Point.Create(location.X, location.Y - 1)); // south
             gameWorld.SetCellVisible(Point.Create(location.X + 1, location.Y - 1)); // southeast
         }
-
-        public static void SetAllCellsInvisible(GameWorld gameWorld)
-        {
-            gameWorld.SetAllCellsInvisible();
-        }
     }
 }

@@ -55,32 +55,24 @@ namespace GameLogic
             return unit;
         }
 
-        public Unit Explore()
+        public Point Explore()
         {
             // find closest non-visible cell
             Dictionary<Point, Point> cameFrom = BreadthFirstSearch.CalculateCameFrom(Location, _gameWorld);
             Point closest = FindClosestNonVisibleCell(cameFrom, _gameWorld);
 
-            if (closest == Point.Null)
-            {
-                CellVisibilitySetter.SetAllCellsInvisible(_gameWorld);
-                CellVisibilitySetter.SetCellVisibility(Location, _gameWorld);
-            }
-            else
+            if (closest != Point.Null)
             {
                 Point[] path = BreadthFirstSearch.GetPath(Location, closest, cameFrom);
 
                 // move towards there
                 if (path.Length > 0)
                 {
-                    Unit unit = Create(UnitType, path[0], MovementPoints - 1, _gameWorld);
-                    CellVisibilitySetter.SetCellVisibility(unit.Location, _gameWorld);
-
-                    return unit;
+                    return path[0];
                 }
             }
 
-            return this;
+            return Location;
         }
 
         private Point FindClosestNonVisibleCell(Dictionary<Point, Point> cameFrom, GameWorld gameWorld)

@@ -60,10 +60,16 @@ namespace GameLogic
 
         internal void SetCellVisible(Point location)
         {
-            if (location.X < 0 || location.X > 31) return;
-            if (location.Y < 0 || location.Y > 31) return;
+            
+            if (location.X < 0 || location.X > GameBoard.NumberOfColumns - 1) return; // 31
+            if (location.Y < 0 || location.Y > GameBoard.NumberOfRows - 1) return; // 31
 
             GameBoard.SetCellVisible(location);
+        }
+
+        internal bool AreAllCellsVisible()
+        {
+            return GameBoard.AreAllCellsVisible();
         }
 
         internal void SetAllCellsInvisible()

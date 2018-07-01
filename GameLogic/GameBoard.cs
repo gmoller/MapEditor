@@ -35,9 +35,36 @@ namespace GameLogic
             }
         }
 
+        private GameBoard(int numberOfLayers, int[,] terrain, bool allVisible)
+        {
+            int numberOfColumns = terrain.GetLength(0);
+            int numberOfRows = terrain.GetLength(1);
+
+            _cells = new Cell[numberOfLayers, numberOfColumns, numberOfRows];
+            _isVisible = new bool[numberOfColumns, numberOfRows];
+
+            for (int layer = 0; layer < numberOfLayers; ++layer)
+            {
+                for (int column = 0; column < numberOfColumns; ++column)
+                {
+                    for (int row = 0; row < numberOfRows; ++row)
+                    {
+                        int terrainTypeId = terrain[column, row];
+                        _cells[layer, column, row] = Cell.Create(terrainTypeId);
+                        _isVisible[column, row] = allVisible;
+                    }
+                }
+            }
+        }
+
         internal static GameBoard Create(int numberOfLayers, int numberOfColumns, int numberOfRows)
         {
             return new GameBoard(numberOfLayers, numberOfColumns, numberOfRows);
+        }
+
+        internal static GameBoard Create(int numberOfLayers, int[,] terrain, bool allVisible)
+        {
+            return new GameBoard(numberOfLayers, terrain, allVisible);
         }
 
         internal void SetState(byte[] bytes)
@@ -173,6 +200,22 @@ namespace GameLogic
         internal void SetCellVisible(Point location)
         {
             _isVisible[location.X, location.Y] = true;
+        }
+
+        internal bool AreAllCellsVisible()
+        {
+            for (int column = 0; column < NumberOfColumns; ++column)
+            {
+                for (int row = 0; row < NumberOfRows; ++row)
+                {
+                    if (!_isVisible[column, row])
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         internal void SetAllCellsInvisible()

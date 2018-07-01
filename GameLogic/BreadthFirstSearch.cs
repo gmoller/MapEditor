@@ -7,7 +7,7 @@ namespace GameLogic
     {
         internal static Point[] FloodFill(Point start, GameWorld gameWorld)
         {
-            Queue<Point> frontier = new Queue<Point>();
+            var frontier = new Queue<Point>();
             frontier.Enqueue(start);
             var visited = new Dictionary<Point, bool> { [start] = true };
 
@@ -33,7 +33,7 @@ namespace GameLogic
 
         internal static Dictionary<Point, Point> CalculateCameFrom(Point start, GameWorld gameWorld)
         {
-            Queue<Point> frontier = new Queue<Point>();
+            var frontier = new Queue<Point>();
             frontier.Enqueue(start);
             var cameFrom = new Dictionary<Point, Point>();
             cameFrom[start] = Point.Null;

@@ -4,25 +4,40 @@ namespace WinFormsGui
 {
     public class Panel
     {
+        private readonly BufferedGraphics _bufferedGraphics;
         private readonly Graphics _graphicsBuffer;
+        private readonly Rectangle _drawingArea;
         private readonly Rectangle _rectangle;
         private readonly Color _color;
 
-        public Panel(Graphics graphicsBuffer, int x, int y, int width, int height, Color color)
+        public Panel(Graphics graphics, int x, int y, int width, int height, Color color)
         {
-            _graphicsBuffer = graphicsBuffer;
-            _rectangle = new Rectangle(x, y, width, height);
+            _drawingArea = new Rectangle(x, y, width, height);
+
+            BufferedGraphicsContext currentContext = BufferedGraphicsManager.Current;
+            _bufferedGraphics = currentContext.Allocate(graphics, _drawingArea);
+            _graphicsBuffer = _bufferedGraphics.Graphics;
+
+            _rectangle = new Rectangle(0, 0, width, height);
             _color = color;
         }
 
-        public void DrawPanel()
+        public void Clear()
         {
-            _graphicsBuffer.FillRectangle(_rectangle, _color);
+            _graphicsBuffer.Clear(_color);
         }
 
         public void DrawText(Point location, string text, Font font, Color foreColor, Color backColor, Color borderColor)
         {
-            _graphicsBuffer.DrawText(new Rectangle(_rectangle.X + location.X, _rectangle.Y + location.Y, _rectangle.Width - 1, 13), text, font, foreColor, backColor, borderColor);
+            Rectangle rect = new Rectangle(location.X, location.Y, _drawingArea.Width - 1, 13);
+            _graphicsBuffer.DrawText(rect, text, font, foreColor, backColor, borderColor);
+
+            _graphicsBuffer.DrawRectangle(_drawingArea, Color.Magenta);
+        }
+
+        public void FlipBuffer()
+        {
+            _bufferedGraphics.Render();
         }
     }
 }
