@@ -56,7 +56,7 @@ namespace WinFormsGui
             _gameWorld = GameWorld.Create(testMap, terrainTypes, unitTypes);
 
             // Add unit
-            _gameWorld.AddUnitForPlayer(4, GameLogic.Point.Create(0, 0), _gameWorld); // 2;3
+            _gameWorld.AddUnitForPlayer(4, GameLogic.Point.Create(0, 159), _gameWorld); // 2;3
 
             // Start timer
             timer1.Interval = 1;
@@ -76,7 +76,7 @@ namespace WinFormsGui
             int height = ClientRectangle.Height - margin * 2;
 
             Graphics graphics = CreateGraphics();
-            _map = new Map(graphics, margin, margin, width, height, Color.CornflowerBlue, _gameWorld, _images);
+            _map = new Map(graphics, margin, margin, width, height, Color.Black, _gameWorld, _images);
 
             width = 100;
             _panelStatusBar = new Panel(graphics, ClientRectangle.Width - width - margin, 0 + margin, width, height, Color.LightBlue);
@@ -90,9 +90,11 @@ namespace WinFormsGui
             timer1.Enabled = false;
 
             _stopwatch.Restart();
-            string result = _gameWorld.DoTurnForPlayer();
-            _gameWorld.EndTurnForPlayer();
+            //string result = _gameWorld.DoTurnForPlayer();
+            //_gameWorld.EndTurnForPlayer();
+            //_turn++;
             _stopwatch.Stop();
+
             //_events.Add($"Turn {_turn + 1}: {result}");
             _events.Add($"Time taken: {_stopwatch.ElapsedMilliseconds} ms.");
 
@@ -101,10 +103,16 @@ namespace WinFormsGui
             timer1.Enabled = true;
         }
 
+        private void Tick()
+        {
+            // if state 
+            // if state is <all moves done> do nothing
+            // if state is <end of turn pressed> do next turn
+        }
+
         private void RenderScreen()
         {
             _stopwatch.Restart();
-            _turn++;
 
             ClearScreen();
             DrawStatusBar();
@@ -134,6 +142,21 @@ namespace WinFormsGui
             {
                 _panelStatusBar.DrawText(new Point(0, y), item, Font, Color.AliceBlue, Color.Transparent, Color.Transparent);
                 y += 15;
+            }
+
+            y += 15;
+
+            // unit status
+            Unit unit = _gameWorld.SelectedUnit;
+            if (unit.UnitType == -1)
+            {
+                _panelStatusBar.DrawText(new Point(0, y), "Next Turn", Font, Color.Green, Color.Transparent, Color.Transparent);
+            }
+            else
+            {
+                _panelStatusBar.DrawText(new Point(0, y), $"Unit: {unit.UnitTypeName}", Font, Color.Green, Color.Transparent, Color.Transparent);
+                y += 15;
+                _panelStatusBar.DrawText(new Point(0, y), $"Moves: {unit.MovementPoints}", Font, Color.Green, Color.Transparent, Color.Transparent);
             }
         }
 
@@ -187,29 +210,56 @@ namespace WinFormsGui
 
             if (keyData == Keys.Up)
             {
-                _map.PanUp();
+                _gameWorld.KeyPressed(true, false, false, false, false);
+
                 return true;
             }
 
             if (keyData == Keys.Down)
             {
-                _map.PanDown();
-                return true;
-            }
-
-            if (keyData == Keys.Right)
-            {
-                _map.PanRight();
+                _gameWorld.KeyPressed(false, true, false, false, false);
                 return true;
             }
 
             if (keyData == Keys.Left)
             {
-                _map.PanLeft();
+                _gameWorld.KeyPressed(false, false, true, false, false);
                 return true;
             }
 
+            if (keyData == Keys.Right)
+            {
+                _gameWorld.KeyPressed(false, false, false, true, false);
+                return true;
+            }
+
+            if (keyData == Keys.Enter)
+            {
+                _gameWorld.KeyPressed(false, false, false, false, true);
+            }
+
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void Form1_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                // did we click on the map?
+                if (e.Location.X < 5 || e.Location.X > _map.Width + 5) return; // clicked off the map
+                if (e.Location.Y < 5 || e.Location.Y > _map.Height + 5) return; // clicked off the map
+
+                // figure out screen cell
+                int screenColumn = (e.Location.X - 5) / 20;
+                int screenRow = (e.Location.Y - 5) / 20;
+
+                // convert to world cell
+                int worldColumn = _map.ConvertScreenColumnToWorldColumn(screenColumn);
+                int worldRow = _map.ConvertScreenRowToWorldRow(screenRow);
+
+                // and finally center
+                _map.CenterOnCell(worldColumn, worldRow);
+            }
         }
     }
 

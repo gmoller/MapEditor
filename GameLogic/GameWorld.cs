@@ -14,6 +14,7 @@ namespace GameLogic
         internal TerrainTypes TerrainTypes { get; }
         internal UnitTypes UnitTypes { get; }
         public IEnumerable<Unit> PlayerUnits => Player.Units;
+        public Unit SelectedUnit => Player.SelectedUnit;
 
         private GameWorld(GameBoard map, List<TerrainType> terrainTypeList, List<UnitType> unitTypeList)
         {
@@ -26,6 +27,11 @@ namespace GameLogic
         public static GameWorld Create(GameBoard gameBoard, List<TerrainType> terrainTypeList, List<UnitType> unitTypeList)
         {
             return new GameWorld(gameBoard, terrainTypeList, unitTypeList);
+        }
+
+        public void KeyPressed(bool up, bool down, bool left, bool right, bool enter)
+        {
+            Player.KeyPressed(up, down, left, right, enter);
         }
 
         public string DoTurnForPlayer()

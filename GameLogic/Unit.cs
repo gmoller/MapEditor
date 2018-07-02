@@ -20,6 +20,17 @@ namespace GameLogic
         public Point Location { get; }
         public float MovementPoints { get; }
 
+        public string UnitTypeName
+        {
+            get
+            {
+                if (UnitType == -1) return "Null";
+                return _gameWorld.UnitTypes[UnitType].Name;
+            }
+        }
+
+        public static readonly Unit Null = new Unit(-1, Point.Null, 0.0f, null);
+
         private Unit(int unitType, Point location, float movementPoints, GameWorld gameWorld)
         {
             _gameWorld = gameWorld;
@@ -108,6 +119,17 @@ namespace GameLogic
             return DebuggerDisplay;
         }
 
-        private string DebuggerDisplay => $"{{UnitType={_gameWorld.UnitTypes[UnitType].Name},Location={Location},MovementPoints={MovementPoints}/{_gameWorld.UnitTypes[UnitType].Moves}}}";
+        private string DebuggerDisplay
+        {
+            get
+            {
+                if (UnitType == -1)
+                {
+                    return "NullUnit";
+                }
+
+                return $"{{UnitType={_gameWorld.UnitTypes[UnitType].Name},Location={Location},MovementPoints={MovementPoints}/{_gameWorld.UnitTypes[UnitType].Moves}}}";
+            }
+        }
     }
 }

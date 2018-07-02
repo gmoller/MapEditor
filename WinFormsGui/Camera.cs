@@ -4,33 +4,43 @@ namespace WinFormsGui
 {
     public class Camera
     {
-        private const int Step = 20;
+        private readonly int _cellWidth;
+        private readonly int _cellHeight;
 
         public Rectangle VisibleRectangle { get; private set; }
 
-        public Camera(Rectangle rectangle)
+        public Camera(Rectangle rectangle, int cellWidth, int cellHeight)
         {
+            _cellWidth = cellWidth;
+            _cellHeight = cellHeight;
             VisibleRectangle = rectangle;
         }
 
-        public void PanUp()
+        public void CenterOnCell(int column, int row)
         {
-            VisibleRectangle = new Rectangle(VisibleRectangle.X, VisibleRectangle.Y - Step, VisibleRectangle.Width, VisibleRectangle.Height);
+            int left = (column - 24) * _cellWidth; // TODO: remove magic number 24
+            int top = (row - 21) * _cellHeight; // TODO: remove magic number 21
+            VisibleRectangle = new Rectangle(left, top, VisibleRectangle.Width, VisibleRectangle.Height);
         }
 
-        public void PanDown()
-        {
-            VisibleRectangle = new Rectangle(VisibleRectangle.X, VisibleRectangle.Y + Step, VisibleRectangle.Width, VisibleRectangle.Height);
-        }
+        //public void PanUp()
+        //{
+        //    VisibleRectangle = new Rectangle(VisibleRectangle.X, VisibleRectangle.Y - Step, VisibleRectangle.Width, VisibleRectangle.Height);
+        //}
 
-        public void PanRight()
-        {
-            VisibleRectangle = new Rectangle(VisibleRectangle.X + Step, VisibleRectangle.Y, VisibleRectangle.Width, VisibleRectangle.Height);
-        }
+        //public void PanDown()
+        //{
+        //    VisibleRectangle = new Rectangle(VisibleRectangle.X, VisibleRectangle.Y + Step, VisibleRectangle.Width, VisibleRectangle.Height);
+        //}
 
-        public void PanLeft()
-        {
-            VisibleRectangle = new Rectangle(VisibleRectangle.X - Step, VisibleRectangle.Y, VisibleRectangle.Width, VisibleRectangle.Height);
-        }
+        //public void PanRight()
+        //{
+        //    VisibleRectangle = new Rectangle(VisibleRectangle.X + Step, VisibleRectangle.Y, VisibleRectangle.Width, VisibleRectangle.Height);
+        //}
+
+        //public void PanLeft()
+        //{
+        //    VisibleRectangle = new Rectangle(VisibleRectangle.X - Step, VisibleRectangle.Y, VisibleRectangle.Width, VisibleRectangle.Height);
+        //}
     }
 }

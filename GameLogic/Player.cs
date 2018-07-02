@@ -8,6 +8,8 @@ namespace GameLogic
     {
         private readonly GameWorld _gameWorld;
         private List<Unit> _units = new List<Unit>();
+        private int _selectedUnitIndex = -1;
+
         private readonly MovementProcessor _movementProcessor;
 
         private readonly Random _random = new Random();
@@ -19,11 +21,96 @@ namespace GameLogic
         }
 
         public IEnumerable<Unit> Units => _units;
+        public Unit SelectedUnit
+        {
+            get
+            {
+                if (_selectedUnitIndex == -1)
+                {
+                    return Unit.Null;
+                }
+
+                return _units[_selectedUnitIndex];
+            }
+        }
+
+        public void KeyPressed(bool up, bool down, bool left, bool right, bool enter)
+        {
+            if (_selectedUnitIndex == -1)
+            {
+                if (enter)
+                {
+                    EndTurn();
+                }
+                return;
+            }
+
+            if (up)
+            {
+                Unit unit = _units[_selectedUnitIndex].Move(_movementProcessor, CompassDirection.North);
+                _units[_selectedUnitIndex] = unit;
+
+                if (unit.MovementPoints <= 0)
+                {
+                    _selectedUnitIndex++;
+                    if (_selectedUnitIndex > _units.Count - 1)
+                    {
+                        _selectedUnitIndex = -1;
+                    }
+                }
+            }
+
+            if (down)
+            {
+                Unit unit = _units[_selectedUnitIndex].Move(_movementProcessor, CompassDirection.South);
+                _units[_selectedUnitIndex] = unit;
+
+                if (unit.MovementPoints <= 0)
+                {
+                    _selectedUnitIndex++;
+                    if (_selectedUnitIndex > _units.Count - 1)
+                    {
+                        _selectedUnitIndex = -1;
+                    }
+                }
+            }
+
+            if (left)
+            {
+                Unit unit = _units[_selectedUnitIndex].Move(_movementProcessor, CompassDirection.West);
+                _units[_selectedUnitIndex] = unit;
+
+                if (unit.MovementPoints <= 0)
+                {
+                    _selectedUnitIndex++;
+                    if (_selectedUnitIndex > _units.Count - 1)
+                    {
+                        _selectedUnitIndex = -1;
+                    }
+                }
+            }
+
+            if (right)
+            {
+                Unit unit = _units[_selectedUnitIndex].Move(_movementProcessor, CompassDirection.East);
+                _units[_selectedUnitIndex] = unit;
+
+                if (unit.MovementPoints <= 0)
+                {
+                    _selectedUnitIndex++;
+                    if (_selectedUnitIndex > _units.Count - 1)
+                    {
+                        _selectedUnitIndex = -1;
+                    }
+                }
+            }
+        }
 
         public void AddUnit(int unitType, Point startLocation, GameWorld gameWorld)
         {
             Unit unit = Unit.CreateNew(unitType, startLocation, gameWorld);
             _units.Add(unit);
+            _selectedUnitIndex = _units.Count - 1;
         }
 
         public void EndTurn()
@@ -43,6 +130,8 @@ namespace GameLogic
             {
                 //_gameWorld.SetAllCellsInvisible();
             }
+
+            _selectedUnitIndex = 0;
         }
 
         public string DoTurn()

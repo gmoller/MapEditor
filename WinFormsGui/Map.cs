@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 using GameLogic;
 
@@ -19,6 +20,9 @@ namespace WinFormsGui
 
         private readonly Camera _camera;
 
+        public int Width => _drawingArea.Width;
+        public int Height => _drawingArea.Height;
+
         public Map(Graphics graphics, int x, int y, int width, int height, Color color, GameWorld gameWorld, Images images)
         {
             _gameWorld = gameWorld;
@@ -30,29 +34,50 @@ namespace WinFormsGui
             _bufferedGraphics = currentContext.Allocate(graphics, _drawingArea);
             _graphicsBuffer = _bufferedGraphics.Graphics;
 
-            _camera = new Camera(new Rectangle(0, 0, width, height));
+            _camera = new Camera(new Rectangle(0, 0, width, height), CellWidth, CellHeight);
             _color = color;
         }
 
-        public void PanUp()
+        internal int ConvertScreenColumnToWorldColumn(int screenColumn)
         {
-            _camera.PanUp();
+            int temp1 = _camera.VisibleRectangle.X - _drawingArea.X + 5;
+            int temp2 = temp1 / CellWidth;
+
+            return temp2 + screenColumn;
         }
 
-        public void PanDown()
+        internal int ConvertScreenRowToWorldRow(int screenRow)
         {
-            _camera.PanDown();
+            int temp1 = _camera.VisibleRectangle.Y - _drawingArea.Y + 5;
+            int temp2 = temp1 / CellHeight;
+
+            return temp2 + screenRow;
         }
 
-        public void PanRight()
+        public void CenterOnCell(int x, int y)
         {
-            _camera.PanRight();
+            _camera.CenterOnCell(x, y);
         }
 
-        public void PanLeft()
-        {
-            _camera.PanLeft();
-        }
+        //public void PanUp()
+        //{
+        //    _camera.PanUp();
+        //}
+
+        //public void PanDown()
+        //{
+        //    _camera.PanDown();
+        //}
+
+        //public void PanRight()
+        //{
+        //    _camera.PanRight();
+        //}
+
+        //public void PanLeft()
+        //{
+        //    _camera.PanLeft();
+        //}
 
         public void Clear()
         {
