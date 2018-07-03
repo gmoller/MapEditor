@@ -5,6 +5,22 @@ namespace WinFormsGui
 {
     public static class GraphicsExtensions
     {
+        public static void DrawEllipse(this Graphics graphics, Rectangle rectangle, Color color)
+        {
+            using (var pen = new Pen(color))
+            {
+                graphics.DrawEllipse(pen, rectangle);
+            }
+        }
+
+        public static void DrawCircle(this Graphics graphics, Point center, float radius, Color color)
+        {
+            using (var pen = new Pen(color))
+            {
+                graphics.DrawEllipse(pen, center.X - radius, center.Y - radius, radius * 2, radius * 2);
+            }
+        }
+
         public static void DrawRectangle(this Graphics graphics, Rectangle rectangle, Color color)
         {
             using (var pen = new Pen(color))

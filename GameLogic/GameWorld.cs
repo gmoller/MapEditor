@@ -15,6 +15,8 @@ namespace GameLogic
         internal UnitTypes UnitTypes { get; }
         public IEnumerable<Unit> PlayerUnits => Player.Units;
         public Unit SelectedUnit => Player.SelectedUnit;
+        public int NumberOfColumns => GameBoard.NumberOfColumns;
+        public int NumberOfRows => GameBoard.NumberOfRows;
 
         private GameWorld(GameBoard map, List<TerrainType> terrainTypeList, List<UnitType> unitTypeList)
         {

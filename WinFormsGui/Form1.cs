@@ -254,11 +254,11 @@ namespace WinFormsGui
                 int screenRow = (e.Location.Y - 5) / 20;
 
                 // convert to world cell
-                int worldColumn = _map.ConvertScreenColumnToWorldColumn(screenColumn);
-                int worldRow = _map.ConvertScreenRowToWorldRow(screenRow);
+                Point viewCell = new Point(screenColumn, screenRow);
+                Point worldCell = _map.ConvertViewToWorld(viewCell);
 
                 // and finally center
-                _map.CenterOnCell(worldColumn, worldRow);
+                _map.CenterOnCell(worldCell);
             }
         }
     }

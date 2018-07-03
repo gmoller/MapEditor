@@ -12,4 +12,18 @@
         NorthWest,
         Direct
     }
+
+    public enum MovementType
+    {
+        None,
+        Ground
+    }
+
+    public enum MyKeys
+    {
+        Up,
+        Down,
+        Left,
+        Right
+    }
 }

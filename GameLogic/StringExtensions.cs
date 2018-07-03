@@ -17,5 +17,10 @@ namespace GameLogic
                 throw new Exception($"Failed to convert string [{s}] to Int32.", ex);
             }
         }
+
+        public static T ToEnum<T>(this string value, bool ignoreCase = true)
+        {
+            return (T)Enum.Parse(typeof(T), value, ignoreCase);
+        }
     }
 }

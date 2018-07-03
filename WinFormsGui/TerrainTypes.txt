@@ -5,9 +5,10 @@
 3,Swamp,3
 4,River,2
 5,River Mouth,2
-6,Hills,3
+6,Hill,3
 7,Mountain,4
 8,Volcano,4
 9,Tundra,2
 10,Shore,-1
 11,Ocean,-1
+12,SorceryNode,1

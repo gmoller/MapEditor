@@ -18,7 +18,8 @@ namespace GameLogic.Loaders
                 int id = splitLine[0].ToInt32();
                 string name = splitLine[1];
                 int moves = splitLine[2].ToInt32();
-                UnitType unitType = UnitType.Create(id, name, moves);
+                string movementType = splitLine[3];
+                UnitType unitType = UnitType.Create(id, name, moves, movementType.ToEnum<MovementType>());
                 unitTypes.Add(unitType);
             }
 

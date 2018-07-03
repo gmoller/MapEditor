@@ -34,10 +34,10 @@ namespace GameLogic.Processors
         public ProcessResponse Process(ProcessRequest request, INewLocationCalculator newLocationCalculator)
         {
             Point newLocation = DetermineNewPosition(request.Location, newLocationCalculator);
-            float movementCost = DetermineMovementCost(request.Location, newLocation);
-            bool hasEnoughMovementPoints = HasEnoughMovementPoints(request.MovementPoints, movementCost);
+            int movementCost = DetermineMovementCost(newLocation);
+            bool canMoveIntoCell = CanMoveIntoCell(request.MovementPoints, movementCost);
 
-            if (hasEnoughMovementPoints)
+            if (canMoveIntoCell)
             {
                 float newMovementPoints = request.MovementPoints - movementCost;
 
@@ -52,19 +52,16 @@ namespace GameLogic.Processors
             return newLocationCalculator.Calculate(currentLocation);
         }
 
-        private float DetermineMovementCost(Point currentLocation, Point newLocation)
+        private int DetermineMovementCost(Point newLocation)
         {
-            int movementCostCurrent = GetMovementCostForTerrain(currentLocation);
-            int movementCostNew = GetMovementCostForTerrain(newLocation);
-            if (movementCostNew == -1) return float.MaxValue;
-            float movementCost = (movementCostCurrent + movementCostNew) * 0.5f;
+            int movementCost = GetMovementCostForTerrain(newLocation);
 
             return movementCost;
         }
 
-        private bool HasEnoughMovementPoints(float movementPoints, float movementCost)
+        private bool CanMoveIntoCell(float movementPoints, int movementCost)
         {
-            return movementPoints - movementCost >= 0.0f;
+            return movementPoints >= 0.5f && movementCost >= 0;
         }
 
         private int GetMovementCostForTerrain(Point location)

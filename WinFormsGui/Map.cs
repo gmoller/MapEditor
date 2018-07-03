@@ -1,7 +1,7 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Windows.Forms;
 using GameLogic;
+using Point = System.Drawing.Point;
 
 namespace WinFormsGui
 {
@@ -22,6 +22,8 @@ namespace WinFormsGui
 
         public int Width => _drawingArea.Width;
         public int Height => _drawingArea.Height;
+        public int ColumnCellsOnMap => _drawingArea.Width / CellWidth;
+        public int RowsCellsOnMap => _drawingArea.Height / CellHeight;
 
         public Map(Graphics graphics, int x, int y, int width, int height, Color color, GameWorld gameWorld, Images images)
         {
@@ -34,50 +36,29 @@ namespace WinFormsGui
             _bufferedGraphics = currentContext.Allocate(graphics, _drawingArea);
             _graphicsBuffer = _bufferedGraphics.Graphics;
 
-            _camera = new Camera(new Rectangle(0, 0, width, height), CellWidth, CellHeight);
+            _camera = new Camera(new Rectangle(0, 0, width, height), new Rectangle(0, 0, gameWorld.NumberOfColumns * CellWidth, gameWorld.NumberOfRows * CellHeight), CellWidth, CellHeight);
             _color = color;
         }
 
-        internal int ConvertScreenColumnToWorldColumn(int screenColumn)
+        internal Point ConvertViewToWorld(Point view)
         {
             int temp1 = _camera.VisibleRectangle.X - _drawingArea.X + 5;
             int temp2 = temp1 / CellWidth;
 
-            return temp2 + screenColumn;
+            int temp3 = temp2 + view.X;
+
+            int temp4 = _camera.VisibleRectangle.Y - _drawingArea.Y + 5;
+            int temp5 = temp4 / CellHeight;
+
+            int temp6 = temp5 + view.Y;
+
+            return new Point(temp3, temp6);
         }
 
-        internal int ConvertScreenRowToWorldRow(int screenRow)
+        public void CenterOnCell(Point worldCell)
         {
-            int temp1 = _camera.VisibleRectangle.Y - _drawingArea.Y + 5;
-            int temp2 = temp1 / CellHeight;
-
-            return temp2 + screenRow;
+            _camera.CenterOnCell(worldCell);
         }
-
-        public void CenterOnCell(int x, int y)
-        {
-            _camera.CenterOnCell(x, y);
-        }
-
-        //public void PanUp()
-        //{
-        //    _camera.PanUp();
-        //}
-
-        //public void PanDown()
-        //{
-        //    _camera.PanDown();
-        //}
-
-        //public void PanRight()
-        //{
-        //    _camera.PanRight();
-        //}
-
-        //public void PanLeft()
-        //{
-        //    _camera.PanLeft();
-        //}
 
         public void Clear()
         {
@@ -118,6 +99,16 @@ namespace WinFormsGui
                 y += CellHeight;
                 x = 0;
             }
+
+            _graphicsBuffer.DrawCircle(new System.Drawing.Point( 0 * 20 + 10 + 5,  0 * 20 + 10 + 5), 10.0f, Color.DeepPink);
+            _graphicsBuffer.DrawCircle(new System.Drawing.Point(47 * 20 + 10 + 5,  0 * 20 + 10 + 5), 10.0f, Color.DeepPink);
+            _graphicsBuffer.DrawCircle(new System.Drawing.Point(24 * 20 + 10 + 5, 21 * 20 + 10 + 5), 10.0f, Color.DeepPink);
+            _graphicsBuffer.DrawCircle(new System.Drawing.Point( 0 * 20 + 10 + 5, 41 * 20 + 10 + 5), 10.0f, Color.DeepPink);
+            _graphicsBuffer.DrawCircle(new System.Drawing.Point(47 * 20 + 10 + 5, 41 * 20 + 10 + 5), 10.0f, Color.DeepPink);
+
+            _graphicsBuffer.DrawRectangle(new Rectangle(_drawingArea.X, _drawingArea.Y, _drawingArea.Width - 1, _drawingArea.Height - 1), Color.Red);
+            _graphicsBuffer.DrawRectangle(new Rectangle(_drawingArea.X + 1, _drawingArea.Y + 1, _drawingArea.Width - 3, _drawingArea.Height - 3), Color.Red);
+            _graphicsBuffer.DrawRectangle(new Rectangle(_drawingArea.X + 2, _drawingArea.Y + 2, _drawingArea.Width - 4, _drawingArea.Height - 4), Color.Red);
         }
 
         public void DrawUnits(Font font)
