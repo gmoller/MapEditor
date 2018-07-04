@@ -5,10 +5,10 @@ namespace GameLogic
     /// <summary>
     /// This struct is immutable.
     /// </summary>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
     public struct TerrainType
     {
-        public static readonly TerrainType Invalid = new TerrainType(-1, "Invalid", short.MaxValue);
+        public static readonly TerrainType Invalid = new TerrainType(-1, "Invalid", -1);
 
         public int Id { get; }
         public string Name { get; }

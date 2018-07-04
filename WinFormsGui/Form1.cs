@@ -194,6 +194,8 @@ namespace WinFormsGui
             _panelStatusBar.FlipBuffer();
         }
 
+        // TODO: do not allow a moved unit to move outside the view window (the window must scroll by one)
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.Escape)
@@ -208,37 +210,67 @@ namespace WinFormsGui
                 return true;
             }
 
-            if (keyData == Keys.Up)
+            if (keyData == Keys.NumPad1)
             {
-                _gameWorld.KeyPressed(true, false, false, false, false);
-
+                _gameWorld.KeyPressed(Key.NumPad1);
                 return true;
             }
 
-            if (keyData == Keys.Down)
+            if (keyData == Keys.NumPad2 || keyData == Keys.Down)
             {
-                _gameWorld.KeyPressed(false, true, false, false, false);
+                _gameWorld.KeyPressed(Key.NumPad2);
                 return true;
             }
 
-            if (keyData == Keys.Left)
+            if (keyData == Keys.NumPad3)
             {
-                _gameWorld.KeyPressed(false, false, true, false, false);
+                _gameWorld.KeyPressed(Key.NumPad3);
                 return true;
             }
 
-            if (keyData == Keys.Right)
+            if (keyData == Keys.NumPad4 || keyData == Keys.Left)
             {
-                _gameWorld.KeyPressed(false, false, false, true, false);
+                _gameWorld.KeyPressed(Key.NumPad4);
+                return true;
+            }
+
+            if (keyData == Keys.NumPad6 || keyData == Keys.Right)
+            {
+                Action centerOnSelectedUnitAction = CenterOnCell;
+                _gameWorld.KeyPressed(Key.NumPad6, centerOnSelectedUnitAction);
+                return true;
+            }
+
+            if (keyData == Keys.NumPad7)
+            {
+                _gameWorld.KeyPressed(Key.NumPad7);
+                return true;
+            }
+
+            if (keyData == Keys.NumPad8 || keyData == Keys.Up)
+            {
+                _gameWorld.KeyPressed(Key.NumPad8);
+                return true;
+            }
+
+            if (keyData == Keys.NumPad9)
+            {
+                _gameWorld.KeyPressed(Key.NumPad9);
                 return true;
             }
 
             if (keyData == Keys.Enter)
             {
-                _gameWorld.KeyPressed(false, false, false, false, true);
+                _gameWorld.KeyPressed(Key.Enter);
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void CenterOnCell()
+        {
+            Point cell = new Point(_gameWorld.SelectedUnit.Location.X, (Rows - 1) - _gameWorld.SelectedUnit.Location.Y);
+            _map.CenterOnCell(cell);
         }
 
         private void Form1_MouseUp(object sender, MouseEventArgs e)

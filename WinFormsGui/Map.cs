@@ -100,11 +100,11 @@ namespace WinFormsGui
                 x = 0;
             }
 
-            _graphicsBuffer.DrawCircle(new System.Drawing.Point( 0 * 20 + 10 + 5,  0 * 20 + 10 + 5), 10.0f, Color.DeepPink);
-            _graphicsBuffer.DrawCircle(new System.Drawing.Point(47 * 20 + 10 + 5,  0 * 20 + 10 + 5), 10.0f, Color.DeepPink);
-            _graphicsBuffer.DrawCircle(new System.Drawing.Point(24 * 20 + 10 + 5, 21 * 20 + 10 + 5), 10.0f, Color.DeepPink);
-            _graphicsBuffer.DrawCircle(new System.Drawing.Point( 0 * 20 + 10 + 5, 41 * 20 + 10 + 5), 10.0f, Color.DeepPink);
-            _graphicsBuffer.DrawCircle(new System.Drawing.Point(47 * 20 + 10 + 5, 41 * 20 + 10 + 5), 10.0f, Color.DeepPink);
+            _graphicsBuffer.DrawCircle(new Point( 0 * 20 + 10 + 5,  0 * 20 + 10 + 5), 10.0f, Color.DeepPink);
+            _graphicsBuffer.DrawCircle(new Point(47 * 20 + 10 + 5,  0 * 20 + 10 + 5), 10.0f, Color.DeepPink);
+            _graphicsBuffer.DrawCircle(new Point(24 * 20 + 10 + 5, 21 * 20 + 10 + 5), 10.0f, Color.DeepPink);
+            _graphicsBuffer.DrawCircle(new Point( 0 * 20 + 10 + 5, 41 * 20 + 10 + 5), 10.0f, Color.DeepPink);
+            _graphicsBuffer.DrawCircle(new Point(47 * 20 + 10 + 5, 41 * 20 + 10 + 5), 10.0f, Color.DeepPink);
 
             _graphicsBuffer.DrawRectangle(new Rectangle(_drawingArea.X, _drawingArea.Y, _drawingArea.Width - 1, _drawingArea.Height - 1), Color.Red);
             _graphicsBuffer.DrawRectangle(new Rectangle(_drawingArea.X + 1, _drawingArea.Y + 1, _drawingArea.Width - 3, _drawingArea.Height - 3), Color.Red);

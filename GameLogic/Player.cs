@@ -34,66 +34,74 @@ namespace GameLogic
             }
         }
 
-        public void KeyPressed(bool up, bool down, bool left, bool right, bool enter)
+        public void KeyPressed(Key key, Action centerOnSelectedUnitAction = null)
         {
             if (_selectedUnitIndex == -1)
             {
-                if (enter)
+                if (key == Key.Enter)
                 {
                     EndTurn();
                 }
                 return;
             }
 
-            if (up)
-            {
-                Unit unit = _units[_selectedUnitIndex].Move(_movementProcessor, CompassDirection.North);
-                _units[_selectedUnitIndex] = unit;
+            bool move = false;
+            CompassDirection direction = CompassDirection.North;
 
-                if (unit.MovementPoints <= 0)
-                {
-                    _selectedUnitIndex++;
-                    if (_selectedUnitIndex > _units.Count - 1)
-                    {
-                        _selectedUnitIndex = -1;
-                    }
-                }
+            if (key == Key.NumPad1)
+            {
+                direction = CompassDirection.SouthWest;
+                move = true;
             }
 
-            if (down)
+            if (key == Key.NumPad2)
             {
-                Unit unit = _units[_selectedUnitIndex].Move(_movementProcessor, CompassDirection.South);
-                _units[_selectedUnitIndex] = unit;
-
-                if (unit.MovementPoints <= 0)
-                {
-                    _selectedUnitIndex++;
-                    if (_selectedUnitIndex > _units.Count - 1)
-                    {
-                        _selectedUnitIndex = -1;
-                    }
-                }
+                direction = CompassDirection.South;
+                move = true;
             }
 
-            if (left)
+            if (key == Key.NumPad3)
             {
-                Unit unit = _units[_selectedUnitIndex].Move(_movementProcessor, CompassDirection.West);
-                _units[_selectedUnitIndex] = unit;
-
-                if (unit.MovementPoints <= 0)
-                {
-                    _selectedUnitIndex++;
-                    if (_selectedUnitIndex > _units.Count - 1)
-                    {
-                        _selectedUnitIndex = -1;
-                    }
-                }
+                direction = CompassDirection.SouthEast;
+                move = true;
             }
 
-            if (right)
+            if (key == Key.NumPad4)
             {
-                Unit unit = _units[_selectedUnitIndex].Move(_movementProcessor, CompassDirection.East);
+                direction = CompassDirection.West;
+                move = true;
+            }
+
+            if (key == Key.NumPad6)
+            {
+                direction = CompassDirection.East;
+                move = true;
+            }
+
+            if (key == Key.NumPad7)
+            {
+                direction = CompassDirection.NorthWest;
+                move = true;
+            }
+
+            if (key == Key.NumPad8)
+            {
+                direction = CompassDirection.North;
+                move = true;
+            }
+
+            if (key == Key.NumPad9)
+            {
+                direction = CompassDirection.NorthEast;
+                move = true;
+            }
+
+            if (move)
+            {
+                Unit unit = _units[_selectedUnitIndex].Move(_movementProcessor, direction);
                 _units[_selectedUnitIndex] = unit;
+
+                centerOnSelectedUnitAction?.Invoke();
 
                 if (unit.MovementPoints <= 0)
                 {

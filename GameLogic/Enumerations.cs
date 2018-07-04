@@ -9,8 +9,7 @@
         South,
         SouthWest,
         West,
-        NorthWest,
-        Direct
+        NorthWest
     }
 
     public enum MovementType
@@ -19,11 +18,20 @@
         Ground
     }
 
-    public enum MyKeys
+    public enum Key
     {
         Up,
         Down,
         Left,
-        Right
+        Right,
+        Enter,
+        NumPad1,
+        NumPad2,
+        NumPad3,
+        NumPad4,
+        NumPad6,
+        NumPad7,
+        NumPad8,
+        NumPad9
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace GameLogic
 {
@@ -31,9 +32,9 @@ namespace GameLogic
             return new GameWorld(gameBoard, terrainTypeList, unitTypeList);
         }
 
-        public void KeyPressed(bool up, bool down, bool left, bool right, bool enter)
+        public void KeyPressed(Key key, Action centerOnSelectedUnitAction = null)
         {
-            Player.KeyPressed(up, down, left, right, enter);
+            Player.KeyPressed(key, centerOnSelectedUnitAction);
         }
 
         public string DoTurnForPlayer()
