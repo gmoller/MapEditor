@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameData;
 using GameLogic.Processors;
+using GameMap;
+using GeneralUtilities;
 
 namespace GameLogic
 {
@@ -114,7 +117,7 @@ namespace GameLogic
             }
         }
 
-        public void AddUnit(int unitType, Point startLocation, GameWorld gameWorld)
+        public void AddUnit(int unitType, Point2 startLocation, GameWorld gameWorld)
         {
             Unit unit = Unit.CreateNew(unitType, startLocation, gameWorld);
             _units.Add(unit);
@@ -173,10 +176,10 @@ namespace GameLogic
 
         private Unit Explore(Unit item)
         {
-            Point newLocation = item.Explore();
+            Point2 newLocation = item.Explore();
 
             Cell cell = _gameWorld.GetCell(newLocation);
-            TerrainType terrainType = _gameWorld.TerrainTypes[cell.TerrainTypeId];
+            TerrainType terrainType = Globals.Instance.TerrainTypes[cell.TerrainTypeId];
             int movementCost = terrainType.MovementCost;
 
             if (item.MovementPoints - movementCost >= 0)

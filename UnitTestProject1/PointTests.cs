@@ -1,4 +1,4 @@
-﻿using GameLogic;
+﻿using GeneralUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTestProject1
@@ -9,7 +9,7 @@ namespace UnitTestProject1
         [TestMethod]
         public void InstantiationTest1()
         {
-            var point = new Point();
+            var point = new Point2();
 
             Assert.AreEqual(0, point.X);
             Assert.AreEqual(0, point.Y);
@@ -18,7 +18,7 @@ namespace UnitTestProject1
         [TestMethod]
         public void InstantiationTest2()
         {
-            Point point = Point.Create(1, 1);
+            Point2 point = Point2.Create(1, 1);
 
             Assert.AreEqual(1, point.X);
             Assert.AreEqual(1, point.Y);

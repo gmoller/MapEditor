@@ -1,18 +1,19 @@
 ﻿using System.Collections.Generic;
+using GeneralUtilities;
 
 namespace GameLogic.Actions
 {
     public class ExploreAction : IAct
     {
-        public Point Execute(Unit unit, GameWorld gameWorld)
+        public Point2 Execute(Unit unit, GameWorld gameWorld)
         {
             // find closest non-visible cell
-            Dictionary<Point, Point> cameFrom = BreadthFirstSearch.CalculateCameFrom(unit.Location, gameWorld);
-            Point closest = FindClosestNonVisibleCell(cameFrom, gameWorld);
+            Dictionary<Point2, Point2> cameFrom = BreadthFirstSearch.CalculateCameFrom(unit.Location, gameWorld);
+            Point2 closest = FindClosestNonVisibleCell(cameFrom, gameWorld);
 
-            if (closest != Point.Null)
+            if (closest != Point2.Null)
             {
-                Point[] path = BreadthFirstSearch.GetPath(unit.Location, closest, cameFrom);
+                Point2[] path = BreadthFirstSearch.GetPath(unit.Location, closest, cameFrom);
 
                 // move towards there
                 if (path.Length > 0)
@@ -24,9 +25,9 @@ namespace GameLogic.Actions
             return unit.Location;
         }
 
-        private Point FindClosestNonVisibleCell(Dictionary<Point, Point> cameFrom, GameWorld gameWorld)
+        private Point2 FindClosestNonVisibleCell(Dictionary<Point2, Point2> cameFrom, GameWorld gameWorld)
         {
-            foreach (Point item in cameFrom.Keys)
+            foreach (Point2 item in cameFrom.Keys)
             {
                 if (!gameWorld.IsCellVisible(item))
                 {
@@ -35,7 +36,7 @@ namespace GameLogic.Actions
                 }
             }
 
-            return Point.Null;
+            return Point2.Null;
         }
     }
 }

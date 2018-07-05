@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using GameLogic;
-using GameLogic.Loaders;
 using GameLogic.Processors;
+using GameMap;
+using GeneralUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTestProject1
@@ -15,17 +16,15 @@ namespace UnitTestProject1
         [ClassInitialize]
         public static void Setup(TestContext context)
         {
-            List<TerrainType> terrainTypes = TerrainTypesLoader.GetTerrainTypes();
-            List<UnitType> unitTypes = UnitTypesLoader.GetUnitTypes();
-            GameBoard gameBoard = GameBoardLoader.Load(3, 3);
-            _gameWorld = GameWorld.Create(gameBoard, terrainTypes, unitTypes);
+            GameBoard gameBoard = GameBoard.Create(1, new int[3, 3], true);
+            _gameWorld = GameWorld.Create(gameBoard);
             _movementProcessor = new MovementProcessor(_gameWorld);
         }
 
         [TestMethod]
         public void One_turn()
         {
-            List<Unit> units = CreateUnits(Point.Create(0, 1));
+            List<Unit> units = CreateUnits(Point2.Create(0, 1));
 
             // move each unit east twice
             foreach (Unit unit in units)
@@ -33,7 +32,7 @@ namespace UnitTestProject1
                 Unit unit2 = unit.Move(_movementProcessor, CompassDirection.East);
                 Unit unit3 = unit2.Move(_movementProcessor, CompassDirection.East);
 
-                Assert.AreEqual(Point.Create(2, 1), unit3.Location, "Location incorrect.");
+                Assert.AreEqual(Point2.Create(2, 1), unit3.Location, "Location incorrect.");
                 Assert.AreEqual(0, unit3.MovementPoints, "MovementPoints incorrect.");
             }
 
@@ -46,7 +45,7 @@ namespace UnitTestProject1
             }
         }
 
-        private List<Unit> CreateUnits(Point startLocation)
+        private List<Unit> CreateUnits(Point2 startLocation)
         {
             List<Unit> units = new List<Unit>();
 

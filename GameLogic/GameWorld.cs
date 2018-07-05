@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameData;
+using GameMap;
+using GeneralUtilities;
 
 namespace GameLogic
 {
@@ -12,24 +15,20 @@ namespace GameLogic
         private Player Player { get; }
 
         public GameBoard GameBoard { get; }
-        internal TerrainTypes TerrainTypes { get; }
-        internal UnitTypes UnitTypes { get; }
         public IEnumerable<Unit> PlayerUnits => Player.Units;
         public Unit SelectedUnit => Player.SelectedUnit;
         public int NumberOfColumns => GameBoard.NumberOfColumns;
         public int NumberOfRows => GameBoard.NumberOfRows;
 
-        private GameWorld(GameBoard map, List<TerrainType> terrainTypeList, List<UnitType> unitTypeList)
+        private GameWorld(GameBoard map)
         {
             GameBoard = map;
             Player = new Player(this);
-            TerrainTypes = TerrainTypes.Create(terrainTypeList);
-            UnitTypes = UnitTypes.Create(unitTypeList);
         }
 
-        public static GameWorld Create(GameBoard gameBoard, List<TerrainType> terrainTypeList, List<UnitType> unitTypeList)
+        public static GameWorld Create(GameBoard gameBoard)
         {
-            return new GameWorld(gameBoard, terrainTypeList, unitTypeList);
+            return new GameWorld(gameBoard);
         }
 
         public void KeyPressed(Key key, Action centerOnSelectedUnitAction = null)
@@ -47,29 +46,28 @@ namespace GameLogic
             Player.EndTurn();
         }
 
-        public void AddUnitForPlayer(int unitType, Point startLocation, GameWorld gameWorld)
+        public void AddUnitForPlayer(int unitType, Point2 startLocation, GameWorld gameWorld)
         {
             Player.AddUnit(unitType, startLocation, gameWorld);
         }
 
-        public Cell GetCell(Point location)
+        public Cell GetCell(Point2 location)
         {
             return GameBoard.GetCell(location);
         }
 
-        internal List<Point> GetCellNeighbors(Point location)
+        internal List<Point2> GetCellNeighbors(Point2 location)
         {
             return GameBoard.GetCellNeighbors(location);
         }
 
-        public bool IsCellVisible(Point location)
+        public bool IsCellVisible(Point2 location)
         {
             return GameBoard.IsCellVisible(location);
         }
 
-        internal void SetCellVisible(Point location)
+        internal void SetCellVisible(Point2 location)
         {
-            
             if (location.X < 0 || location.X > GameBoard.NumberOfColumns - 1) return; // 31
             if (location.Y < 0 || location.Y > GameBoard.NumberOfRows - 1) return; // 31
 

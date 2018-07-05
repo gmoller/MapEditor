@@ -1,7 +1,9 @@
-﻿namespace GameLogic.NewLocationCalculators
+﻿using GeneralUtilities;
+
+namespace GameLogic.NewLocationCalculators
 {
     public interface INewLocationCalculator
     {
-        Point Calculate(Point location);
+        Point2 Calculate(Point2 location);
     }
 }

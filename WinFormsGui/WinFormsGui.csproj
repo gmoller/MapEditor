@@ -79,9 +79,21 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GameData\GameData.csproj">
+      <Project>{35bfb00c-7ecc-4a04-a787-452319ad4b9b}</Project>
+      <Name>GameData</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GameLogic\GameLogic.csproj">
       <Project>{1364bc83-91e5-47b7-8e43-4346ff978fc0}</Project>
       <Name>GameLogic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GameMap\GameMap.csproj">
+      <Project>{40c67b06-306e-4b17-8d04-677fd11e2e23}</Project>
+      <Name>GameMap</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GeneralUtilities\GeneralUtilities.csproj">
+      <Project>{52dae17e-3240-4b33-a875-a9fe73e208c5}</Project>
+      <Name>GeneralUtilities</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using GameData;
 using GameLogic;
-using GameLogic.Loaders;
-using Point = System.Drawing.Point;
+using GameMap;
+using GeneralUtilities;
 
 namespace WinFormsGui
 {
     public partial class Form1 : Form
     {
-        private const int Columns = 200; // 50
-        private const int Rows = 160; // 40
+        private const int Columns = 60; // 200
+        private const int Rows = 40; // 160
 
         private const bool AllVisible = true;
 
@@ -39,7 +40,6 @@ namespace WinFormsGui
         {
             // Load stuff
             List<TerrainType> terrainTypes = TerrainTypesLoader.GetTerrainTypes();
-            List<UnitType> unitTypes = UnitTypesLoader.GetUnitTypes();
 
             _texts = new List<string>();
             foreach (TerrainType terrainType in terrainTypes)
@@ -51,12 +51,14 @@ namespace WinFormsGui
             _images = new Images();
 
             // Create gameboard
-            //GameBoard testMap = GameBoardLoader.Load("Map.txt");
-            GameBoard testMap = GameBoardGenerator.Generate(Columns, Rows, AllVisible);
-            _gameWorld = GameWorld.Create(testMap, terrainTypes, unitTypes);
+            //int[,] terrain = MapLoader.Load("Map.txt");
+            int[,] terrain = MapGenerator.Generate(Columns, Rows);
+            GameBoard testMap = GameBoard.Create(1, terrain, AllVisible);
+
+            _gameWorld = GameWorld.Create(testMap);
 
             // Add unit
-            _gameWorld.AddUnitForPlayer(4, GameLogic.Point.Create(0, 159), _gameWorld); // 2;3
+            _gameWorld.AddUnitForPlayer(4, Point2.Create(0, 0), _gameWorld);
 
             // Start timer
             timer1.Interval = 1;
@@ -69,6 +71,11 @@ namespace WinFormsGui
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
+        {
+            Resize2();
+        }
+
+        private void Resize2()
         {
             int margin = 5;
 
@@ -157,6 +164,8 @@ namespace WinFormsGui
                 _panelStatusBar.DrawText(new Point(0, y), $"Unit: {unit.UnitTypeName}", Font, Color.Green, Color.Transparent, Color.Transparent);
                 y += 15;
                 _panelStatusBar.DrawText(new Point(0, y), $"Moves: {unit.MovementPoints}", Font, Color.Green, Color.Transparent, Color.Transparent);
+                y += 15;
+                _panelStatusBar.DrawText(new Point(0, y), $"Loc: {unit.Location}", Font, Color.Green, Color.Transparent, Color.Transparent);
             }
         }
 
@@ -236,7 +245,7 @@ namespace WinFormsGui
 
             if (keyData == Keys.NumPad6 || keyData == Keys.Right)
             {
-                Action centerOnSelectedUnitAction = CenterOnCell;
+                Action centerOnSelectedUnitAction = CenterOnSelectedUnitCell;
                 _gameWorld.KeyPressed(Key.NumPad6, centerOnSelectedUnitAction);
                 return true;
             }
@@ -267,7 +276,7 @@ namespace WinFormsGui
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
-        private void CenterOnCell()
+        private void CenterOnSelectedUnitCell()
         {
             Point cell = new Point(_gameWorld.SelectedUnit.Location.X, (Rows - 1) - _gameWorld.SelectedUnit.Location.Y);
             _map.CenterOnCell(cell);
@@ -282,8 +291,8 @@ namespace WinFormsGui
                 if (e.Location.Y < 5 || e.Location.Y > _map.Height + 5) return; // clicked off the map
 
                 // figure out screen cell
-                int screenColumn = (e.Location.X - 5) / 20;
-                int screenRow = (e.Location.Y - 5) / 20;
+                int screenColumn = (e.Location.X - 5) / 30;
+                int screenRow = (e.Location.Y - 5) / 30;
 
                 // convert to world cell
                 Point viewCell = new Point(screenColumn, screenRow);

@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using GeneralUtilities;
 
-namespace GameLogic.Loaders
+namespace GameData
 {
     public static class TerrainTypesLoader
     {

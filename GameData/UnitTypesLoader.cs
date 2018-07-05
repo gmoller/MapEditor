@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using GeneralUtilities;
 
-namespace GameLogic.Loaders
+namespace GameData
 {
     public static class UnitTypesLoader
     {
-        public static List<UnitType> GetUnitTypes()
+        public static List<UnitType> GetUnitTypes(MovementTypes movementTypes)
         {
             var unitTypes = new List<UnitType>();
 
@@ -19,7 +20,7 @@ namespace GameLogic.Loaders
                 string name = splitLine[1];
                 int moves = splitLine[2].ToInt32();
                 string movementType = splitLine[3];
-                UnitType unitType = UnitType.Create(id, name, moves, movementType.ToEnum<MovementType>());
+                UnitType unitType = UnitType.Create(id, name, moves, movementTypes[movementType]);
                 unitTypes.Add(unitType);
             }
 

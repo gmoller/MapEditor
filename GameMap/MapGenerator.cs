@@ -1,19 +1,17 @@
 ﻿using System;
 
-namespace GameLogic
+namespace GameMap
 {
-    public static class GameBoardGenerator
+    public class MapGenerator
     {
-        public static GameBoard Generate(int numberOfColumns, int numberOfRows, bool allVisible)
+        public static int[,] Generate(int numberOfColumns, int numberOfRows)
         {
             // make some noise!
             float[,] noise = MakeNoise(numberOfColumns, numberOfRows);
 
             int[,] terrain = TurnNoiseIntoTerrain(noise);
 
-            GameBoard gameBoard = GameBoard.Create(1, terrain, allVisible);
-
-            return gameBoard;
+            return terrain;
         }
 
         private static float[,] MakeNoise(int numberOfColumns, int numberOfRows)

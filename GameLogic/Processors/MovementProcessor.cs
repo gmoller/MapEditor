@@ -1,5 +1,8 @@
 ﻿using System.Threading.Tasks;
+using GameData;
 using GameLogic.NewLocationCalculators;
+using GameMap;
+using GeneralUtilities;
 
 namespace GameLogic.Processors
 {
@@ -33,7 +36,7 @@ namespace GameLogic.Processors
 
         public ProcessResponse Process(ProcessRequest request, INewLocationCalculator newLocationCalculator)
         {
-            Point newLocation = DetermineNewPosition(request.Location, newLocationCalculator);
+            Point2 newLocation = DetermineNewPosition(request.Location, newLocationCalculator);
             int movementCost = DetermineMovementCost(newLocation);
             bool canMoveIntoCell = CanMoveIntoCell(request.MovementPoints, movementCost);
 
@@ -47,14 +50,19 @@ namespace GameLogic.Processors
             return new ProcessResponse(request.Location, request.MovementPoints);
         }
 
-        private Point DetermineNewPosition(Point currentLocation, INewLocationCalculator newLocationCalculator)
+        private Point2 DetermineNewPosition(Point2 currentLocation, INewLocationCalculator newLocationCalculator)
         {
             return newLocationCalculator.Calculate(currentLocation);
         }
 
-        private int DetermineMovementCost(Point newLocation)
+        private int DetermineMovementCost(Point2 location)
         {
-            int movementCost = GetMovementCostForTerrain(newLocation);
+            // get terrain type for location
+            Cell cell = _gameWorld.GetCell(location);
+
+            // get movement cost for that terrain type
+            TerrainType terrainType = Globals.Instance.TerrainTypes[cell.TerrainTypeId];
+            int movementCost = terrainType.MovementCost;
 
             return movementCost;
         }
@@ -63,18 +71,6 @@ namespace GameLogic.Processors
         {
             return movementPoints >= 0.5f && movementCost >= 0;
         }
-
-        private int GetMovementCostForTerrain(Point location)
-        {
-            // get terrain type for location
-            Cell cell = _gameWorld.GetCell(location);
-
-            // get movement cost for that terrain type
-            TerrainType terrainType = _gameWorld.TerrainTypes[cell.TerrainTypeId];
-            int movementCost = terrainType.MovementCost;
-
-            return movementCost;
-        }
     }
 
     /// <summary>
@@ -82,10 +78,10 @@ namespace GameLogic.Processors
     /// </summary>
     public struct ProcessRequest
     {
-        public Point Location { get; }
+        public Point2 Location { get; }
         public float MovementPoints { get; }
 
-        public ProcessRequest(Point location, float movementPoints)
+        public ProcessRequest(Point2 location, float movementPoints)
         {
             Location = location;
             MovementPoints = movementPoints;
@@ -97,10 +93,10 @@ namespace GameLogic.Processors
     /// </summary>
     public struct ProcessResponse
     {
-        public Point NewLocation { get; }
+        public Point2 NewLocation { get; }
         public float NewMovementPoints { get; }
 
-        public ProcessResponse(Point newLocation, float newMovementPoints)
+        public ProcessResponse(Point2 newLocation, float newMovementPoints)
         {
             NewLocation = newLocation;
             NewMovementPoints = newMovementPoints;

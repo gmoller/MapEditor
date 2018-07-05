@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using GeneralUtilities;
 
-namespace GameLogic
+namespace GameMap
 {
     /// <summary>
     /// </summary>
@@ -11,29 +12,12 @@ namespace GameLogic
     {
         private readonly Random _random = new Random();
 
-        private Cell[,,] _cells; // layer-z, column-x, row-y
+        private readonly Cell[,,] _cells; // layer-z, column-x, row-y
         private bool[,] _isVisible;
 
         internal int NumberOfLayers => _cells.GetLength(0);
         public int NumberOfColumns => _cells.GetLength(1);
         public int NumberOfRows => _cells.GetLength(2);
-
-        private GameBoard(int numberOfLayers, int numberOfColumns, int numberOfRows)
-        {
-            _cells = new Cell[numberOfLayers, numberOfColumns, numberOfRows];
-            _isVisible = new bool[numberOfColumns, numberOfRows];
-
-            for (int layer = 0; layer < numberOfLayers; ++layer)
-            {
-                for (int column = 0; column < numberOfColumns; ++column)
-                {
-                    for (int row = 0; row < numberOfRows; ++row)
-                    {
-                        _cells[layer, column, row] = Cell.Create(0);
-                    }
-                }
-            }
-        }
 
         private GameBoard(int numberOfLayers, int[,] terrain, bool allVisible)
         {
@@ -57,66 +41,12 @@ namespace GameLogic
             }
         }
 
-        internal static GameBoard Create(int numberOfLayers, int numberOfColumns, int numberOfRows)
-        {
-            return new GameBoard(numberOfLayers, numberOfColumns, numberOfRows);
-        }
-
-        internal static GameBoard Create(int numberOfLayers, int[,] terrain, bool allVisible)
+        public static GameBoard Create(int numberOfLayers, int[,] terrain, bool allVisible)
         {
             return new GameBoard(numberOfLayers, terrain, allVisible);
         }
 
-        internal void SetState(byte[] bytes)
-        {
-            // check version
-            if (bytes[0] != 0x00 || bytes[1] != 0x01)
-            {
-                throw new Exception("Only version 1 supported!");
-            }
-
-            // number of layers, columns, rows
-            byte numberOfLayers = bytes[2];
-            int numberOfColumns = BitConverter.ToInt32(bytes, 3);
-            int numberOfRows = BitConverter.ToInt32(bytes, 7);
-
-            _cells = new Cell[numberOfLayers, numberOfColumns, numberOfRows];
-            _isVisible = new bool[numberOfColumns, numberOfRows];
-
-            // cells
-            int cursor = 11;
-            int layer = 0;
-            int column = 0;
-            int row = 0;
-            for (int i = cursor; i < bytes.Length - NumberOfLayers; i += 2)
-            {
-                byte b1 = bytes[i];
-                byte b2 = bytes[i + 1];
-
-                if (b2 == 0) b2 = 1;
-                else if (b2 == 7) b2 = 6;
-                else if (b2 == 8) b2 = 7;
-                else if (b2 == 9) b2 = 11;
-                else if (b2 == 10) b2 = 0;
-                //_cells[layer, column, row].PaletteId = b1;
-                //_cells[layer, column, row].TileId = b2;
-                _cells[layer, column, row] = Cell.Create(b2);
-
-                row++;
-                if (row > NumberOfRows - 1)
-                {
-                    row = 0;
-                    column++;
-                    if (column > NumberOfColumns - 1)
-                    {
-                        column = 0;
-                        layer++;
-                    }
-                }
-            }
-        }
-
-        internal Cell GetCell(Point location)
+        public Cell GetCell(Point2 location)
         {
             if (!IsCellOnBoard(location))
             {
@@ -126,7 +56,7 @@ namespace GameLogic
             return _cells[0, location.X, location.Y];
         }
 
-        private bool IsCellOnBoard(Point location)
+        private bool IsCellOnBoard(Point2 location)
         {
             if (location.X < 0 ||
                 location.Y < 0 ||
@@ -139,15 +69,15 @@ namespace GameLogic
             return true;
         }
 
-        internal List<Point> GetCellNeighbors(Point location)
+        public List<Point2> GetCellNeighbors(Point2 location)
         {
-            var neighbors = new List<Point>();
-            Point a = Point.Create(location.X, location.Y + 1); // north
-            Point b = Point.Create(location.X - 1, location.Y); // west
-            Point c = Point.Create(location.X, location.Y - 1); // south
-            Point d = Point.Create(location.X + 1, location.Y); // east
+            var neighbors = new List<Point2>();
+            Point2 a = Point2.Create(location.X, location.Y + 1); // north
+            Point2 b = Point2.Create(location.X - 1, location.Y); // west
+            Point2 c = Point2.Create(location.X, location.Y - 1); // south
+            Point2 d = Point2.Create(location.X + 1, location.Y); // east
 
-            var dic = new Dictionary<int, Point[]>
+            var dic = new Dictionary<int, Point2[]>
             {
                 {1, new[] {a, b, c, d}},
                 {2, new[] {a, b, d, c}},
@@ -176,14 +106,14 @@ namespace GameLogic
             };
 
             int i = _random.Next(1, 25);
-            Point[] points = dic[i];
+            Point2[] points = dic[i];
             AddCellsIfItsOnBoard(neighbors, points);
 
             return neighbors;
         }
-        private void AddCellsIfItsOnBoard(List<Point> neighbors, params Point[] points)
+        private void AddCellsIfItsOnBoard(List<Point2> neighbors, params Point2[] points)
         {
-            foreach (Point item in points)
+            foreach (Point2 item in points)
             {
                 if (IsCellOnBoard(item))
                 {
@@ -192,17 +122,17 @@ namespace GameLogic
             }
         }
 
-        internal bool IsCellVisible(Point location)
+        public bool IsCellVisible(Point2 location)
         {
             return _isVisible[location.X, location.Y];
         }
 
-        internal void SetCellVisible(Point location)
+        public void SetCellVisible(Point2 location)
         {
             _isVisible[location.X, location.Y] = true;
         }
 
-        internal bool AreAllCellsVisible()
+        public bool AreAllCellsVisible()
         {
             for (int column = 0; column < NumberOfColumns; ++column)
             {
@@ -218,7 +148,7 @@ namespace GameLogic
             return true;
         }
 
-        internal void SetAllCellsInvisible()
+        public void SetAllCellsInvisible()
         {
             _isVisible = new bool[NumberOfColumns, NumberOfRows];
         }

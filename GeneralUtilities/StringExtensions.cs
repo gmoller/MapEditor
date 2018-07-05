@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GameLogic
+namespace GeneralUtilities
 {
     public static class StringExtensions
     {

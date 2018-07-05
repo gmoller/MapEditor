@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1364BC83-91E5-47B7-8E43-4346FF978FC0}</ProjectGuid>
+    <ProjectGuid>{40C67B06-306E-4B17-8D04-677FD11E2E23}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GameLogic</RootNamespace>
-    <AssemblyName>GameLogic</AssemblyName>
+    <RootNamespace>GameMap</RootNamespace>
+    <AssemblyName>GameMap</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,39 +33,13 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actions\IAct.cs" />
-    <Compile Include="Actions\MoveAction.cs" />
-    <Compile Include="BreadthFirstSearch.cs" />
-    <Compile Include="CellVisibiltySetter.cs" />
-    <Compile Include="City.cs" />
-    <Compile Include="Actions\ExploreAction.cs" />
-    <Compile Include="Enumerations.cs" />
-    <Compile Include="GameWorld.cs" />
-    <Compile Include="Globals.cs" />
-    <Compile Include="NewLocationCalculators\EastCalculator.cs" />
-    <Compile Include="NewLocationCalculators\INewLocationCalculator.cs" />
-    <Compile Include="NewLocationCalculators\NewLocationCalculatorFactory.cs" />
-    <Compile Include="NewLocationCalculators\NorthCalculator.cs" />
-    <Compile Include="NewLocationCalculators\NorthEastCalculator.cs" />
-    <Compile Include="NewLocationCalculators\NorthWestCalculator.cs" />
-    <Compile Include="Player.cs" />
-    <Compile Include="Processors\MovementProcessor.cs" />
+    <Compile Include="Cell.cs" />
+    <Compile Include="GameBoard.cs" />
+    <Compile Include="MapGenerator.cs" />
+    <Compile Include="MapLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="NewLocationCalculators\SouthCalculator.cs" />
-    <Compile Include="NewLocationCalculators\SouthEastCalculator.cs" />
-    <Compile Include="NewLocationCalculators\SouthWestCalculator.cs" />
-    <Compile Include="Unit.cs" />
-    <Compile Include="NewLocationCalculators\WestCalculator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GameData\GameData.csproj">
-      <Project>{35bfb00c-7ecc-4a04-a787-452319ad4b9b}</Project>
-      <Name>GameData</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GameMap\GameMap.csproj">
-      <Project>{40c67b06-306e-4b17-8d04-677fd11e2e23}</Project>
-      <Name>GameMap</Name>
-    </ProjectReference>
     <ProjectReference Include="..\GeneralUtilities\GeneralUtilities.csproj">
       <Project>{52dae17e-3240-4b33-a875-a9fe73e208c5}</Project>
       <Name>GeneralUtilities</Name>

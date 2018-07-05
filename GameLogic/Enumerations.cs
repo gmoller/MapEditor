@@ -12,12 +12,6 @@
         NorthWest
     }
 
-    public enum MovementType
-    {
-        None,
-        Ground
-    }
-
     public enum Key
     {
         Up,

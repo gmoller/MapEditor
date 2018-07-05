@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using GameLogic.NewLocationCalculators;
 using GameLogic.Processors;
+using GeneralUtilities;
 
 namespace GameLogic
 {
@@ -17,7 +18,7 @@ namespace GameLogic
         private readonly GameWorld _gameWorld;
 
         public int UnitType { get; }
-        public Point Location { get; }
+        public Point2 Location { get; }
         public float MovementPoints { get; }
 
         public string UnitTypeName
@@ -25,13 +26,13 @@ namespace GameLogic
             get
             {
                 if (UnitType == -1) return "Null";
-                return _gameWorld.UnitTypes[UnitType].Name;
+                return Globals.Instance.UnitTypes[UnitType].Name;
             }
         }
 
-        public static readonly Unit Null = new Unit(-1, Point.Null, 0.0f, null);
+        public static readonly Unit Null = new Unit(-1, Point2.Null, 0.0f, null);
 
-        private Unit(int unitType, Point location, float movementPoints, GameWorld gameWorld)
+        private Unit(int unitType, Point2 location, float movementPoints, GameWorld gameWorld)
         {
             _gameWorld = gameWorld;
             UnitType = unitType;
@@ -39,16 +40,16 @@ namespace GameLogic
             MovementPoints = movementPoints;
         }
 
-        public static Unit CreateNew(int unitType, Point location, GameWorld gameWorld)
+        public static Unit CreateNew(int unitType, Point2 location, GameWorld gameWorld)
         {
-            float movementPoints = gameWorld.UnitTypes[unitType].Moves;
+            float movementPoints = Globals.Instance.UnitTypes[unitType].Moves;
             var unit = new Unit(unitType, location, movementPoints, gameWorld);
             CellVisibilitySetter.SetCellVisibility(unit.Location, gameWorld);
 
             return unit;
         }
 
-        public static Unit Create(int unitType, Point newLocation, float movementPoints, GameWorld gameWorld)
+        public static Unit Create(int unitType, Point2 newLocation, float movementPoints, GameWorld gameWorld)
         {
             var unit = new Unit(unitType, newLocation, movementPoints, gameWorld);
 
@@ -66,15 +67,15 @@ namespace GameLogic
             return unit;
         }
 
-        public Point Explore()
+        public Point2 Explore()
         {
             // find closest non-visible cell
-            Dictionary<Point, Point> cameFrom = BreadthFirstSearch.CalculateCameFrom(Location, _gameWorld);
-            Point closest = FindClosestNonVisibleCell(cameFrom, _gameWorld);
+            Dictionary<Point2, Point2> cameFrom = BreadthFirstSearch.CalculateCameFrom(Location, _gameWorld);
+            Point2 closest = FindClosestNonVisibleCell(cameFrom, _gameWorld);
 
-            if (closest != Point.Null)
+            if (closest != Point2.Null)
             {
-                Point[] path = BreadthFirstSearch.GetPath(Location, closest, cameFrom);
+                Point2[] path = BreadthFirstSearch.GetPath(Location, closest, cameFrom);
 
                 // move towards there
                 if (path.Length > 0)
@@ -86,9 +87,9 @@ namespace GameLogic
             return Location;
         }
 
-        private Point FindClosestNonVisibleCell(Dictionary<Point, Point> cameFrom, GameWorld gameWorld)
+        private Point2 FindClosestNonVisibleCell(Dictionary<Point2, Point2> cameFrom, GameWorld gameWorld)
         {
-            foreach (Point item in cameFrom.Keys)
+            foreach (Point2 item in cameFrom.Keys)
             {
                 if (!gameWorld.IsCellVisible(item))
                 {
@@ -97,7 +98,7 @@ namespace GameLogic
                 }
             }
 
-            return Point.Null;
+            return Point2.Null;
         }
 
         public void FoundCity()
@@ -108,7 +109,7 @@ namespace GameLogic
 
         public Unit StartNewTurn()
         {
-            float movementPoints = _gameWorld.UnitTypes[UnitType].Moves;
+            float movementPoints = Globals.Instance.UnitTypes[UnitType].Moves;
             Unit unit = Create(UnitType, Location, movementPoints, _gameWorld);
 
             return unit;
@@ -128,7 +129,7 @@ namespace GameLogic
                     return "NullUnit";
                 }
 
-                return $"{{UnitType={_gameWorld.UnitTypes[UnitType].Name},Location={Location},MovementPoints={MovementPoints}/{_gameWorld.UnitTypes[UnitType].Moves}}}";
+                return $"{{UnitType={Globals.Instance.UnitTypes[UnitType].Name},Location={Location},MovementPoints={MovementPoints}/{Globals.Instance.UnitTypes[UnitType].Moves}}}";
             }
         }
     }

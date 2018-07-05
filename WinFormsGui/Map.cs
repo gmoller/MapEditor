@@ -1,14 +1,15 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
 using GameLogic;
-using Point = System.Drawing.Point;
+using GameMap;
+using GeneralUtilities;
 
 namespace WinFormsGui
 {
     public class Map
     {
-        private const int CellWidth = 20;
-        private const int CellHeight = 20;
+        private const int CellWidth = 30;
+        private const int CellHeight = 30;
 
         private readonly GameWorld _gameWorld;
         private readonly Images _images;
@@ -74,9 +75,9 @@ namespace WinFormsGui
             {
                 for (int colIndex = 0; colIndex < _gameWorld.GameBoard.NumberOfColumns; ++colIndex)
                 {
-                    var rectangle = new Rectangle(x + _drawingArea.X - _camera.VisibleRectangle.X, y + _drawingArea.Y - _camera.VisibleRectangle.Y, CellWidth, CellHeight);
+                    var rectangle = new Rectangle(x + _drawingArea.X -_camera.VisibleRectangle.X, y + _drawingArea.Y - _camera.VisibleRectangle.Y, CellWidth, CellHeight);
 
-                    GameLogic.Point p = GameLogic.Point.Create(colIndex, rowIndex);
+                    Point2 p = Point2.Create(colIndex, rowIndex);
                     Cell cell = _gameWorld.GetCell(p);
                     if (_gameWorld.IsCellVisible(p))
                     {
@@ -100,11 +101,14 @@ namespace WinFormsGui
                 x = 0;
             }
 
-            _graphicsBuffer.DrawCircle(new Point( 0 * 20 + 10 + 5,  0 * 20 + 10 + 5), 10.0f, Color.DeepPink);
-            _graphicsBuffer.DrawCircle(new Point(47 * 20 + 10 + 5,  0 * 20 + 10 + 5), 10.0f, Color.DeepPink);
-            _graphicsBuffer.DrawCircle(new Point(24 * 20 + 10 + 5, 21 * 20 + 10 + 5), 10.0f, Color.DeepPink);
-            _graphicsBuffer.DrawCircle(new Point( 0 * 20 + 10 + 5, 41 * 20 + 10 + 5), 10.0f, Color.DeepPink);
-            _graphicsBuffer.DrawCircle(new Point(47 * 20 + 10 + 5, 41 * 20 + 10 + 5), 10.0f, Color.DeepPink);
+            // TODO: get below values from camera
+            const int margin = 5;
+            int radius = CellWidth / 2;
+            _graphicsBuffer.DrawCircle(new Point( 0 * CellWidth + radius + margin,  0 * CellHeight + radius + margin), radius, Color.DeepPink); // NW
+            _graphicsBuffer.DrawCircle(new Point(31 * CellWidth + radius + margin,  0 * CellHeight + radius + margin), radius, Color.DeepPink); // NE
+            _graphicsBuffer.DrawCircle(new Point(16 * CellWidth + radius + margin, 14 * CellHeight + radius + margin), radius, Color.DeepPink); // Center
+            _graphicsBuffer.DrawCircle(new Point( 0 * CellWidth + radius + margin, 27 * CellHeight + radius + margin), radius, Color.DeepPink); // SW
+            _graphicsBuffer.DrawCircle(new Point(31 * CellWidth + radius + margin, 27 * CellHeight + radius + margin), radius, Color.DeepPink); // SE
 
             _graphicsBuffer.DrawRectangle(new Rectangle(_drawingArea.X, _drawingArea.Y, _drawingArea.Width - 1, _drawingArea.Height - 1), Color.Red);
             _graphicsBuffer.DrawRectangle(new Rectangle(_drawingArea.X + 1, _drawingArea.Y + 1, _drawingArea.Width - 3, _drawingArea.Height - 3), Color.Red);

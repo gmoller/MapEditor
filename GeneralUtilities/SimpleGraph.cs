@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GameLogic.Graph
+namespace GeneralUtilities
 {
     public class SimpleGraph<T>
     {

@@ -1,11 +1,12 @@
 ﻿using GameLogic.NewLocationCalculators;
 using GameLogic.Processors;
+using GeneralUtilities;
 
 namespace GameLogic.Actions
 {
     public class MoveAction : IAct
     {
-        public Point Execute(Unit unit, GameWorld gameWorld)
+        public Point2 Execute(Unit unit, GameWorld gameWorld)
         {
             //INewLocationCalculator newLocationCalculator = NewLocationCalculatorFactory.GetNewLocationCalculator(compassDirection);
             //ProcessResponse response = movementProcessor.Process(new ProcessRequest(unit.Location, unit.MovementPoints), newLocationCalculator);

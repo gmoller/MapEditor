@@ -1,10 +1,12 @@
-﻿namespace GameLogic.NewLocationCalculators
+﻿using GeneralUtilities;
+
+namespace GameLogic.NewLocationCalculators
 {
     public class NorthCalculator : INewLocationCalculator
     {
-        public Point Calculate(Point location)
+        public Point2 Calculate(Point2 location)
         {
-            return Point.Create(location.X, location.Y + 1);
+            return Point2.Create(location.X, location.Y + 1);
         }
     }
 }
