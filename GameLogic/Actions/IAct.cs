@@ -1,9 +1,7 @@
-﻿using GeneralUtilities;
-
-namespace GameLogic.Actions
+﻿namespace GameLogic.Actions
 {
     public interface IAct
     {
-        Point2 Execute(Unit unit, GameWorld gameWorld);
+        Unit Execute(Unit unit, object parameters, GameWorld gameWorld);
     }
 }

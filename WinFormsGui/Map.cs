@@ -8,8 +8,8 @@ namespace WinFormsGui
 {
     public class Map
     {
-        private const int CellWidth = 30;
-        private const int CellHeight = 30;
+        public const int CellWidth = 30;
+        public const int CellHeight = 30;
 
         private readonly GameWorld _gameWorld;
         private readonly Images _images;

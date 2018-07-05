@@ -12,6 +12,7 @@ namespace WinFormsGui
 {
     public partial class Form1 : Form
     {
+        private const int Margin = 5;
         private const int Columns = 60; // 200
         private const int Rows = 40; // 160
 
@@ -77,19 +78,17 @@ namespace WinFormsGui
 
         private void Resize2()
         {
-            int margin = 5;
-
-            int width = ClientRectangle.Width - 200 - margin * 4;
-            int height = ClientRectangle.Height - margin * 2;
+            int width = ClientRectangle.Width - 200 - Margin * 4;
+            int height = ClientRectangle.Height - Margin * 2;
 
             Graphics graphics = CreateGraphics();
-            _mapWindow = new Map(graphics, margin, margin, 960, 840, Color.Black, _gameWorld, _images); // TODO: fix hard-coding
+            _mapWindow = new Map(graphics, Margin, Margin, 32 * Map.CellWidth, 28 * Map.CellHeight, Color.Black, _gameWorld, _images); // TODO: fix hard-coding
 
             width = 100;
-            _panelStatusBar = new Panel(graphics, ClientRectangle.Width - width - margin, 0 + margin, width, height, Color.LightBlue);
+            _panelStatusBar = new Panel(graphics, ClientRectangle.Width - width - Margin, 0 + Margin, width, height, Color.LightBlue);
 
             width = 100;
-            _panelEventsBar = new Panel(graphics, ClientRectangle.Width - width - margin - 100 - margin, 0 + margin, width, height, Color.LightGray); // 100 is width of statusbar
+            _panelEventsBar = new Panel(graphics, ClientRectangle.Width - width - Margin - 100 - Margin, 0 + Margin, width, height, Color.LightGray); // 100 is width of statusbar
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -287,12 +286,12 @@ namespace WinFormsGui
             if (e.Button == MouseButtons.Right)
             {
                 // did we click on the map?
-                if (e.Location.X < 5 || e.Location.X > _mapWindow.Width + 5) return; // clicked off the map
-                if (e.Location.Y < 5 || e.Location.Y > _mapWindow.Height + 5) return; // clicked off the map
+                if (e.Location.X < Margin || e.Location.X > _mapWindow.Width + Margin) return; // clicked off the map
+                if (e.Location.Y < Margin || e.Location.Y > _mapWindow.Height + Margin) return; // clicked off the map
 
                 // figure out screen cell
-                int screenColumn = (e.Location.X - 5) / 30; // TODO: remove hard-coded 30
-                int screenRow = (e.Location.Y - 5) / 30; // TODO: remove hard-coded 30
+                int screenColumn = (e.Location.X - Margin) / Map.CellWidth;
+                int screenRow = (e.Location.Y - Margin) / Map.CellHeight;
 
                 // convert to world cell
                 Point viewCell = new Point(screenColumn, screenRow);

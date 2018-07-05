@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using GameLogic.NewLocationCalculators;
-using GameLogic.Processors;
+using GameLogic.Actions;
 using GeneralUtilities;
 
 namespace GameLogic
@@ -16,6 +15,8 @@ namespace GameLogic
     public struct Unit
     {
         private readonly GameWorld _gameWorld;
+
+        private readonly Dictionary<string, IAct> _actions;
 
         public int UnitType { get; }
         public Point2 Location { get; }
@@ -38,6 +39,8 @@ namespace GameLogic
             UnitType = unitType;
             Location = location;
             MovementPoints = movementPoints;
+
+            _actions = new Dictionary<string, IAct> {{"Move", new MoveAction()}, {"Explore", new ExploreAction()}};
         }
 
         public static Unit CreateNew(int unitType, Point2 location, GameWorld gameWorld)
@@ -56,49 +59,11 @@ namespace GameLogic
             return unit;
         }
 
-        public Unit Move(MovementProcessor movementProcessor, CompassDirection compassDirection)
+        public Unit DoAction(string action, object parameters)
         {
-            INewLocationCalculator newLocationCalculator = NewLocationCalculatorFactory.GetNewLocationCalculator(compassDirection);
-            ProcessResponse response = movementProcessor.Process(new ProcessRequest(Location, MovementPoints), newLocationCalculator);
-
-            Unit unit = Create(UnitType, response.NewLocation, response.NewMovementPoints, _gameWorld);
-            CellVisibilitySetter.SetCellVisibility(unit.Location, _gameWorld);
+            Unit unit = _actions[action].Execute(this, parameters, _gameWorld);
 
             return unit;
-        }
-
-        public Point2 Explore()
-        {
-            // find closest non-visible cell
-            Dictionary<Point2, Point2> cameFrom = BreadthFirstSearch.CalculateCameFrom(Location, _gameWorld);
-            Point2 closest = FindClosestNonVisibleCell(cameFrom, _gameWorld);
-
-            if (closest != Point2.Null)
-            {
-                Point2[] path = BreadthFirstSearch.GetPath(Location, closest, cameFrom);
-
-                // move towards there
-                if (path.Length > 0)
-                {
-                    return path[0];
-                }
-            }
-
-            return Location;
-        }
-
-        private Point2 FindClosestNonVisibleCell(Dictionary<Point2, Point2> cameFrom, GameWorld gameWorld)
-        {
-            foreach (Point2 item in cameFrom.Keys)
-            {
-                if (!gameWorld.IsCellVisible(item))
-                {
-                    // the location to move towards
-                    return item;
-                }
-            }
-
-            return Point2.Null;
         }
 
         public void FoundCity()

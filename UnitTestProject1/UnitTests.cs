@@ -109,7 +109,7 @@ namespace UnitTestProject1
 
         private Unit MoveUnit(Unit unit, CompassDirection compassDirection, Point2 expectedLocation, float expectedMovementPoints = 1.0f)
         {
-            unit = unit.Move(_movementProcessor, compassDirection);
+            //unit = unit.Move(_movementProcessor, compassDirection);
 
             Assert.AreEqual(expectedLocation, unit.Location, "Location incorrect.");
             Assert.AreEqual(expectedLocation.X, unit.Location.X, "Location.X incorrect.");

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameData;
-using GameLogic.Processors;
-using GameMap;
 using GeneralUtilities;
 
 namespace GameLogic
@@ -13,14 +10,11 @@ namespace GameLogic
         private List<Unit> _units = new List<Unit>();
         private int _selectedUnitIndex = -1;
 
-        private readonly MovementProcessor _movementProcessor;
-
         private readonly Random _random = new Random();
 
         public Player(GameWorld gameWorld)
         {
             _gameWorld = gameWorld;
-            _movementProcessor = new MovementProcessor(gameWorld);
         }
 
         public IEnumerable<Unit> Units => _units;
@@ -101,7 +95,8 @@ namespace GameLogic
 
             if (move)
             {
-                Unit unit = _units[_selectedUnitIndex].Move(_movementProcessor, direction);
+                Unit unit = _units[_selectedUnitIndex].DoAction("Move", direction);
+
                 _units[_selectedUnitIndex] = unit;
 
                 centerOnSelectedUnitAction?.Invoke();
@@ -160,11 +155,10 @@ namespace GameLogic
                 // do it
                 //if (num == 0 || num == 2 || num == 4 || num == 6)
                 {
-                    //Unit unit = item.Move(_movementProcessor, (CompassDirection) num);
-                    //item.Actions["Move"].Execute(item, gameWorld);
-                    //or perhaps: item.DoAction("Move");
+                    //Unit unit = item.DoAction("Move", direction);
 
-                    Unit unit = Explore(item);
+                    //Unit unit = Explore(item);
+                    Unit unit = item.DoAction("Explore", null);
                     units.Add(unit);
                 }
             }
@@ -174,27 +168,29 @@ namespace GameLogic
             return result;
         }
 
-        private Unit Explore(Unit item)
-        {
-            Point2 newLocation = item.Explore();
+        //private Unit Explore(Unit item)
+        //{
+        //    Point2 newLocation = item.Explore();
 
-            Cell cell = _gameWorld.GetCell(newLocation);
-            TerrainType terrainType = Globals.Instance.TerrainTypes[cell.TerrainTypeId];
-            int movementCost = terrainType.MovementCost;
+        //    Cell cell = _gameWorld.GetCell(newLocation);
+        //    TerrainType terrainType = Globals.Instance.TerrainTypes[cell.TerrainTypeId];
+        //    int movementCost = terrainType.MovementCost;
 
-            if (item.MovementPoints - movementCost >= 0)
-            {
-                Unit unit = Unit.Create(item.UnitType, newLocation, item.MovementPoints - movementCost, _gameWorld);
-                return unit;
-                //result = $"{item.ToString()} -> {unit.ToString()}";
-            }
-            else // can't move, not enough points
-            {
-                // TODO: fix bug where if not enough movement points, unit keeps to trying to move to same spot and gets stuck!
-                return item;
-                //result = "Nothing";
-            }
-        }
+        //    if (item.MovementPoints - movementCost >= 0)
+        //    {
+        //        Unit unit = Unit.Create(item.UnitType, newLocation, item.MovementPoints - movementCost, _gameWorld);
+        //        return unit;
+        //        //result = $"{item.ToString()} -> {unit.ToString()}";
+        //    }
+        //    else // can't move, not enough points
+        //    {
+        //        // TODO: fix bug where if not enough movement points, unit keeps to trying to move to same spot and gets stuck!
+        //        return item;
+        //        //result = "Nothing";
+        //    }
+
+        //    return item;
+        //}
 
         public bool UnitInCell(int colIndex, int rowIndex)
         {

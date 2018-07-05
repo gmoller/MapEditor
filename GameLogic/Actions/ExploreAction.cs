@@ -5,7 +5,7 @@ namespace GameLogic.Actions
 {
     public class ExploreAction : IAct
     {
-        public Point2 Execute(Unit unit, GameWorld gameWorld)
+        public Unit Execute(Unit unit, object parameters, GameWorld gameWorld)
         {
             // find closest non-visible cell
             Dictionary<Point2, Point2> cameFrom = BreadthFirstSearch.CalculateCameFrom(unit.Location, gameWorld);
@@ -18,11 +18,11 @@ namespace GameLogic.Actions
                 // move towards there
                 if (path.Length > 0)
                 {
-                    return path[0];
+                    //return path[0];
                 }
             }
 
-            return unit.Location;
+            return unit;
         }
 
         private Point2 FindClosestNonVisibleCell(Dictionary<Point2, Point2> cameFrom, GameWorld gameWorld)

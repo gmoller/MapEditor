@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameData;
+using GameLogic.Processors;
 using GameMap;
 using GeneralUtilities;
 
@@ -14,6 +14,7 @@ namespace GameLogic
     {
         private Player Player { get; }
 
+        public MovementProcessor MovementProcessor { get; }
         public GameBoard GameBoard { get; }
         public IEnumerable<Unit> PlayerUnits => Player.Units;
         public Unit SelectedUnit => Player.SelectedUnit;
@@ -23,6 +24,7 @@ namespace GameLogic
         private GameWorld(GameBoard map)
         {
             GameBoard = map;
+            MovementProcessor = new MovementProcessor(this);
             Player = new Player(this);
         }
 
