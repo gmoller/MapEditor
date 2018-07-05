@@ -22,7 +22,7 @@ namespace WinFormsGui
         private readonly SlidingBuffer<string> _events = new SlidingBuffer<string>(30);
         private List<string> _texts;
 
-        private Map _map;
+        private Map _mapWindow;
         private Panel _panelStatusBar;
         private Panel _panelEventsBar;
 
@@ -83,7 +83,7 @@ namespace WinFormsGui
             int height = ClientRectangle.Height - margin * 2;
 
             Graphics graphics = CreateGraphics();
-            _map = new Map(graphics, margin, margin, width, height, Color.Black, _gameWorld, _images);
+            _mapWindow = new Map(graphics, margin, margin, 960, 840, Color.Black, _gameWorld, _images); // TODO: fix hard-coding
 
             width = 100;
             _panelStatusBar = new Panel(graphics, ClientRectangle.Width - width - margin, 0 + margin, width, height, Color.LightBlue);
@@ -135,7 +135,7 @@ namespace WinFormsGui
 
         private void ClearScreen()
         {
-            _map.Clear();
+            _mapWindow.Clear();
             _panelEventsBar.Clear();
             _panelStatusBar.Clear();
         }
@@ -188,17 +188,17 @@ namespace WinFormsGui
 
         private void DrawBoard()
         {
-            _map.DrawBoard(_showGrid);
+            _mapWindow.DrawBoard(_showGrid);
         }
 
         private void DrawUnits()
         {
-            _map.DrawUnits(Font);
+            _mapWindow.DrawUnits(Font);
         }
 
         private void FlipBuffer()
         {
-            _map.FlipBuffer();
+            _mapWindow.FlipBuffer();
             _panelEventsBar.FlipBuffer();
             _panelStatusBar.FlipBuffer();
         }
@@ -219,52 +219,52 @@ namespace WinFormsGui
                 return true;
             }
 
-            if (keyData == Keys.NumPad1)
+            if (keyData == Keys.NumPad1 || keyData == Keys.End) // SW
             {
                 _gameWorld.KeyPressed(Key.NumPad1);
                 return true;
             }
 
-            if (keyData == Keys.NumPad2 || keyData == Keys.Down)
+            if (keyData == Keys.NumPad2 || keyData == Keys.Down) // S
             {
                 _gameWorld.KeyPressed(Key.NumPad2);
                 return true;
             }
 
-            if (keyData == Keys.NumPad3)
+            if (keyData == Keys.NumPad3  || keyData == Keys.PageDown) // SE
             {
                 _gameWorld.KeyPressed(Key.NumPad3);
                 return true;
             }
 
-            if (keyData == Keys.NumPad4 || keyData == Keys.Left)
+            if (keyData == Keys.NumPad4 || keyData == Keys.Left) // W
             {
                 _gameWorld.KeyPressed(Key.NumPad4);
                 return true;
             }
 
-            if (keyData == Keys.NumPad6 || keyData == Keys.Right)
+            if (keyData == Keys.NumPad6 || keyData == Keys.Right) // E
             {
                 Action centerOnSelectedUnitAction = CenterOnSelectedUnitCell;
                 _gameWorld.KeyPressed(Key.NumPad6, centerOnSelectedUnitAction);
                 return true;
             }
 
-            if (keyData == Keys.NumPad7)
+            if (keyData == Keys.NumPad7 || keyData == Keys.Home) // NW
             {
                 _gameWorld.KeyPressed(Key.NumPad7);
                 return true;
             }
 
-            if (keyData == Keys.NumPad8 || keyData == Keys.Up)
+            if (keyData == Keys.NumPad8 || keyData == Keys.Up) // N
             {
                 _gameWorld.KeyPressed(Key.NumPad8);
                 return true;
             }
 
-            if (keyData == Keys.NumPad9)
+            if (keyData == Keys.NumPad9 || keyData == Keys.PageUp)
             {
-                _gameWorld.KeyPressed(Key.NumPad9);
+                _gameWorld.KeyPressed(Key.NumPad9); // NE
                 return true;
             }
 
@@ -278,8 +278,8 @@ namespace WinFormsGui
 
         private void CenterOnSelectedUnitCell()
         {
-            Point cell = new Point(_gameWorld.SelectedUnit.Location.X, (Rows - 1) - _gameWorld.SelectedUnit.Location.Y);
-            _map.CenterOnCell(cell);
+            Point cell = new Point(_gameWorld.SelectedUnit.Location.X, _gameWorld.SelectedUnit.Location.Y);
+            _mapWindow.CenterOnCell(cell);
         }
 
         private void Form1_MouseUp(object sender, MouseEventArgs e)
@@ -287,19 +287,19 @@ namespace WinFormsGui
             if (e.Button == MouseButtons.Right)
             {
                 // did we click on the map?
-                if (e.Location.X < 5 || e.Location.X > _map.Width + 5) return; // clicked off the map
-                if (e.Location.Y < 5 || e.Location.Y > _map.Height + 5) return; // clicked off the map
+                if (e.Location.X < 5 || e.Location.X > _mapWindow.Width + 5) return; // clicked off the map
+                if (e.Location.Y < 5 || e.Location.Y > _mapWindow.Height + 5) return; // clicked off the map
 
                 // figure out screen cell
-                int screenColumn = (e.Location.X - 5) / 30;
-                int screenRow = (e.Location.Y - 5) / 30;
+                int screenColumn = (e.Location.X - 5) / 30; // TODO: remove hard-coded 30
+                int screenRow = (e.Location.Y - 5) / 30; // TODO: remove hard-coded 30
 
                 // convert to world cell
                 Point viewCell = new Point(screenColumn, screenRow);
-                Point worldCell = _map.ConvertViewToWorld(viewCell);
+                Point worldCell = _mapWindow.ConvertViewToWorld(viewCell);
 
                 // and finally center
-                _map.CenterOnCell(worldCell);
+                _mapWindow.CenterOnCell(worldCell);
             }
         }
     }

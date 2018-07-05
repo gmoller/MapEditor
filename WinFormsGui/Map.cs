@@ -23,8 +23,10 @@ namespace WinFormsGui
 
         public int Width => _drawingArea.Width;
         public int Height => _drawingArea.Height;
-        public int ColumnCellsOnMap => _drawingArea.Width / CellWidth;
-        public int RowsCellsOnMap => _drawingArea.Height / CellHeight;
+        public int ColumnCellsOnScreen => _drawingArea.Width / CellWidth;
+        public int RowsCellsOnScreen => _drawingArea.Height / CellHeight;
+        public int ColumnCellsInWorld => _gameWorld.NumberOfColumns * CellWidth;
+        public int RowCellsInWorld => _gameWorld.NumberOfRows * CellHeight;
 
         public Map(Graphics graphics, int x, int y, int width, int height, Color color, GameWorld gameWorld, Images images)
         {
@@ -37,7 +39,7 @@ namespace WinFormsGui
             _bufferedGraphics = currentContext.Allocate(graphics, _drawingArea);
             _graphicsBuffer = _bufferedGraphics.Graphics;
 
-            _camera = new Camera(new Rectangle(0, 0, width, height), new Rectangle(0, 0, gameWorld.NumberOfColumns * CellWidth, gameWorld.NumberOfRows * CellHeight), CellWidth, CellHeight);
+            _camera = new Camera(new Rectangle(0, 0, width, height), new Rectangle(0, 0, ColumnCellsInWorld, RowCellsInWorld), CellWidth, CellHeight);
             _color = color;
         }
 
@@ -71,7 +73,7 @@ namespace WinFormsGui
             Rectangle sourceRectangle = _images.GetImageSize();
             int x = 0;
             int y = 0;
-            for (int rowIndex = _gameWorld.GameBoard.NumberOfRows - 1; rowIndex >= 0; --rowIndex)
+            for (int rowIndex = 0; rowIndex < _gameWorld.GameBoard.NumberOfRows; ++rowIndex)
             {
                 for (int colIndex = 0; colIndex < _gameWorld.GameBoard.NumberOfColumns; ++colIndex)
                 {
@@ -120,7 +122,7 @@ namespace WinFormsGui
             foreach (Unit item in _gameWorld.PlayerUnits)
             {
                 int x = item.Location.X * CellWidth;
-                int y = CellWidth * (_gameWorld.GameBoard.NumberOfRows - 1) - item.Location.Y * CellHeight;
+                int y = item.Location.Y * CellHeight;
                 Font font2 = new Font(font.FontFamily, 16.5f);
                 var rectangle = new Rectangle(x - _camera.VisibleRectangle.X, y - _camera.VisibleRectangle.Y, CellWidth, CellHeight);
                 _graphicsBuffer.DrawText(rectangle, "@", font2, Color.Red, Color.Transparent, Color.Transparent, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
