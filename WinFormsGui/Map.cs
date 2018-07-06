@@ -121,12 +121,22 @@ namespace WinFormsGui
         {
             foreach (Unit item in _gameWorld.PlayerUnits)
             {
-                int x = item.Location.X * CellWidth;
-                int y = item.Location.Y * CellHeight;
-                Font font2 = new Font(font.FontFamily, 16.5f);
-                var rectangle = new Rectangle(x - _camera.VisibleRectangle.X, y - _camera.VisibleRectangle.Y, CellWidth, CellHeight);
-                _graphicsBuffer.DrawText(rectangle, "@", font2, Color.Red, Color.Transparent, Color.Transparent, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+                DrawUnit(item, "@", font);
             }
+
+            foreach (Unit item in _gameWorld.Player2Units)
+            {
+                DrawUnit(item, "#", font);
+            }
+        }
+
+        public void DrawUnit(Unit unit, string symbol, Font font)
+        {
+            int x = unit.Location.X * CellWidth;
+            int y = unit.Location.Y * CellHeight;
+            Font font2 = new Font(font.FontFamily, 16.5f);
+            var rectangle = new Rectangle(x - _camera.VisibleRectangle.X, y - _camera.VisibleRectangle.Y, CellWidth, CellHeight);
+            _graphicsBuffer.DrawText(rectangle, symbol, font2, Color.Red, Color.Transparent, Color.Transparent, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
         }
 
         public void FlipBuffer()

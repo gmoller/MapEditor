@@ -12,13 +12,12 @@ namespace WinFormsGui
 {
     public partial class Form1 : Form
     {
-        private const int Margin = 5;
+        private new const int Margin = 5;
         private const int Columns = 60; // 200
         private const int Rows = 40; // 160
 
         private const bool AllVisible = true;
 
-        private GameWorld _gameWorld;
         private int _turn;
         private readonly SlidingBuffer<string> _events = new SlidingBuffer<string>(30);
         private List<string> _texts;
@@ -56,10 +55,20 @@ namespace WinFormsGui
             int[,] terrain = MapGenerator.Generate(Columns, Rows);
             GameBoard testMap = GameBoard.Create(1, terrain, AllVisible);
 
-            _gameWorld = GameWorld.Create(testMap);
+            Globals.Instance.GameWorld.SetGameBoard(testMap);
+
+            var player = new Player();
+            player.TurnEnded += Player_TurnEnded;
+            var player2 = new Player2();
+            player2.UnitMoved += Player2_UnitMoved;
+            player2.AddUnit(0, Point2.Create(1, 0)); // 50,30
+            player2.AddUnit(0, Point2.Create(2, 0));
+
+            Globals.Instance.GameWorld.SetPlayer(player);
+            Globals.Instance.GameWorld.SetPlayer2(player2);
 
             // Add unit
-            _gameWorld.AddUnitForPlayer(4, Point2.Create(0, 0), _gameWorld);
+            Globals.Instance.GameWorld.AddUnitForPlayer(4, Point2.Create(0, 0));
 
             // Start timer
             timer1.Interval = 1;
@@ -82,7 +91,7 @@ namespace WinFormsGui
             int height = ClientRectangle.Height - Margin * 2;
 
             Graphics graphics = CreateGraphics();
-            _mapWindow = new Map(graphics, Margin, Margin, 32 * Map.CellWidth, 28 * Map.CellHeight, Color.Black, _gameWorld, _images); // TODO: fix hard-coding
+            _mapWindow = new Map(graphics, Margin, Margin, 32 * Map.CellWidth, 28 * Map.CellHeight, Color.Black, Globals.Instance.GameWorld, _images); // TODO: fix hard-coding
 
             width = 100;
             _panelStatusBar = new Panel(graphics, ClientRectangle.Width - width - Margin, 0 + Margin, width, height, Color.LightBlue);
@@ -107,13 +116,6 @@ namespace WinFormsGui
             RenderScreen();
 
             timer1.Enabled = true;
-        }
-
-        private void Tick()
-        {
-            // if state 
-            // if state is <all moves done> do nothing
-            // if state is <end of turn pressed> do next turn
         }
 
         private void RenderScreen()
@@ -153,7 +155,7 @@ namespace WinFormsGui
             y += 15;
 
             // unit status
-            Unit unit = _gameWorld.SelectedUnit;
+            Unit unit = Globals.Instance.GameWorld.SelectedUnit;
             if (unit.UnitType == -1)
             {
                 _panelStatusBar.DrawText(new Point(0, y), "Next Turn", Font, Color.Green, Color.Transparent, Color.Transparent);
@@ -166,6 +168,8 @@ namespace WinFormsGui
                 y += 15;
                 _panelStatusBar.DrawText(new Point(0, y), $"Loc: {unit.Location}", Font, Color.Green, Color.Transparent, Color.Transparent);
             }
+
+            _panelStatusBar.DrawText(new Point(0, 500), $"MLoc: {_panelStatusBar.Location}", Font, Color.Blue, Color.Transparent, Color.Transparent);
         }
 
         private void DrawEventsBar()
@@ -220,64 +224,77 @@ namespace WinFormsGui
 
             if (keyData == Keys.NumPad1 || keyData == Keys.End) // SW
             {
-                _gameWorld.KeyPressed(Key.NumPad1);
+                Globals.Instance.GameWorld.KeyPressed(Key.NumPad1);
                 return true;
             }
 
             if (keyData == Keys.NumPad2 || keyData == Keys.Down) // S
             {
-                _gameWorld.KeyPressed(Key.NumPad2);
+                Globals.Instance.GameWorld.KeyPressed(Key.NumPad2);
                 return true;
             }
 
             if (keyData == Keys.NumPad3  || keyData == Keys.PageDown) // SE
             {
-                _gameWorld.KeyPressed(Key.NumPad3);
+                Globals.Instance.GameWorld.KeyPressed(Key.NumPad3);
                 return true;
             }
 
             if (keyData == Keys.NumPad4 || keyData == Keys.Left) // W
             {
-                _gameWorld.KeyPressed(Key.NumPad4);
+                Globals.Instance.GameWorld.KeyPressed(Key.NumPad4);
                 return true;
             }
 
             if (keyData == Keys.NumPad6 || keyData == Keys.Right) // E
             {
                 Action centerOnSelectedUnitAction = CenterOnSelectedUnitCell;
-                _gameWorld.KeyPressed(Key.NumPad6, centerOnSelectedUnitAction);
+                Globals.Instance.GameWorld.KeyPressed(Key.NumPad6, centerOnSelectedUnitAction);
                 return true;
             }
 
             if (keyData == Keys.NumPad7 || keyData == Keys.Home) // NW
             {
-                _gameWorld.KeyPressed(Key.NumPad7);
+                Globals.Instance.GameWorld.KeyPressed(Key.NumPad7);
                 return true;
             }
 
             if (keyData == Keys.NumPad8 || keyData == Keys.Up) // N
             {
-                _gameWorld.KeyPressed(Key.NumPad8);
+                Globals.Instance.GameWorld.KeyPressed(Key.NumPad8);
                 return true;
             }
 
             if (keyData == Keys.NumPad9 || keyData == Keys.PageUp)
             {
-                _gameWorld.KeyPressed(Key.NumPad9); // NE
+                Globals.Instance.GameWorld.KeyPressed(Key.NumPad9); // NE
                 return true;
             }
 
             if (keyData == Keys.Enter)
             {
-                _gameWorld.KeyPressed(Key.Enter);
+                Globals.Instance.GameWorld.KeyPressed(Key.Enter);
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
+        private void Player_TurnEnded(object sender, EventArgs e)
+        {
+            Globals.Instance.GameWorld.DoTurnForPlayer2();
+            Globals.Instance.GameWorld.EndTurnForPlayer2();
+            _turn++;
+        }
+
+        private void Player2_UnitMoved(object sender, UnitMovedEventArgs e)
+        {
+            _mapWindow.DrawUnit(e.Unit, "#", Font);
+            _mapWindow.FlipBuffer();
+        }
+
         private void CenterOnSelectedUnitCell()
         {
-            Point cell = new Point(_gameWorld.SelectedUnit.Location.X, _gameWorld.SelectedUnit.Location.Y);
+            Point cell = new Point(Globals.Instance.GameWorld.SelectedUnit.Location.X, Globals.Instance.GameWorld.SelectedUnit.Location.Y);
             _mapWindow.CenterOnCell(cell);
         }
 
@@ -285,21 +302,42 @@ namespace WinFormsGui
         {
             if (e.Button == MouseButtons.Right)
             {
-                // did we click on the map?
-                if (e.Location.X < Margin || e.Location.X > _mapWindow.Width + Margin) return; // clicked off the map
-                if (e.Location.Y < Margin || e.Location.Y > _mapWindow.Height + Margin) return; // clicked off the map
+                Point? worldCell = GetWorldCell(e.Location);
 
-                // figure out screen cell
-                int screenColumn = (e.Location.X - Margin) / Map.CellWidth;
-                int screenRow = (e.Location.Y - Margin) / Map.CellHeight;
-
-                // convert to world cell
-                Point viewCell = new Point(screenColumn, screenRow);
-                Point worldCell = _mapWindow.ConvertViewToWorld(viewCell);
-
-                // and finally center
-                _mapWindow.CenterOnCell(worldCell);
+                if (worldCell != null)
+                {
+                    _mapWindow.CenterOnCell(worldCell.GetValueOrDefault());
+                }
             }
+        }
+
+        private void Form1_MouseMove(object sender, MouseEventArgs e)
+        {
+            Point? worldCell = GetWorldCell(e.Location);
+
+            if (_panelStatusBar != null)
+            {
+                _panelStatusBar.Location = worldCell;
+            }
+        }
+
+        private Point? GetWorldCell(Point location)
+        {
+            if (_mapWindow == null) return null;
+
+            // are we are on the map?
+            if (location.X < Margin || location.X > _mapWindow.Width + Margin) return null;
+            if (location.Y < Margin || location.Y > _mapWindow.Height + Margin) return null;
+
+            // figure out screen cell
+            int screenColumn = (location.X - Margin) / Map.CellWidth;
+            int screenRow = (location.Y - Margin) / Map.CellHeight;
+
+            // convert to world cell
+            Point viewCell = new Point(screenColumn, screenRow);
+            Point worldCell = _mapWindow.ConvertViewToWorld(viewCell);
+
+            return worldCell;
         }
     }
 

@@ -105,7 +105,7 @@ namespace GameMap
                 {24, new[] {d, c, b, a}}
             };
 
-            int i = _random.Next(1, 25);
+            int i = _random.Next(1, 25); // get a number between 1 and 24
             Point2[] points = dic[i];
             AddCellsIfItsOnBoard(neighbors, points);
 

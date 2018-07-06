@@ -6,16 +6,8 @@ namespace GameLogic
 {
     public class Player
     {
-        private readonly GameWorld _gameWorld;
         private List<Unit> _units = new List<Unit>();
         private int _selectedUnitIndex = -1;
-
-        private readonly Random _random = new Random();
-
-        public Player(GameWorld gameWorld)
-        {
-            _gameWorld = gameWorld;
-        }
 
         public IEnumerable<Unit> Units => _units;
         public Unit SelectedUnit
@@ -30,6 +22,8 @@ namespace GameLogic
                 return _units[_selectedUnitIndex];
             }
         }
+
+        public event EventHandler TurnEnded;
 
         public void KeyPressed(Key key, Action centerOnSelectedUnitAction = null)
         {
@@ -95,31 +89,36 @@ namespace GameLogic
 
             if (move)
             {
-                Unit unit = _units[_selectedUnitIndex].DoAction("Move", direction);
+                Move(direction, centerOnSelectedUnitAction);
+            }
+        }
 
-                _units[_selectedUnitIndex] = unit;
+        private void Move(CompassDirection direction, Action centerOnSelectedUnitAction)
+        {
+            Unit unit = _units[_selectedUnitIndex].DoAction("Move", direction);
 
-                centerOnSelectedUnitAction?.Invoke();
+            _units[_selectedUnitIndex] = unit;
 
-                if (unit.MovementPoints <= 0)
+            centerOnSelectedUnitAction?.Invoke();
+
+            if (unit.MovementPoints <= 0)
+            {
+                _selectedUnitIndex++;
+                if (_selectedUnitIndex > _units.Count - 1)
                 {
-                    _selectedUnitIndex++;
-                    if (_selectedUnitIndex > _units.Count - 1)
-                    {
-                        _selectedUnitIndex = -1;
-                    }
+                    _selectedUnitIndex = -1;
                 }
             }
         }
 
-        public void AddUnit(int unitType, Point2 startLocation, GameWorld gameWorld)
+        public void AddUnit(int unitType, Point2 startLocation)
         {
-            Unit unit = Unit.CreateNew(unitType, startLocation, gameWorld);
+            Unit unit = Unit.CreateNew(unitType, startLocation);
             _units.Add(unit);
             _selectedUnitIndex = _units.Count - 1;
         }
 
-        public void EndTurn()
+        private void EndTurn()
         {
             List<Unit> units = new List<Unit>(_units.Count);
 
@@ -127,45 +126,20 @@ namespace GameLogic
             {
                 Unit unit = item.StartNewTurn();
                 units.Add(unit);
-                CellVisibilitySetter.SetCellVisibility(unit.Location, _gameWorld);
+                CellVisibilitySetter.SetCellVisibility(unit.Location, Globals.Instance.GameWorld);
             }
 
             _units = units;
-
-            if (_gameWorld.AreAllCellsVisible())
-            {
-                //_gameWorld.SetAllCellsInvisible();
-            }
-
             _selectedUnitIndex = 0;
+
+            // raise event here to inform listeners that turn has been ended
+            OnTurnEnded(EventArgs.Empty);
         }
 
-        public string DoTurn()
+        private void OnTurnEnded(EventArgs e)
         {
-            string result = string.Empty;
-
-            List<Unit> units = new List<Unit>(_units.Count);
-
-            foreach (Unit item in _units)
-            {
-                // decide what to do
-                int num = _random.Next(0, 9);
-                //if (num > 7) continue; // do nothing
-
-                // do it
-                //if (num == 0 || num == 2 || num == 4 || num == 6)
-                {
-                    //Unit unit = item.DoAction("Move", direction);
-
-                    //Unit unit = Explore(item);
-                    Unit unit = item.DoAction("Explore", null);
-                    units.Add(unit);
-                }
-            }
-
-            _units = units;
-
-            return result;
+            //Interlocked.CompareExchange(ref TurnEnded, null, null)?.Invoke(this, e);
+            TurnEnded?.Invoke(this, e);
         }
 
         //private Unit Explore(Unit item)
@@ -191,18 +165,5 @@ namespace GameLogic
 
         //    return item;
         //}
-
-        public bool UnitInCell(int colIndex, int rowIndex)
-        {
-            foreach (Unit item in _units)
-            {
-                if (item.Location.X == colIndex && item.Location.Y == rowIndex)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
     }
 }

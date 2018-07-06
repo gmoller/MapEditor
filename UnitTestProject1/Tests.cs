@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using GameLogic;
-using GameLogic.Processors;
 using GameMap;
 using GeneralUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -11,14 +10,14 @@ namespace UnitTestProject1
     public class Tests
     {
         private static GameWorld _gameWorld;
-        private static MovementProcessor _movementProcessor;
 
         [ClassInitialize]
         public static void Setup(TestContext context)
         {
             GameBoard gameBoard = GameBoard.Create(1, new int[3, 3], true);
-            _gameWorld = GameWorld.Create(gameBoard);
-            _movementProcessor = new MovementProcessor(_gameWorld);
+            Globals.Instance.GameWorld.SetGameBoard(gameBoard);
+            Globals.Instance.GameWorld.SetPlayer(new Player());
+            Globals.Instance.GameWorld.SetPlayer2(new Player2());
         }
 
         [TestMethod]
@@ -51,7 +50,7 @@ namespace UnitTestProject1
 
             for (int i = 0; i < 10; ++i)
             {
-                Unit unit = Unit.CreateNew(4, startLocation, _gameWorld);
+                Unit unit = Unit.CreateNew(4, startLocation);
                 units.Add(unit);
             }
 

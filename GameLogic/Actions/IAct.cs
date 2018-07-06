@@ -2,6 +2,6 @@
 {
     public interface IAct
     {
-        Unit Execute(Unit unit, object parameters, GameWorld gameWorld);
+        Unit Execute(Unit unit, object parameters);
     }
 }

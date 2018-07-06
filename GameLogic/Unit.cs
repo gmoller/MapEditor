@@ -14,8 +14,6 @@ namespace GameLogic
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
     public struct Unit
     {
-        private readonly GameWorld _gameWorld;
-
         private readonly Dictionary<string, IAct> _actions;
 
         public int UnitType { get; }
@@ -31,11 +29,10 @@ namespace GameLogic
             }
         }
 
-        public static readonly Unit Null = new Unit(-1, Point2.Null, 0.0f, null);
+        public static readonly Unit Null = new Unit(-1, Point2.Null, 0.0f);
 
-        private Unit(int unitType, Point2 location, float movementPoints, GameWorld gameWorld)
+        private Unit(int unitType, Point2 location, float movementPoints)
         {
-            _gameWorld = gameWorld;
             UnitType = unitType;
             Location = location;
             MovementPoints = movementPoints;
@@ -43,25 +40,25 @@ namespace GameLogic
             _actions = new Dictionary<string, IAct> {{"Move", new MoveAction()}, {"Explore", new ExploreAction()}};
         }
 
-        public static Unit CreateNew(int unitType, Point2 location, GameWorld gameWorld)
+        public static Unit CreateNew(int unitType, Point2 location)
         {
             float movementPoints = Globals.Instance.UnitTypes[unitType].Moves;
-            var unit = new Unit(unitType, location, movementPoints, gameWorld);
-            CellVisibilitySetter.SetCellVisibility(unit.Location, gameWorld);
+            var unit = new Unit(unitType, location, movementPoints);
+            CellVisibilitySetter.SetCellVisibility(unit.Location, Globals.Instance.GameWorld);
 
             return unit;
         }
 
-        public static Unit Create(int unitType, Point2 newLocation, float movementPoints, GameWorld gameWorld)
+        public static Unit Create(int unitType, Point2 newLocation, float movementPoints)
         {
-            var unit = new Unit(unitType, newLocation, movementPoints, gameWorld);
+            var unit = new Unit(unitType, newLocation, movementPoints);
 
             return unit;
         }
 
         public Unit DoAction(string action, object parameters)
         {
-            Unit unit = _actions[action].Execute(this, parameters, _gameWorld);
+            Unit unit = _actions[action].Execute(this, parameters);
 
             return unit;
         }
@@ -75,7 +72,7 @@ namespace GameLogic
         public Unit StartNewTurn()
         {
             float movementPoints = Globals.Instance.UnitTypes[UnitType].Moves;
-            Unit unit = Create(UnitType, Location, movementPoints, _gameWorld);
+            Unit unit = Create(UnitType, Location, movementPoints);
 
             return unit;
         }

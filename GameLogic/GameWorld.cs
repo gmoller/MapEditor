@@ -12,45 +12,60 @@ namespace GameLogic
     /// </summary>
     public class GameWorld
     {
-        private Player Player { get; }
+        private Player _player;
+        private Player2 _player2;
 
         public MovementProcessor MovementProcessor { get; }
-        public GameBoard GameBoard { get; }
-        public IEnumerable<Unit> PlayerUnits => Player.Units;
-        public Unit SelectedUnit => Player.SelectedUnit;
+        public GameBoard GameBoard { get; private set; }
+        public IEnumerable<Unit> PlayerUnits => _player.Units;
+        public IEnumerable<Unit> Player2Units => _player2.Units;
+        public Unit SelectedUnit => _player.SelectedUnit;
         public int NumberOfColumns => GameBoard.NumberOfColumns;
         public int NumberOfRows => GameBoard.NumberOfRows;
 
-        private GameWorld(GameBoard map)
+        private GameWorld()
         {
-            GameBoard = map;
             MovementProcessor = new MovementProcessor(this);
-            Player = new Player(this);
         }
 
-        public static GameWorld Create(GameBoard gameBoard)
+        public static GameWorld Create()
         {
-            return new GameWorld(gameBoard);
+            return new GameWorld();
+        }
+
+        public void SetGameBoard(GameBoard gameBoard)
+        {
+            GameBoard = gameBoard;
+        }
+
+        public void SetPlayer(Player player)
+        {
+            _player = player;
+        }
+
+        public void SetPlayer2(Player2 player2)
+        {
+            _player2 = player2;
         }
 
         public void KeyPressed(Key key, Action centerOnSelectedUnitAction = null)
         {
-            Player.KeyPressed(key, centerOnSelectedUnitAction);
+            _player.KeyPressed(key, centerOnSelectedUnitAction);
         }
 
-        public string DoTurnForPlayer()
+        public void DoTurnForPlayer2()
         {
-            return Player.DoTurn();
+            _player2.DoTurn();
         }
 
-        public void EndTurnForPlayer()
+        public void EndTurnForPlayer2()
         {
-            Player.EndTurn();
+            _player2.EndTurn();
         }
 
-        public void AddUnitForPlayer(int unitType, Point2 startLocation, GameWorld gameWorld)
+        public void AddUnitForPlayer(int unitType, Point2 startLocation)
         {
-            Player.AddUnit(unitType, startLocation, gameWorld);
+            _player.AddUnit(unitType, startLocation);
         }
 
         public Cell GetCell(Point2 location)

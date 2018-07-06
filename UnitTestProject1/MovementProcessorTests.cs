@@ -18,7 +18,9 @@ namespace UnitTestProject1
         public static void Setup(TestContext context)
         {
             GameBoard gameBoard = GameBoard.Create(1, new int[3,3], true);
-            _gameWorld = GameWorld.Create(gameBoard);
+            Globals.Instance.GameWorld.SetGameBoard(gameBoard);
+            Globals.Instance.GameWorld.SetPlayer(new Player());
+            Globals.Instance.GameWorld.SetPlayer2(new Player2());
         }
 
         [TestMethod]
@@ -33,7 +35,7 @@ namespace UnitTestProject1
             sw.Stop();
             Console.WriteLine($"Time taken: {sw.ElapsedMilliseconds} ms");
 
-            Unit unit = Unit.Create(0, response.NewLocation, response.NewMovementPoints, _gameWorld);
+            Unit unit = Unit.Create(0, response.NewLocation, response.NewMovementPoints);
 
             Assert.AreEqual(Point2.Create(1, 0), unit.Location, "Location incorrect.");
             Assert.AreEqual(1.0f, unit.MovementPoints, "MovementPoints incorrect.");

@@ -10,6 +10,8 @@ namespace WinFormsGui
         private readonly Rectangle _rectangle;
         private readonly Color _color;
 
+        public Point? Location { get; set; }
+
         public Panel(Graphics graphics, int x, int y, int width, int height, Color color)
         {
             _drawingArea = new Rectangle(x, y, width, height);
