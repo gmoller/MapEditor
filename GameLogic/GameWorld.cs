@@ -12,6 +12,18 @@ namespace GameLogic
     /// </summary>
     public class GameWorld
     {
+        private readonly Dictionary<Key, CompassDirection> _movementMapping = new Dictionary<Key, CompassDirection>
+        {
+            {Key.NumPad1, CompassDirection.SouthWest},
+            {Key.NumPad2, CompassDirection.South},
+            {Key.NumPad3, CompassDirection.SouthEast},
+            {Key.NumPad4, CompassDirection.West},
+            {Key.NumPad6, CompassDirection.East},
+            {Key.NumPad7, CompassDirection.NorthWest},
+            {Key.NumPad8, CompassDirection.North},
+            {Key.NumPad9, CompassDirection.NorthEast}
+        };
+
         private Player _player;
         private Player2 _player2;
 
@@ -48,9 +60,32 @@ namespace GameLogic
             _player2 = player2;
         }
 
-        public void KeyPressed(Key key, Action centerOnSelectedUnitAction = null)
+        public void KeyPressed(Key key)
         {
-            _player.KeyPressed(key, centerOnSelectedUnitAction);
+            if (key == Key.Enter)
+            {
+                _player.EndTurn();
+                return;
+            }
+
+            CompassDirection direction = DetermineDirectionToMove(key);
+            if (direction != CompassDirection.None)
+            {
+                _player.MoveSelectedUnit(direction);
+            }
+        }
+
+        private CompassDirection DetermineDirectionToMove(Key key)
+        {
+            CompassDirection direction;
+            _movementMapping.TryGetValue(key, out direction);
+
+            return direction;
+        }
+
+        public void StartTurnForPlayer()
+        {
+            _player.StartTurn();
         }
 
         public void DoTurnForPlayer2()
@@ -61,11 +96,6 @@ namespace GameLogic
         public void EndTurnForPlayer2()
         {
             _player2.EndTurn();
-        }
-
-        public void AddUnitForPlayer(int unitType, Point2 startLocation)
-        {
-            _player.AddUnit(unitType, startLocation);
         }
 
         public Cell GetCell(Point2 location)

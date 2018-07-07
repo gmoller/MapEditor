@@ -1,4 +1,6 @@
-﻿namespace GameLogic
+﻿using System;
+
+namespace GameLogic
 {
     public enum CompassDirection
     {
@@ -9,7 +11,8 @@
         South,
         SouthWest,
         West,
-        NorthWest
+        NorthWest,
+        None
     }
 
     public enum Key
@@ -27,5 +30,17 @@
         NumPad7,
         NumPad8,
         NumPad9
+    }
+
+    public delegate void UnitMovedEventHandler(object sender, UnitMovedEventArgs e);
+
+    public class UnitMovedEventArgs : EventArgs
+    {
+        public Unit Unit { get; }
+
+        public UnitMovedEventArgs(Unit unit)
+        {
+            Unit = unit;
+        }
     }
 }

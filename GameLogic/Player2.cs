@@ -1,21 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GeneralUtilities;
 
 namespace GameLogic
 {
-    public delegate void UnitMovedEventHandler(object sender, UnitMovedEventArgs e);
-
-    public class UnitMovedEventArgs : EventArgs
-    {
-        public Unit Unit { get; }
-
-        public UnitMovedEventArgs(Unit unit)
-        {
-            Unit = unit;
-        }
-    }
-
     /// <summary>
     /// A computer player.
     /// </summary>
@@ -48,9 +35,8 @@ namespace GameLogic
                 int direction = Globals.Instance.GetRandomNumber(0, 7);
 
                 Unit unit = item.DoAction("Move", direction);
-                units.Add(unit);
-
                 OnUnitMoved(new UnitMovedEventArgs(unit));
+                units.Add(unit);
             }
 
             _units = units;

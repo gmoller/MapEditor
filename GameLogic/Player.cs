@@ -23,83 +23,16 @@ namespace GameLogic
             }
         }
 
+        public event UnitMovedEventHandler UnitMoved;
         public event EventHandler TurnEnded;
 
-        public void KeyPressed(Key key, Action centerOnSelectedUnitAction = null)
+        public void MoveSelectedUnit(CompassDirection direction)
         {
-            if (_selectedUnitIndex == -1)
-            {
-                if (key == Key.Enter)
-                {
-                    EndTurn();
-                }
-                return;
-            }
+            if (_selectedUnitIndex == -1) return;
 
-            bool move = false;
-            CompassDirection direction = CompassDirection.North;
-
-            if (key == Key.NumPad1)
-            {
-                direction = CompassDirection.SouthWest;
-                move = true;
-            }
-
-            if (key == Key.NumPad2)
-            {
-                direction = CompassDirection.South;
-                move = true;
-            }
-
-            if (key == Key.NumPad3)
-            {
-                direction = CompassDirection.SouthEast;
-                move = true;
-            }
-
-            if (key == Key.NumPad4)
-            {
-                direction = CompassDirection.West;
-                move = true;
-            }
-
-            if (key == Key.NumPad6)
-            {
-                direction = CompassDirection.East;
-                move = true;
-            }
-
-            if (key == Key.NumPad7)
-            {
-                direction = CompassDirection.NorthWest;
-                move = true;
-            }
-
-            if (key == Key.NumPad8)
-            {
-                direction = CompassDirection.North;
-                move = true;
-            }
-
-            if (key == Key.NumPad9)
-            {
-                direction = CompassDirection.NorthEast;
-                move = true;
-            }
-
-            if (move)
-            {
-                Move(direction, centerOnSelectedUnitAction);
-            }
-        }
-
-        private void Move(CompassDirection direction, Action centerOnSelectedUnitAction)
-        {
             Unit unit = _units[_selectedUnitIndex].DoAction("Move", direction);
-
+            OnUnitMoved(new UnitMovedEventArgs(unit));
             _units[_selectedUnitIndex] = unit;
-
-            centerOnSelectedUnitAction?.Invoke();
 
             if (unit.MovementPoints <= 0)
             {
@@ -111,6 +44,12 @@ namespace GameLogic
             }
         }
 
+        private void OnUnitMoved(UnitMovedEventArgs e)
+        {
+            //Interlocked.CompareExchange(ref TurnEnded, null, null)?.Invoke(this, e);
+            UnitMoved?.Invoke(this, e);
+        }
+
         public void AddUnit(int unitType, Point2 startLocation)
         {
             Unit unit = Unit.CreateNew(unitType, startLocation);
@@ -118,7 +57,7 @@ namespace GameLogic
             _selectedUnitIndex = _units.Count - 1;
         }
 
-        private void EndTurn()
+        public void StartTurn()
         {
             List<Unit> units = new List<Unit>(_units.Count);
 
@@ -131,6 +70,23 @@ namespace GameLogic
 
             _units = units;
             _selectedUnitIndex = 0;
+        }
+
+        public void EndTurn()
+        {
+            if (_selectedUnitIndex >= 0) return;
+
+            //List<Unit> units = new List<Unit>(_units.Count);
+
+            //foreach (Unit item in _units)
+            //{
+            //    Unit unit = item.StartNewTurn();
+            //    units.Add(unit);
+            //    CellVisibilitySetter.SetCellVisibility(unit.Location, Globals.Instance.GameWorld);
+            //}
+
+            //_units = units;
+            //_selectedUnitIndex = 0;
 
             // raise event here to inform listeners that turn has been ended
             OnTurnEnded(EventArgs.Empty);

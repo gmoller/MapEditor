@@ -18,7 +18,7 @@ namespace WinFormsGui
 
         private const bool AllVisible = true;
 
-        private int _turn;
+        private int _turn = 1;
         private readonly SlidingBuffer<string> _events = new SlidingBuffer<string>(30);
         private List<string> _texts;
 
@@ -58,7 +58,12 @@ namespace WinFormsGui
             Globals.Instance.GameWorld.SetGameBoard(testMap);
 
             var player = new Player();
+            player.UnitMoved += Player_UnitMoved;
             player.TurnEnded += Player_TurnEnded;
+            player.AddUnit(4, Point2.Create(0, 0)); // cavalry
+            player.AddUnit(0, Point2.Create(0, 1)); // cavalry
+            player.StartTurn();
+
             var player2 = new Player2();
             player2.UnitMoved += Player2_UnitMoved;
             player2.AddUnit(0, Point2.Create(1, 0)); // 50,30
@@ -66,9 +71,6 @@ namespace WinFormsGui
 
             Globals.Instance.GameWorld.SetPlayer(player);
             Globals.Instance.GameWorld.SetPlayer2(player2);
-
-            // Add unit
-            Globals.Instance.GameWorld.AddUnitForPlayer(4, Point2.Create(0, 0));
 
             // Start timer
             timer1.Interval = 1;
@@ -105,15 +107,10 @@ namespace WinFormsGui
             timer1.Enabled = false;
 
             _stopwatch.Restart();
-            //string result = _gameWorld.DoTurnForPlayer();
-            //_gameWorld.EndTurnForPlayer();
-            //_turn++;
+            RenderScreen();
             _stopwatch.Stop();
 
-            //_events.Add($"Turn {_turn + 1}: {result}");
             _events.Add($"Time taken: {_stopwatch.ElapsedMilliseconds} ms.");
-
-            RenderScreen();
 
             timer1.Enabled = true;
         }
@@ -248,8 +245,7 @@ namespace WinFormsGui
 
             if (keyData == Keys.NumPad6 || keyData == Keys.Right) // E
             {
-                Action centerOnSelectedUnitAction = CenterOnSelectedUnitCell;
-                Globals.Instance.GameWorld.KeyPressed(Key.NumPad6, centerOnSelectedUnitAction);
+                Globals.Instance.GameWorld.KeyPressed(Key.NumPad6);
                 return true;
             }
 
@@ -284,18 +280,19 @@ namespace WinFormsGui
             Globals.Instance.GameWorld.DoTurnForPlayer2();
             Globals.Instance.GameWorld.EndTurnForPlayer2();
             _turn++;
+            Globals.Instance.GameWorld.StartTurnForPlayer();
+        }
+
+        private void Player_UnitMoved(object sender, UnitMovedEventArgs e)
+        {
+            Point cell = new Point(Globals.Instance.GameWorld.SelectedUnit.Location.X, Globals.Instance.GameWorld.SelectedUnit.Location.Y);
+            _mapWindow.CenterOnCell(cell);
         }
 
         private void Player2_UnitMoved(object sender, UnitMovedEventArgs e)
         {
             _mapWindow.DrawUnit(e.Unit, "#", Font);
             _mapWindow.FlipBuffer();
-        }
-
-        private void CenterOnSelectedUnitCell()
-        {
-            Point cell = new Point(Globals.Instance.GameWorld.SelectedUnit.Location.X, Globals.Instance.GameWorld.SelectedUnit.Location.Y);
-            _mapWindow.CenterOnCell(cell);
         }
 
         private void Form1_MouseUp(object sender, MouseEventArgs e)
@@ -343,33 +340,61 @@ namespace WinFormsGui
 
     public class Images
     {
-        private readonly Dictionary<int, Image> _dictionary;
+        private readonly Dictionary<int, Image> _tileImages;
+        private readonly Dictionary<int, Image> _townImages;
 
         public Images()
         {
-            _dictionary = new Dictionary<int, Image>();
+            _tileImages = new Dictionary<int, Image>();
+            AddTileImage(0, "Tiles/00-plains_1.png");
+            AddTileImage(1, "Tiles/01-conifer_forest_inner.png");
+            AddTileImage(6, "Tiles/06-hills_inner_1.png");
+            AddTileImage(7, "Tiles/07-mountains_inner.png");
+            AddTileImage(11, "Tiles/11-ocean_inner.png");
 
-            AddImage(0, "00-plains_1.png");
-            AddImage(1, "01-conifer_forest_inner.png");
-            AddImage(6, "06-hills_inner_1.png");
-            AddImage(7, "07-mountains_inner.png");
-            AddImage(11, "11-ocean_inner.png");
+            _townImages = new Dictionary<int, Image>();
+            AddTownImage(0, "Towns/0-outpost.png");
+            AddTownImage(1, "Towns/1-hamlet.png");
+            AddTownImage(2, "Towns/2-village.png");
+            AddTownImage(3, "Towns/3-town.png");
+            AddTownImage(4, "Towns/4-city.png");
+            AddTownImage(5, "Towns/5-capital.png");
         }
 
-        private void AddImage(int index, string filename)
+        private void AddTileImage(int index, string filename)
         {
             Image image = Image.FromFile($"Images/{filename}");
-            _dictionary.Add(index, image);
+            _tileImages.Add(index, image);
         }
 
-        internal Image GetImage(int imageId)
+        private void AddTownImage(int index, string filename)
         {
-            return _dictionary[imageId];
+            Image image = Image.FromFile($"Images/{filename}");
+            _townImages.Add(index, image);
         }
 
-        internal Rectangle GetImageSize()
+        internal Image GetTileImage(int imageId)
         {
-            return new Rectangle(0, 0, 64, 64);
+            return _tileImages[imageId];
+        }
+
+        internal Image GetTownImage(int imageId)
+        {
+            return _townImages[imageId];
+        }
+
+        internal Rectangle GetTileImageSize(int index)
+        {
+            Image image = _tileImages[index];
+
+            return new Rectangle(0, 0, image.Width, image.Height);
+        }
+
+        internal Rectangle GetTownImageSize(int index)
+        {
+            Image image = _townImages[index];
+
+            return new Rectangle(0, 0, image.Width, image.Height);
         }
     }
 }

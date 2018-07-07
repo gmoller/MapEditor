@@ -70,7 +70,6 @@ namespace WinFormsGui
 
         public void DrawBoard(bool showGrid)
         {
-            Rectangle sourceRectangle = _images.GetImageSize();
             int x = 0;
             int y = 0;
             for (int rowIndex = 0; rowIndex < _gameWorld.GameBoard.NumberOfRows; ++rowIndex)
@@ -83,8 +82,9 @@ namespace WinFormsGui
                     Cell cell = _gameWorld.GetCell(p);
                     if (_gameWorld.IsCellVisible(p))
                     {
-                        _graphicsBuffer.DrawImage(_images.GetImage(cell.TerrainTypeId), rectangle, sourceRectangle, GraphicsUnit.Pixel);
-
+                        Image image = _images.GetTileImage(cell.TerrainTypeId);
+                        var sourceRectangle = new Rectangle(0, 0, image.Width, image.Height);
+                        _graphicsBuffer.DrawImage(image, rectangle, sourceRectangle, GraphicsUnit.Pixel);
                     }
                     else
                     {
@@ -137,6 +137,11 @@ namespace WinFormsGui
             Font font2 = new Font(font.FontFamily, 16.5f);
             var rectangle = new Rectangle(x - _camera.VisibleRectangle.X, y - _camera.VisibleRectangle.Y, CellWidth, CellHeight);
             _graphicsBuffer.DrawText(rectangle, symbol, font2, Color.Red, Color.Transparent, Color.Transparent, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+
+            //Image image = _images.GetTownImage(0);
+            //var sourceRectangle = new Rectangle(0, 0, image.Width, image.Height);
+            //var sourceRectangle = new Rectangle(0, 0, 30, 30);
+            //_graphicsBuffer.DrawImage(image, rectangle);
         }
 
         public void FlipBuffer()
