@@ -2,6 +2,16 @@
 
 namespace GameLogic
 {
+    public enum SettlementType
+    {
+        Outpost,
+        Hamlet,
+        Village,
+        Town,
+        City,
+        Capital
+    }
+
     public enum CompassDirection
     {
         North,

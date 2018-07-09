@@ -1,14 +1,16 @@
-﻿--Id,Name,MovementCost--
-0,Grassland,1
-1,Forest,2
-2,Desert,1
-3,Swamp,3
-4,River,2
-5,River Mouth,2
-6,Hill,3
-7,Mountain,4
-8,Volcano,4
-9,Tundra,2
-10,Shore,-1
-11,Ocean,-1
-12,SorceryNode,1
+﻿--Id,Name,MovementCost,FoodOutput--
+0,Grassland,1,1.5
+1,Forest,2,0.5
+2,Desert,1,0
+3,Swamp,3,0
+4,River,2,2
+5,River Mouth,2,2
+6,Hill,3,0.5
+7,Mountain,4,0
+8,Volcano,4,0
+9,Tundra,2,0
+10,Shore,-1,0.5
+11,Ocean,-1,0
+12,SorceryNode,1,2
+13,ChaosNode,4,0
+14,NatureNode,2,2.5

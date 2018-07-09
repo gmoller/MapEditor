@@ -144,6 +144,18 @@ namespace WinFormsGui
             //_graphicsBuffer.DrawImage(image, rectangle);
         }
 
+        public void DrawSettlements()
+        {
+            foreach (Settlement item in _gameWorld.PlayerSettlements)
+            {
+                int x = item.Location.X * CellWidth + 5;
+                int y = item.Location.Y * CellHeight + 5;
+                Image image = _images.GetTownImage(0);
+                var rectangle = new Rectangle(x - _camera.VisibleRectangle.X, y - _camera.VisibleRectangle.Y, CellWidth, CellHeight);
+                _graphicsBuffer.DrawImage(image, rectangle);
+            }
+        }
+
         public void FlipBuffer()
         {
             _bufferedGraphics.Render();

@@ -7,26 +7,24 @@ namespace GameData
     /// This struct is immutable.
     /// </summary>
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
-    public struct UnitType
+    public struct MineralType
     {
-        public static readonly UnitType Invalid = new UnitType(-1, "None", 0, MovementType.Invalid);
+        public static readonly MineralType Invalid = new MineralType(-1, "None", 0.0f);
 
         public int Id { get; }
         public string Name { get; }
-        public int Moves { get; }
-        public MovementType MovementType { get; }
+        public float FoodModifier { get; }
 
-        private UnitType(int id, string name, int moves, MovementType movementType)
+        private MineralType(int id, string name, float foodModifier)
         {
             Id = id;
             Name = name;
-            Moves = moves;
-            MovementType = movementType;
+            FoodModifier = foodModifier;
         }
 
-        public static UnitType Create(int id, string name, int moves, MovementType movementType)
+        public static MineralType Create(int id, string name, float foodModifier)
         {
-            return new UnitType(id, name, moves, movementType);
+            return new MineralType(id, name, foodModifier);
         }
 
         private string DebuggerDisplay => $"{{Id={Id},Name={Name}}}";
@@ -36,33 +34,33 @@ namespace GameData
     /// This class is immutable.
     /// </summary>
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
-    public class UnitTypes
+    public class MineralTypes
     {
-        private readonly Dictionary<int, UnitType> _items;
+        private readonly Dictionary<int, MineralType> _items;
 
-        private UnitTypes(List<UnitType> items)
+        private MineralTypes(List<MineralType> items)
         {
-            _items = new Dictionary<int, UnitType>();
-            foreach (UnitType item in items)
+            _items = new Dictionary<int, MineralType>();
+            foreach (MineralType item in items)
             {
                 _items.Add(item.Id, item);
             }
         }
 
-        public static UnitTypes Create(List<UnitType> items)
+        public static MineralTypes Create(List<MineralType> items)
         {
-            return new UnitTypes(items);
+            return new MineralTypes(items);
         }
 
         public int Count => _items.Count;
 
-        public UnitType this[int index]
+        public MineralType this[int index]
         {
             get
             {
                 if (index < 0 || index > _items.Count - 1)
                 {
-                    return UnitType.Invalid;
+                    return MineralType.Invalid;
                 }
 
                 return _items[index];

@@ -2,7 +2,7 @@
 using System.IO;
 using GeneralUtilities;
 
-namespace GameData
+namespace GameData.Loaders
 {
     public static class TerrainTypesLoader
     {
@@ -19,7 +19,8 @@ namespace GameData
                 int id = splitLine[0].ToInt32();
                 string name = splitLine[1];
                 int movementCost = splitLine[2].ToInt32();
-                TerrainType terrainType = TerrainType.Create(id, name, movementCost);
+                float foodOutput = splitLine[3].ToFloat();
+                TerrainType terrainType = TerrainType.Create(id, name, movementCost, foodOutput);
                 terrainTypes.Add(terrainType);
             }
 

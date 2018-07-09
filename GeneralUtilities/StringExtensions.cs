@@ -18,6 +18,20 @@ namespace GeneralUtilities
             }
         }
 
+        public static float ToFloat(this string s)
+        {
+            try
+            {
+                float f = Convert.ToSingle(s);
+
+                return f;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to convert string [{s}] to float.", ex);
+            }
+        }
+
         public static T ToEnum<T>(this string value, bool ignoreCase = true)
         {
             return (T)Enum.Parse(typeof(T), value, ignoreCase);

@@ -2,7 +2,7 @@
 using System.IO;
 using GeneralUtilities;
 
-namespace GameData
+namespace GameData.Loaders
 {
     public static class UnitTypesLoader
     {

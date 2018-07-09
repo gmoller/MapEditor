@@ -29,6 +29,7 @@ namespace GameLogic
 
         public MovementProcessor MovementProcessor { get; }
         public GameBoard GameBoard { get; private set; }
+        public IEnumerable<Settlement> PlayerSettlements => _player.Settlements;
         public IEnumerable<Unit> PlayerUnits => _player.Units;
         public IEnumerable<Unit> Player2Units => _player2.Units;
         public Unit SelectedUnit => _player.SelectedUnit;
@@ -129,6 +130,32 @@ namespace GameLogic
         internal void SetAllCellsInvisible()
         {
             GameBoard.SetAllCellsInvisible();
+        }
+
+        public bool IsPlayerSettlementOnCell(Point2 location)
+        {
+            foreach (Settlement item in Globals.Instance.GameWorld.PlayerSettlements)
+            {
+                if (item.Location == location)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public Settlement GetPlayerSettlementOnCell(Point2 location)
+        {
+            foreach (Settlement item in Globals.Instance.GameWorld.PlayerSettlements)
+            {
+                if (item.Location == location)
+                {
+                    return item;
+                }
+            }
+
+            return null;
         }
     }
 }

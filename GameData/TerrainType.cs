@@ -9,22 +9,24 @@ namespace GameData
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
     public struct TerrainType
     {
-        public static readonly TerrainType Invalid = new TerrainType(-1, "Invalid", -1);
+        public static readonly TerrainType Invalid = new TerrainType(-1, "None", -1, 0);
 
         public int Id { get; }
         public string Name { get; }
         public int MovementCost { get; }
+        public float FoodOutput { get; }
 
-        private TerrainType(int id, string name, int movementCost)
+        private TerrainType(int id, string name, int movementCost, float foodOutput)
         {
             Id = id;
             Name = name;
             MovementCost = movementCost;
+            FoodOutput = foodOutput;
         }
 
-        public static TerrainType Create(int id, string name, int movementCost)
+        public static TerrainType Create(int id, string name, int movementCost, float foodOutput)
         {
-            return new TerrainType(id, name, movementCost);
+            return new TerrainType(id, name, movementCost, foodOutput);
         }
 
         private string DebuggerDisplay => $"{{Id={Id},Name={Name}}}";

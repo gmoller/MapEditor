@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using GameData;
+using GameData.Loaders;
 using GameLogic;
 using GameMap;
 using GeneralUtilities;
@@ -12,11 +13,11 @@ namespace WinFormsGui
 {
     public partial class Form1 : Form
     {
-        private new const int Margin = 5;
-        private const int Columns = 60; // 200
-        private const int Rows = 40; // 160
+        private const int MARGIN = 5;
+        private const int COLUMNS = 60; // 200
+        private const int ROWS = 40; // 160
 
-        private const bool AllVisible = true;
+        private const bool ALL_VISIBLE = true;
 
         private int _turn = 1;
         private readonly SlidingBuffer<string> _events = new SlidingBuffer<string>(30);
@@ -52,14 +53,15 @@ namespace WinFormsGui
 
             // Create gameboard
             //int[,] terrain = MapLoader.Load("Map.txt");
-            int[,] terrain = MapGenerator.Generate(Columns, Rows);
-            GameBoard testMap = GameBoard.Create(1, terrain, AllVisible);
+            int[,] terrain = MapGenerator.Generate(COLUMNS, ROWS);
+            GameBoard testMap = GameBoard.Create(1, terrain, ALL_VISIBLE);
 
             Globals.Instance.GameWorld.SetGameBoard(testMap);
 
             var player = new Player();
             player.UnitMoved += Player_UnitMoved;
             player.TurnEnded += Player_TurnEnded;
+            player.AddSettlement("Margeritaville", Point2.Create(1, 1));
             player.AddUnit(4, Point2.Create(0, 0)); // cavalry
             player.AddUnit(0, Point2.Create(0, 1)); // cavalry
             player.StartTurn();
@@ -89,17 +91,17 @@ namespace WinFormsGui
 
         private void Resize2()
         {
-            int width = ClientRectangle.Width - 200 - Margin * 4;
-            int height = ClientRectangle.Height - Margin * 2;
+            int width = ClientRectangle.Width - 200 - MARGIN * 4;
+            int height = ClientRectangle.Height - MARGIN * 2;
 
             Graphics graphics = CreateGraphics();
-            _mapWindow = new Map(graphics, Margin, Margin, 32 * Map.CellWidth, 28 * Map.CellHeight, Color.Black, Globals.Instance.GameWorld, _images); // TODO: fix hard-coding
+            _mapWindow = new Map(graphics, MARGIN, MARGIN, 32 * Map.CellWidth, 28 * Map.CellHeight, Color.Black, Globals.Instance.GameWorld, _images); // TODO: fix hard-coding
 
             width = 100;
-            _panelStatusBar = new Panel(graphics, ClientRectangle.Width - width - Margin, 0 + Margin, width, height, Color.LightBlue);
+            _panelStatusBar = new Panel(graphics, ClientRectangle.Width - width - MARGIN, 0 + MARGIN, width, height, Color.LightBlue);
 
             width = 100;
-            _panelEventsBar = new Panel(graphics, ClientRectangle.Width - width - Margin - 100 - Margin, 0 + Margin, width, height, Color.LightGray); // 100 is width of statusbar
+            _panelEventsBar = new Panel(graphics, ClientRectangle.Width - width - MARGIN - 100 - MARGIN, 0 + MARGIN, width, height, Color.LightGray); // 100 is width of statusbar
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -123,6 +125,7 @@ namespace WinFormsGui
             DrawStatusBar();
             DrawEventsBar();
             DrawBoard();
+            DrawSettlements();
             DrawUnits();
 
             FlipBuffer();
@@ -189,6 +192,11 @@ namespace WinFormsGui
         private void DrawBoard()
         {
             _mapWindow.DrawBoard(_showGrid);
+        }
+
+        private void DrawSettlements()
+        {
+            _mapWindow.DrawSettlements();
         }
 
         private void DrawUnits()
@@ -303,7 +311,18 @@ namespace WinFormsGui
 
                 if (worldCell != null)
                 {
-                    _mapWindow.CenterOnCell(worldCell.GetValueOrDefault());
+                    Point2 location = Point2.Create(worldCell.Value.X, worldCell.Value.Y);
+                    if (Globals.Instance.GameWorld.IsPlayerSettlementOnCell(location))
+                    {
+                        Settlement settlement = Globals.Instance.GameWorld.GetPlayerSettlementOnCell(location);
+                        var settlementForm = new SettlementForm();
+                        settlementForm.SetData(settlement);
+                        settlementForm.ShowDialog();
+                    }
+                    else
+                    {
+                        _mapWindow.CenterOnCell(worldCell.GetValueOrDefault());
+                    }
                 }
             }
         }
@@ -323,12 +342,12 @@ namespace WinFormsGui
             if (_mapWindow == null) return null;
 
             // are we are on the map?
-            if (location.X < Margin || location.X > _mapWindow.Width + Margin) return null;
-            if (location.Y < Margin || location.Y > _mapWindow.Height + Margin) return null;
+            if (location.X < MARGIN || location.X > _mapWindow.Width + MARGIN) return null;
+            if (location.Y < MARGIN || location.Y > _mapWindow.Height + MARGIN) return null;
 
             // figure out screen cell
-            int screenColumn = (location.X - Margin) / Map.CellWidth;
-            int screenRow = (location.Y - Margin) / Map.CellHeight;
+            int screenColumn = (location.X - MARGIN) / Map.CellWidth;
+            int screenRow = (location.Y - MARGIN) / Map.CellHeight;
 
             // convert to world cell
             Point viewCell = new Point(screenColumn, screenRow);

@@ -6,6 +6,9 @@ namespace GameLogic
 {
     public class Player
     {
+        private List<Settlement> _settlements = new List<Settlement>();
+        public IEnumerable<Settlement> Settlements => _settlements;
+
         private List<Unit> _units = new List<Unit>();
         private int _selectedUnitIndex = -1;
 
@@ -48,6 +51,13 @@ namespace GameLogic
         {
             //Interlocked.CompareExchange(ref TurnEnded, null, null)?.Invoke(this, e);
             UnitMoved?.Invoke(this, e);
+        }
+
+        public void AddSettlement(string name, Point2 location)
+        {
+            var raceType = Globals.Instance.RaceTypes[0];
+            Settlement settlement = Settlement.CreateNew(name, raceType, location, 4);
+            _settlements.Add(settlement);
         }
 
         public void AddUnit(int unitType, Point2 startLocation)
