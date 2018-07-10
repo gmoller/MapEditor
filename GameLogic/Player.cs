@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameData;
 using GeneralUtilities;
 
 namespace GameLogic
 {
     public class Player
     {
-        private List<Settlement> _settlements = new List<Settlement>();
+        private readonly List<Settlement> _settlements = new List<Settlement>();
         public IEnumerable<Settlement> Settlements => _settlements;
 
         private List<Unit> _units = new List<Unit>();
@@ -53,10 +54,9 @@ namespace GameLogic
             UnitMoved?.Invoke(this, e);
         }
 
-        public void AddSettlement(string name, Point2 location)
+        public void AddSettlement(string name, Point2 location, int populationSize, RaceType raceType)
         {
-            var raceType = Globals.Instance.RaceTypes[0];
-            Settlement settlement = Settlement.CreateNew(name, raceType, location, 4);
+            Settlement settlement = Settlement.CreateNew(name, raceType, location, populationSize);
             _settlements.Add(settlement);
         }
 

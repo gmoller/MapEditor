@@ -55,6 +55,7 @@
     <Compile Include="MovementProcessorTests.cs" />
     <Compile Include="NoiseTests.cs" />
     <Compile Include="PointTests.cs" />
+    <Compile Include="SettlementTests.cs" />
     <Compile Include="Tests.cs" />
     <Compile Include="UnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

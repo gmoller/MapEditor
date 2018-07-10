@@ -61,7 +61,7 @@ namespace WinFormsGui
             var player = new Player();
             player.UnitMoved += Player_UnitMoved;
             player.TurnEnded += Player_TurnEnded;
-            player.AddSettlement("Margeritaville", Point2.Create(1, 1));
+            player.AddSettlement("Margeritaville", Point2.Create(1, 1), 4, Globals.Instance.RaceTypes[0]);
             player.AddUnit(4, Point2.Create(0, 0)); // cavalry
             player.AddUnit(0, Point2.Create(0, 1)); // cavalry
             player.StartTurn();

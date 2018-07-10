@@ -20,7 +20,8 @@ namespace GameData.Loaders
                 string name = splitLine[1];
                 int movementCost = splitLine[2].ToInt32();
                 float foodOutput = splitLine[3].ToFloat();
-                TerrainType terrainType = TerrainType.Create(id, name, movementCost, foodOutput);
+                float productionPercentage = splitLine[4].ToFloat();
+                TerrainType terrainType = TerrainType.Create(id, name, movementCost, foodOutput, productionPercentage);
                 terrainTypes.Add(terrainType);
             }
 

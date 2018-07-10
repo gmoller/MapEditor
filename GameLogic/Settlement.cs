@@ -20,11 +20,13 @@ namespace GameLogic
         public string Name { get; }
         public Point2 Location { get; }
         public int Residents { get; private set; } // every 1 population is 1,000 residents
-        public Population Population { get; private set; }
+        public Population Population { get; private set; } // TODO: make this private (idea: turn this into a List<PopulationType>. This can allow the types to be de-hardcoded)
+        public int TotalPopulation => Population.Total;
         public string RaceName => _race.Name;
         public int GrowthRate => DetermineGrowthRate();
         public int FoodConsumption => Population.Total;
         public int FoodSurplus => DetermineFoodProductionPerTurn() - Population.Total;
+        public int Production => DetermineProductionPointsPerTurn();
 
         public SettlementType SettlementType
         {
@@ -65,16 +67,16 @@ namespace GameLogic
 
         private int DetermineFoodProductionPerTurn() // FoodProduction
         {
-            int farmingRate = _race.FarmingRate; // SettlementHasAnimistsGuild ? 3 : RaceType.FarmingRate;
-            int fromFarmers = Population.TotalFarmers * farmingRate;
+            float farmingRate = _race.FarmingRate; // SettlementHasAnimistsGuild ? 3 : RaceType.FarmingRate;
+            float fromFarmers = Population.TotalFarmers * farmingRate;
             /////int fromForestersGuild = SettlementHasForestersGuild ? 2 : 0;
-            int foodProductionPerTurn = fromFarmers + 0; //fromForestersGuild
+            float foodProductionPerTurn = fromFarmers + 0; //fromForestersGuild
             ////foodProductionPerTurn = IsCityEnchantmentFamineActive ? foodProductionPerTurn / 2 : foodProductionPerTurn;
 
             int baseFoodLevel = DetermineBaseFoodLevel();
             if (foodProductionPerTurn > baseFoodLevel)
             {
-                int excess = (foodProductionPerTurn - baseFoodLevel) / 2;
+                int excess = ((int)foodProductionPerTurn - baseFoodLevel) / 2;
                 foodProductionPerTurn = baseFoodLevel + excess;
             }
 
@@ -83,11 +85,12 @@ namespace GameLogic
             foodProductionPerTurn += GetMineralFoodModifierFromTerrain(Location);
             //foodProductionPerTurn += NumberOfSharedWildGameTiles;
 
-            return foodProductionPerTurn;
+            return (int)foodProductionPerTurn;
         }
 
         private int CalculateSubsistenceFarmers(int totalPopulation, int rebelPopulation)
         {
+            // TODO: wild game not being factored in
             int foodNeeded = totalPopulation;
             // subtract food from granary, farmers market, foresters guild
 
@@ -154,6 +157,19 @@ namespace GameLogic
             return (int)baseFoodLevelFromTerrain;
         }
 
+        private int GetBaseProductionPointsFromTerrain(Point2 location)
+        {
+            float baseProductionPointsFromTerrain = 0.0f;
+
+            List<Cell> cells = GetSettlementCells(location);
+            foreach (Cell item in cells)
+            {
+                baseProductionPointsFromTerrain += Globals.Instance.TerrainTypes[item.TerrainTypeId].ProductionPercentage;
+            }
+
+            return (int)baseProductionPointsFromTerrain;
+        }
+
         private int GetMineralFoodModifierFromTerrain(Point2 location)
         {
             float wildGameFromTerrain = 0.0f;
@@ -195,6 +211,22 @@ namespace GameLogic
             };
 
             return cells;
+        }
+
+        private int DetermineProductionPointsPerTurn()
+        {
+            float productionPoints = Population.Workers * _race.WorkerProductionRate + Population.TotalFarmers * _race.FarmerProductionRate;
+
+            // TODO: buildings
+
+            float percentMultiplier = GetBaseProductionPointsFromTerrain(Location);
+            percentMultiplier = 1 + percentMultiplier / 100;
+
+            float totalProductionPoints = productionPoints * percentMultiplier;
+
+            // TODO: spells
+
+            return (int)totalProductionPoints;
         }
     }
 }

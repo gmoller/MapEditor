@@ -35,17 +35,19 @@ namespace WinFormsGui
             {
                 residents += "W";
             }
+            residents += " ";
             for (int i = 0; i < settlementPopulation.Rebels; i++)
             {
                 residents += "R";
             }
 
-            return residents;
+            return residents.Trim();
         }
 
         private void SetResources(Settlement settlement)
         {
             lstResources.Items.Add($"Food: Consumption - {settlement.FoodConsumption}, Surplus - {settlement.FoodSurplus}");
+            lstResources.Items.Add($"Production: {settlement.Production}");
         }
     }
 }
