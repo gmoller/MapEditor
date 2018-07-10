@@ -9,8 +9,6 @@ namespace UnitTestProject1
     [TestClass]
     public class Tests
     {
-        private static GameWorld _gameWorld;
-
         [ClassInitialize]
         public static void Setup(TestContext context)
         {

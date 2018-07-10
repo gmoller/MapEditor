@@ -8,8 +8,6 @@ namespace UnitTestProject1
     [TestClass]
     public class UnitTests
     {
-        private static GameWorld _gameWorld;
-
         [ClassInitialize]
         public static void Setup(TestContext context)
         {
@@ -23,14 +21,14 @@ namespace UnitTestProject1
         public void Unit_can_move_north()
         {
             Unit unit = CreateUnit(Point2.Create(1, 1));
-            MoveUnit(unit, CompassDirection.North, Point2.Create(1, 2));
+            MoveUnit(unit, CompassDirection.North, Point2.Create(1, 0));
         }
 
         [TestMethod]
         public void Unit_can_move_northeast()
         {
             Unit unit = CreateUnit(Point2.Create(1, 1));
-            MoveUnit(unit, CompassDirection.NorthEast, Point2.Create(2, 2));
+            MoveUnit(unit, CompassDirection.NorthEast, Point2.Create(2, 0));
         }
 
         [TestMethod]
@@ -44,21 +42,21 @@ namespace UnitTestProject1
         public void Unit_can_move_southeast()
         {
             Unit unit = CreateUnit(Point2.Create(1, 1));
-            MoveUnit(unit, CompassDirection.SouthEast, Point2.Create(2, 0));
+            MoveUnit(unit, CompassDirection.SouthEast, Point2.Create(2, 2));
         }
 
         [TestMethod]
         public void Unit_can_move_south()
         {
             Unit unit = CreateUnit(Point2.Create(1, 1));
-            MoveUnit(unit, CompassDirection.South, Point2.Create(1, 0));
+            MoveUnit(unit, CompassDirection.South, Point2.Create(1, 2));
         }
 
         [TestMethod]
         public void Unit_can_move_southwest()
         {
             Unit unit = CreateUnit(Point2.Create(1, 1));
-            MoveUnit(unit, CompassDirection.SouthWest, Point2.Create(0, 0));
+            MoveUnit(unit, CompassDirection.SouthWest, Point2.Create(0, 2));
         }
 
         [TestMethod]
@@ -79,7 +77,7 @@ namespace UnitTestProject1
         public void Unit_can_move_northwest()
         {
             Unit unit = CreateUnit(Point2.Create(1, 1));
-            MoveUnit(unit, CompassDirection.NorthWest, Point2.Create(0, 2));
+            MoveUnit(unit, CompassDirection.NorthWest, Point2.Create(0, 0));
         }
 
         [TestMethod]
@@ -108,7 +106,7 @@ namespace UnitTestProject1
 
         private Unit MoveUnit(Unit unit, CompassDirection compassDirection, Point2 expectedLocation, float expectedMovementPoints = 1.0f)
         {
-            //unit = unit.Move(_movementProcessor, compassDirection);
+            unit = unit.DoAction("Move", compassDirection);
 
             Assert.AreEqual(expectedLocation, unit.Location, "Location incorrect.");
             Assert.AreEqual(expectedLocation.X, unit.Location.X, "Location.X incorrect.");

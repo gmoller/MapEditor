@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GameLogic.Processors;
 using GameMap;
 using GeneralUtilities;
@@ -38,7 +37,7 @@ namespace GameLogic
 
         private GameWorld()
         {
-            MovementProcessor = new MovementProcessor(this);
+            MovementProcessor = new MovementProcessor();
         }
 
         public static GameWorld Create()

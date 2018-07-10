@@ -1,5 +1,4 @@
-﻿using System;
-using GeneralUtilities;
+﻿using GeneralUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTestProject1

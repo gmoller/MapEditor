@@ -11,13 +11,6 @@ namespace GameLogic.Processors
     /// </summary>
     public class MovementProcessor
     {
-        private readonly GameWorld _gameWorld;
-
-        public MovementProcessor(GameWorld gameWorld)
-        {
-            _gameWorld = gameWorld;
-        }
-
         public ProcessResponse[] Process(ProcessRequest[] requests, INewLocationCalculator newLocationCalculator)
         {
             ProcessResponse[] response = new ProcessResponse[requests.Length];
@@ -58,7 +51,7 @@ namespace GameLogic.Processors
         private int DetermineMovementCost(Point2 location)
         {
             // get terrain type for location
-            Cell cell = _gameWorld.GetCell(location);
+            Cell cell = Globals.Instance.GameWorld.GetCell(location);
 
             // get movement cost for that terrain type
             TerrainType terrainType = Globals.Instance.TerrainTypes[cell.TerrainTypeId];

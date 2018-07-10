@@ -12,8 +12,6 @@ namespace UnitTestProject1
     [TestClass]
     public class MovementProcessorTests
     {
-        private static GameWorld _gameWorld;
-
         [ClassInitialize]
         public static void Setup(TestContext context)
         {
@@ -26,7 +24,7 @@ namespace UnitTestProject1
         [TestMethod]
         public void Unit_can_move_east()
         {
-            var movementProcessor = new MovementProcessor(_gameWorld);
+            var movementProcessor = new MovementProcessor();
 
             INewLocationCalculator newLocationCalculator = NewLocationCalculatorFactory.GetNewLocationCalculator(CompassDirection.East);
 
@@ -44,7 +42,7 @@ namespace UnitTestProject1
         [TestMethod]
         public void Multiple_units_can_move_east_single_threaded()
         {
-            var movementProcessor = new MovementProcessor(_gameWorld);
+            var movementProcessor = new MovementProcessor();
 
             INewLocationCalculator newLocationCalculator = NewLocationCalculatorFactory.GetNewLocationCalculator(CompassDirection.East);
 
@@ -63,7 +61,7 @@ namespace UnitTestProject1
         [TestMethod]
         public void Unit_can_move_east_in_parallel()
         {
-            var movementProcessor = new MovementProcessor(_gameWorld);
+            var movementProcessor = new MovementProcessor();
 
             INewLocationCalculator newLocationCalculator = NewLocationCalculatorFactory.GetNewLocationCalculator(CompassDirection.East);
 
@@ -83,7 +81,7 @@ namespace UnitTestProject1
         {
             const int repetitions = 1;
 
-            var movementProcessor = new MovementProcessor(_gameWorld);
+            var movementProcessor = new MovementProcessor();
 
             INewLocationCalculator newLocationCalculator = NewLocationCalculatorFactory.GetNewLocationCalculator(CompassDirection.East);
 
