@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using GameData;
-using GameMap;
 using GeneralUtilities;
 
 namespace GameLogic
@@ -16,62 +14,75 @@ namespace GameLogic
         private const int MAXIMUM_POPULATION_CAP = 25;
 
         private readonly RaceType _race;
+        private readonly SettlementCitizens _citizens;
 
         public string Name { get; }
         public Point2 Location { get; }
-        public int Residents { get; private set; } // every 1 population is 1,000 residents
-        public Population Population { get; private set; } // TODO: make this private (idea: turn this into a List<PopulationType>. This can allow the types to be de-hardcoded)
-        public int TotalPopulation => Population.Total;
+        public int Population { get; private set; } // every 1 population is 1,000 residents
+        public int SettlementSize => _citizens.Count;
         public string RaceName => _race.Name;
         public int GrowthRate => DetermineGrowthRate();
-        public int FoodConsumption => Population.Total;
-        public int FoodSurplus => DetermineFoodProductionPerTurn() - Population.Total;
+        public int FoodConsumption => _citizens.Count;
+        public int FoodSurplus => DetermineFoodProductionPerTurn() - _citizens.Count;
         public int Production => DetermineProductionPointsPerTurn();
+
+        public int SubsistenceFarmers => _citizens.SubsistenceFarmers;
+        public int AdditionalFarmers => _citizens.AdditionalFarmers;
+        public int TotalFarmers => _citizens.TotalFarmers;
+        public int TotalWorkers => _citizens.TotalWorkers;
+        public int TotalRebels => _citizens.TotalRebels;
 
         public SettlementType SettlementType
         {
             get
             {
-                if (Population.Total <= 4)
+                if (_citizens.Count <= 4)
                     return SettlementType.Hamlet;
-                if (Population.Total >= 5 && Population.Total <= 8)
+                if (_citizens.Count >= 5 && _citizens.Count <= 8)
                     return SettlementType.Village;
-                if (Population.Total >= 9 && Population.Total <= 12)
+                if (_citizens.Count >= 9 && _citizens.Count <= 12)
                     return SettlementType.Town;
-                if (Population.Total >= 13 && Population.Total <= 16)
+                if (_citizens.Count >= 13 && _citizens.Count <= 16)
                     return SettlementType.City;
-                if (Population.Total >= 17)
+                if (_citizens.Count >= 17)
                     return SettlementType.Capital;
 
                 throw new Exception("Unknown settlement type.");
             }
         }
 
-        private Settlement(string name, RaceType raceType, Point2 location, int population)
+        private Settlement(string name, RaceType raceType, Point2 location, int settlementSize)
         {
             Name = name;
             _race = raceType;
             Location = location;
-            Residents = population * 1000;
-
-            int farmersSubsistence = CalculateSubsistenceFarmers(population, 0);
-            Population = new Population(farmersSubsistence, population - farmersSubsistence, 0, 0); // defaults to all farmers
+            Population = settlementSize * 1000;
+            _citizens = new SettlementCitizens(settlementSize, raceType.FarmingRate);
         }
 
-        public static Settlement CreateNew(string name, RaceType raceType, Point2 location, int population)
+        public static Settlement CreateNew(string name, RaceType raceType, Point2 location, int settlementSize)
         {
-            var settlement = new Settlement(name, raceType, location, population);
+            var settlement = new Settlement(name, raceType, location, settlementSize);
 
             return settlement;
         }
 
-        private int DetermineFoodProductionPerTurn() // FoodProduction
+        public void EndTurn()
         {
-            float farmingRate = _race.FarmingRate; // SettlementHasAnimistsGuild ? 3 : RaceType.FarmingRate;
-            float fromFarmers = Population.TotalFarmers * farmingRate;
-            /////int fromForestersGuild = SettlementHasForestersGuild ? 2 : 0;
+            Population += GrowthRate;
+            if (Population / 1000 > SettlementSize)
+            {
+                _citizens.Increase();
+            }
+        }
+
+        private int DetermineFoodProductionPerTurn()
+        {
+            float farmingRate = _race.FarmingRate; // _buildings.HasBuilding("Animists Guild") ? 3 : RaceType.FarmingRate;
+            float fromFarmers = TotalFarmers * farmingRate;
+            //int fromForestersGuild = _buildings.HasBuilding("Foresters Guild") ? 2 : 0;
             float foodProductionPerTurn = fromFarmers + 0; //fromForestersGuild
-            ////foodProductionPerTurn = IsCityEnchantmentFamineActive ? foodProductionPerTurn / 2 : foodProductionPerTurn;
+            //foodProductionPerTurn = IsCityEnchantmentFamineActive ? foodProductionPerTurn / 2 : foodProductionPerTurn;
 
             int baseFoodLevel = DetermineBaseFoodLevel();
             if (foodProductionPerTurn > baseFoodLevel)
@@ -80,37 +91,20 @@ namespace GameLogic
                 foodProductionPerTurn = baseFoodLevel + excess;
             }
 
-            /////foodProductionPerTurn = SettlementHasGranary ? foodProductionPerTurn + 2 : foodProductionPerTurn;
-            /////foodProductionPerTurn = SettlementHasFarmersMarket ? foodProductionPerTurn + 3 : foodProductionPerTurn;
-            foodProductionPerTurn += GetMineralFoodModifierFromTerrain(Location);
+            //foodProductionPerTurn = _buildings.HasBuilding("Granary") ? foodProductionPerTurn + 2 : foodProductionPerTurn;
+            //foodProductionPerTurn = _buildings.HasBuilding("Farmers Market") ? foodProductionPerTurn + 3 : foodProductionPerTurn;
+            foodProductionPerTurn += TerrainHelper.GetMineralFoodModifierFromTerrain(Location);
             //foodProductionPerTurn += NumberOfSharedWildGameTiles;
 
             return (int)foodProductionPerTurn;
         }
 
-        private int CalculateSubsistenceFarmers(int totalPopulation, int rebelPopulation)
-        {
-            // TODO: wild game not being factored in
-            int foodNeeded = totalPopulation;
-            // subtract food from granary, farmers market, foresters guild
-
-            float farmersSubsistenceFloat = foodNeeded / (float)_race.FarmingRate;
-            int farmersSubsistence = (int)Math.Ceiling(farmersSubsistenceFloat);
-
-            if (totalPopulation - rebelPopulation >= farmersSubsistence)
-            {
-                return farmersSubsistence;
-            }
-
-            return totalPopulation - rebelPopulation;
-        }
-
         private int DetermineGrowthRate()
         {
             int maxSettlementSize = DetermineMaximumSettlementSize();
-            if (Population.Total >= maxSettlementSize) return 0;
+            if (_citizens.Count >= maxSettlementSize) return 0;
 
-            float baseGrowthRate = (maxSettlementSize - Population.Total + 1) / 2.0f;
+            float baseGrowthRate = (maxSettlementSize - _citizens.Count + 1) / 2.0f;
             int baseGrowthRateRoundedUp = (int)Math.Ceiling(baseGrowthRate);
 
             var adjustedGrowthRate = baseGrowthRateRoundedUp * 10 + _race.GrowthRateModifier;
@@ -122,13 +116,13 @@ namespace GameLogic
             return adjustedGrowthRate;
         }
 
-        private int DetermineMaximumSettlementSize() // MaximumPopulation
+        private int DetermineMaximumSettlementSize()
         {
             int baseFoodLevel = DetermineBaseFoodLevel();
             ////baseFoodLevel = IsCityEnchantmentFamineActive ? baseFoodLevel / 2 : baseFoodLevel;
             /////baseFoodLevel = SettlementHasGranary ? baseFoodLevel + 2 : baseFoodLevel;
             /////baseFoodLevel = SettlementHasFarmersMarket ? baseFoodLevel + 3 : baseFoodLevel;
-            baseFoodLevel += GetMineralFoodModifierFromTerrain(Location);
+            baseFoodLevel += TerrainHelper.GetMineralFoodModifierFromTerrain(Location);
             //baseFoodLevel += NumberOfSharedWildGameTiles;
 
             return baseFoodLevel > MAXIMUM_POPULATION_CAP ? MAXIMUM_POPULATION_CAP : baseFoodLevel;
@@ -137,89 +131,20 @@ namespace GameLogic
         private int DetermineBaseFoodLevel() // BaseFoodLevel (used by Surveyor before creating a settlement)
         {
             // Each city has a base food level of Food it can produce
-            int baseFoodLevel = GetBaseFoodLevelFromTerrain(Location);
+            int baseFoodLevel = TerrainHelper.GetBaseFoodLevelFromTerrain(Location);
 
             ////baseFoodLevel = IsCityEnchantmentGaiasBlessingActive ? baseFoodLevel * 1.5f : baseFoodLevel;
 
             return baseFoodLevel;
         }
 
-        private int GetBaseFoodLevelFromTerrain(Point2 location)
-        {
-            float baseFoodLevelFromTerrain = 0.0f;
-
-            List<Cell> cells = GetSettlementCells(location);
-            foreach (Cell item in cells)
-            {
-                baseFoodLevelFromTerrain += Globals.Instance.TerrainTypes[item.TerrainTypeId].FoodOutput;
-            }
-
-            return (int)baseFoodLevelFromTerrain;
-        }
-
-        private int GetBaseProductionPointsFromTerrain(Point2 location)
-        {
-            float baseProductionPointsFromTerrain = 0.0f;
-
-            List<Cell> cells = GetSettlementCells(location);
-            foreach (Cell item in cells)
-            {
-                baseProductionPointsFromTerrain += Globals.Instance.TerrainTypes[item.TerrainTypeId].ProductionPercentage;
-            }
-
-            return (int)baseProductionPointsFromTerrain;
-        }
-
-        private int GetMineralFoodModifierFromTerrain(Point2 location)
-        {
-            float wildGameFromTerrain = 0.0f;
-
-            List<Cell> cells = GetSettlementCells(location);
-            foreach (Cell item in cells)
-            {
-                wildGameFromTerrain += Globals.Instance.MineralTypes[item.MineralTypeId].FoodModifier;
-            }
-
-            return (int)wildGameFromTerrain;
-        }
-
-        private List<Cell> GetSettlementCells(Point2 location)
-        {
-            var cells = new List<Cell>
-            {
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X - 1, location.Y - 2)),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X, location.Y - 2)),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X + 1, location.Y - 2)),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X - 2, location.Y - 1)),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X - 1, location.Y - 1)),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X, location.Y - 1)),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X + 1, location.Y - 1)),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X + 2, location.Y - 1)),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X - 2, location.Y)),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X - 1, location.Y)),
-                Globals.Instance.GameWorld.GetCell(location),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X + 1, location.Y)),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X + 2, location.Y)),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X - 2, location.Y + 1)),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X - 1, location.Y + 1)),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X, location.Y + 1)),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X + 1, location.Y + 1)),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X + 2, location.Y + 1)),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X - 1, location.Y + 2)),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X, location.Y + 2)),
-                Globals.Instance.GameWorld.GetCell(Point2.Create(location.X + 1, location.Y + 2))
-            };
-
-            return cells;
-        }
-
         private int DetermineProductionPointsPerTurn()
         {
-            float productionPoints = Population.Workers * _race.WorkerProductionRate + Population.TotalFarmers * _race.FarmerProductionRate;
+            float productionPoints = TotalWorkers * _race.WorkerProductionRate + TotalFarmers * _race.FarmerProductionRate;
 
             // TODO: buildings
 
-            float percentMultiplier = GetBaseProductionPointsFromTerrain(Location);
+            float percentMultiplier = TerrainHelper.GetBaseProductionPointsFromTerrain(Location);
             percentMultiplier = 1 + percentMultiplier / 100;
 
             float totalProductionPoints = productionPoints * percentMultiplier;

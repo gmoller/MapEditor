@@ -34,6 +34,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BuildingType.cs" />
+    <Compile Include="Loaders\BuildingTypesLoader.cs" />
     <Compile Include="Loaders\MineralTypesLoader.cs" />
     <Compile Include="Loaders\RaceTypesLoader.cs" />
     <Compile Include="MineralType.cs" />

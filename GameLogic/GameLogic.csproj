@@ -57,6 +57,9 @@
     <Compile Include="NewLocationCalculators\SouthCalculator.cs" />
     <Compile Include="NewLocationCalculators\SouthEastCalculator.cs" />
     <Compile Include="NewLocationCalculators\SouthWestCalculator.cs" />
+    <Compile Include="SettlementBuildings.cs" />
+    <Compile Include="SettlementCitizens.cs" />
+    <Compile Include="TerrainHelper.cs" />
     <Compile Include="Unit.cs" />
     <Compile Include="NewLocationCalculators\WestCalculator.cs" />
   </ItemGroup>

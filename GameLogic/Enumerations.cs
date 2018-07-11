@@ -12,6 +12,14 @@ namespace GameLogic
         Capital
     }
 
+    public enum CitizenType
+    {
+        SubsistenceFarmer,
+        AdditionalFarmer,
+        Worker,
+        Rebel
+    }
+
     public enum CompassDirection
     {
         North,

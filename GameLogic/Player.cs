@@ -86,17 +86,11 @@ namespace GameLogic
         {
             if (_selectedUnitIndex >= 0) return;
 
-            //List<Unit> units = new List<Unit>(_units.Count);
-
-            //foreach (Unit item in _units)
-            //{
-            //    Unit unit = item.StartNewTurn();
-            //    units.Add(unit);
-            //    CellVisibilitySetter.SetCellVisibility(unit.Location, Globals.Instance.GameWorld);
-            //}
-
-            //_units = units;
-            //_selectedUnitIndex = 0;
+            // each settlement must have its residents increased
+            foreach (Settlement item in _settlements)
+            {
+                item.EndTurn();
+            }
 
             // raise event here to inform listeners that turn has been ended
             OnTurnEnded(EventArgs.Empty);

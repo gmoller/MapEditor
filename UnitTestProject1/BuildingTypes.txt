@@ -1,0 +1,4 @@
+﻿--Id,Name,ProductionCost,UpkeepGold,UpkeepMana,FoodProduced,GrowthRateIncrease--
+0,Barracks,30.0,0.0,0.0,0.0,0.0
+1,Smithy,40.0,1.0,0.0,0.0,0.0
+2,Builders' Hall,60.0,1.0,0.0,0.0,0.0

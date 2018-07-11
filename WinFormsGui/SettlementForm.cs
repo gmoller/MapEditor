@@ -14,29 +14,29 @@ namespace WinFormsGui
         {
             Text = $@"{settlement.SettlementType} of {settlement.Name}";
             lblRace.Text = $@"Race: {settlement.RaceName}";
-            lblPopulation.Text = $@"Population: {settlement.Residents} (+{settlement.GrowthRate})";
-            lblResidents.Text = BuildResidentsString(settlement.Population);
+            lblPopulation.Text = $@"Population: {settlement.Population} (+{settlement.GrowthRate})";
+            lblResidents.Text = BuildResidentsString(settlement);
             SetResources(settlement);
         }
 
-        private string BuildResidentsString(Population settlementPopulation)
+        private string BuildResidentsString(Settlement settlement)
         {
             string residents = string.Empty;
-            for (int i = 0; i < settlementPopulation.SubsistenceFarmers; i++)
+            for (int i = 0; i < settlement.SubsistenceFarmers; i++)
             {
                 residents += "F";
             }
             residents += " ";
-            for (int i = 0; i < settlementPopulation.AdditionalFarmers; i++)
+            for (int i = 0; i < settlement.AdditionalFarmers; i++)
             {
                 residents += "F";
             }
-            for (int i = 0; i < settlementPopulation.Workers; i++)
+            for (int i = 0; i < settlement.TotalWorkers; i++)
             {
                 residents += "W";
             }
             residents += " ";
-            for (int i = 0; i < settlementPopulation.Rebels; i++)
+            for (int i = 0; i < settlement.TotalRebels; i++)
             {
                 residents += "R";
             }
