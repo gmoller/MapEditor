@@ -9,30 +9,32 @@ namespace GameData
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
     public struct BuildingType
     {
-        public static readonly BuildingType Invalid = new BuildingType(-1, "None", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+        public static readonly BuildingType Invalid = new BuildingType(-1, "None", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, new List<int>());
 
         public int Id { get; }
         public string Name { get; }
-        public float ProductionCost { get; }
+        public float ConstructionCost { get; }
         public float UpkeepGold { get; }
         public float UpkeepMana { get; }
         public float FoodProduced { get; }
         public float GrowthRateIncrease { get; }
+        public List<int> DependentBuildings { get; }
 
-        private BuildingType(int id, string name, float productionCost, float upkeepGold, float upkeepMana, float foodProduced, float growthRateIncrease)
+        private BuildingType(int id, string name, float constructionCost, float upkeepGold, float upkeepMana, float foodProduced, float growthRateIncrease, List<int> dependentBuildings)
         {
             Id = id;
             Name = name;
-            ProductionCost = productionCost;
+            ConstructionCost = constructionCost;
             UpkeepGold = upkeepGold;
             UpkeepMana = upkeepMana;
             FoodProduced = foodProduced;
             GrowthRateIncrease = growthRateIncrease;
+            DependentBuildings = dependentBuildings;
         }
 
-        public static BuildingType Create(int id, string name, float productionCost, float upkeepGold, float upkeepMana, float foodProduced, float growthRateIncrease)
+        public static BuildingType Create(int id, string name, float constructionCost, float upkeepGold, float upkeepMana, float foodProduced, float growthRateIncrease, List<int> dependentBuildings)
         {
-            return new BuildingType(id, name, productionCost, upkeepGold, upkeepMana, foodProduced, growthRateIncrease);
+            return new BuildingType(id, name, constructionCost, upkeepGold, upkeepMana, foodProduced, growthRateIncrease, dependentBuildings);
         }
 
         private string DebuggerDisplay => $"{{Id={Id},Name={Name}}}";

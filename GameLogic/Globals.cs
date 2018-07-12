@@ -17,6 +17,7 @@ namespace GameLogic
         public MineralTypes MineralTypes { get; }
         public UnitTypes UnitTypes { get; }
         public RaceTypes RaceTypes { get; }
+        public BuildingTypes BuildingTypes { get; }
 
         public static Globals Instance => Lazy.Value;
 
@@ -30,6 +31,7 @@ namespace GameLogic
             MineralTypes = MineralTypes.Create(MineralTypesLoader.GetMineralTypes());
             UnitTypes = UnitTypes.Create(UnitTypesLoader.GetUnitTypes(MovementTypes));
             RaceTypes = RaceTypes.Create(RaceTypesLoader.GetRaceTypes());
+            BuildingTypes = BuildingTypes.Create(BuildingTypesLoader.GetBuildingTypes());
         }
 
         public int GetRandomNumber(int minValue, int maxValue)
