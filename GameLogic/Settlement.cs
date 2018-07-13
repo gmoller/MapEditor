@@ -20,6 +20,7 @@ namespace GameLogic
         public Point2 Location { get; }
         public int Population { get; private set; } // every 1 population is 1,000 residents
         public int SettlementSize => _citizens.Count;
+        public int RaceId => _race.Id;
         public string RaceName => _race.Name;
         public int GrowthRate => DetermineGrowthRate();
         public int FoodConsumption => _citizens.Count;

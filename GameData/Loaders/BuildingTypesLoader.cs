@@ -25,9 +25,9 @@ namespace GameData.Loaders
                 float foodProduced = splitLine[5].ToFloat();
                 float growthRateIncrease = splitLine[6].ToFloat();
                 List<int> dependentBuildings = GetDependentBuildings(splitLine[7]);
-                string races = splitLine[8];
+                List<int> races = GetRaces(splitLine[8]);
 
-                BuildingType buildingType = BuildingType.Create(id, name, constructionCost, upkeepGold, upkeepMana, foodProduced, growthRateIncrease, dependentBuildings);
+                BuildingType buildingType = BuildingType.Create(id, name, constructionCost, upkeepGold, upkeepMana, foodProduced, growthRateIncrease, dependentBuildings, races);
                 buildingTypes.Add(buildingType);
             }
 
@@ -56,7 +56,9 @@ namespace GameData.Loaders
 
             if (split[0] == "all")
             {
-                
+                races.Add(0);
+                races.Add(1);
+                races.Add(2);
             }
 
             return races;

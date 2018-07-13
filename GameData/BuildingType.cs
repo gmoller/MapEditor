@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace GameData
@@ -9,7 +10,7 @@ namespace GameData
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
     public struct BuildingType
     {
-        public static readonly BuildingType Invalid = new BuildingType(-1, "None", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, new List<int>());
+        public static readonly BuildingType Invalid = new BuildingType(-1, "None", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, new List<int>(), new List<int>());
 
         public int Id { get; }
         public string Name { get; }
@@ -19,8 +20,9 @@ namespace GameData
         public float FoodProduced { get; }
         public float GrowthRateIncrease { get; }
         public List<int> DependentBuildings { get; }
+        public List<int> Races { get; }
 
-        private BuildingType(int id, string name, float constructionCost, float upkeepGold, float upkeepMana, float foodProduced, float growthRateIncrease, List<int> dependentBuildings)
+        private BuildingType(int id, string name, float constructionCost, float upkeepGold, float upkeepMana, float foodProduced, float growthRateIncrease, List<int> dependentBuildings, List<int> races)
         {
             Id = id;
             Name = name;
@@ -30,11 +32,12 @@ namespace GameData
             FoodProduced = foodProduced;
             GrowthRateIncrease = growthRateIncrease;
             DependentBuildings = dependentBuildings;
+            Races = races;
         }
 
-        public static BuildingType Create(int id, string name, float constructionCost, float upkeepGold, float upkeepMana, float foodProduced, float growthRateIncrease, List<int> dependentBuildings)
+        public static BuildingType Create(int id, string name, float constructionCost, float upkeepGold, float upkeepMana, float foodProduced, float growthRateIncrease, List<int> dependentBuildings, List<int> races)
         {
-            return new BuildingType(id, name, constructionCost, upkeepGold, upkeepMana, foodProduced, growthRateIncrease, dependentBuildings);
+            return new BuildingType(id, name, constructionCost, upkeepGold, upkeepMana, foodProduced, growthRateIncrease, dependentBuildings, races);
         }
 
         private string DebuggerDisplay => $"{{Id={Id},Name={Name}}}";
@@ -44,7 +47,7 @@ namespace GameData
     /// This class is immutable.
     /// </summary>
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
-    public class BuildingTypes
+    public class BuildingTypes : IEnumerable<BuildingType>
     {
         private readonly Dictionary<int, BuildingType> _items;
 
@@ -75,6 +78,19 @@ namespace GameData
 
                 return _items[index];
             }
+        }
+
+        public IEnumerator<BuildingType> GetEnumerator()
+        {
+            foreach (KeyValuePair<int, BuildingType> item in _items)
+            {
+                yield return item.Value;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
         private string DebuggerDisplay => $"{{Count={_items.Count}}}";
