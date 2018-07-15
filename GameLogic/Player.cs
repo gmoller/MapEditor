@@ -54,9 +54,9 @@ namespace GameLogic
             UnitMoved?.Invoke(this, e);
         }
 
-        public void AddSettlement(string name, Point2 location, int populationSize, RaceType raceType)
+        public void AddSettlement(string name, Point2 location, RaceType raceType)
         {
-            Settlement settlement = Settlement.CreateNew(name, raceType, location, populationSize);
+            Settlement settlement = Settlement.CreateNew(name, raceType, location);
             _settlements.Add(settlement);
         }
 
@@ -86,7 +86,7 @@ namespace GameLogic
         {
             if (_selectedUnitIndex >= 0) return;
 
-            // each settlement must have its residents increased
+            // each settlement must have its residents increased and build stuff
             foreach (Settlement item in _settlements)
             {
                 item.EndTurn();

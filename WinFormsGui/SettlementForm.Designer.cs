@@ -37,14 +37,15 @@
             this.lstResources = new System.Windows.Forms.ListBox();
             this.lstEnchantments = new System.Windows.Forms.ListBox();
             this.lblBuildings = new System.Windows.Forms.Label();
-            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.lstBuildings = new System.Windows.Forms.ListBox();
             this.lblUnits = new System.Windows.Forms.Label();
             this.listBox2 = new System.Windows.Forms.ListBox();
             this.lblProducing = new System.Windows.Forms.Label();
             this.lstProducing = new System.Windows.Forms.ListBox();
             this.btnBuy = new System.Windows.Forms.Button();
-            this.btnChange = new System.Windows.Forms.Button();
             this.btnOk = new System.Windows.Forms.Button();
+            this.cboProduceBuilding = new System.Windows.Forms.ComboBox();
+            this.cboProduceUnit = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -127,13 +128,13 @@
             this.lblBuildings.TabIndex = 7;
             this.lblBuildings.Text = "Buildings:";
             // 
-            // listBox1
+            // lstBuildings
             // 
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(12, 208);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(370, 147);
-            this.listBox1.TabIndex = 8;
+            this.lstBuildings.FormattingEnabled = true;
+            this.lstBuildings.Location = new System.Drawing.Point(12, 208);
+            this.lstBuildings.Name = "lstBuildings";
+            this.lstBuildings.Size = new System.Drawing.Size(370, 199);
+            this.lstBuildings.TabIndex = 8;
             // 
             // lblUnits
             // 
@@ -171,44 +172,57 @@
             // 
             // btnBuy
             // 
-            this.btnBuy.Location = new System.Drawing.Point(388, 332);
+            this.btnBuy.Location = new System.Drawing.Point(388, 384);
             this.btnBuy.Name = "btnBuy";
-            this.btnBuy.Size = new System.Drawing.Size(58, 23);
+            this.btnBuy.Size = new System.Drawing.Size(90, 23);
             this.btnBuy.TabIndex = 13;
             this.btnBuy.Text = "Buy";
             this.btnBuy.UseVisualStyleBackColor = true;
             // 
-            // btnChange
-            // 
-            this.btnChange.Location = new System.Drawing.Point(452, 332);
-            this.btnChange.Name = "btnChange";
-            this.btnChange.Size = new System.Drawing.Size(58, 23);
-            this.btnChange.TabIndex = 14;
-            this.btnChange.Text = "Change";
-            this.btnChange.UseVisualStyleBackColor = true;
-            // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(517, 332);
+            this.btnOk.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnOk.Location = new System.Drawing.Point(485, 384);
             this.btnOk.Name = "btnOk";
-            this.btnOk.Size = new System.Drawing.Size(58, 23);
+            this.btnOk.Size = new System.Drawing.Size(90, 23);
             this.btnOk.TabIndex = 15;
             this.btnOk.Text = "OK";
             this.btnOk.UseVisualStyleBackColor = true;
+            this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
+            // 
+            // cboProduceBuilding
+            // 
+            this.cboProduceBuilding.FormattingEnabled = true;
+            this.cboProduceBuilding.Location = new System.Drawing.Point(389, 328);
+            this.cboProduceBuilding.Name = "cboProduceBuilding";
+            this.cboProduceBuilding.Size = new System.Drawing.Size(186, 21);
+            this.cboProduceBuilding.TabIndex = 16;
+            this.cboProduceBuilding.SelectedIndexChanged += new System.EventHandler(this.cboProduceBuilding_SelectedIndexChanged);
+            // 
+            // cboProduceUnit
+            // 
+            this.cboProduceUnit.FormattingEnabled = true;
+            this.cboProduceUnit.Location = new System.Drawing.Point(388, 353);
+            this.cboProduceUnit.Name = "cboProduceUnit";
+            this.cboProduceUnit.Size = new System.Drawing.Size(187, 21);
+            this.cboProduceUnit.TabIndex = 17;
             // 
             // SettlementForm
             // 
+            this.AcceptButton = this.btnOk;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(587, 362);
+            this.CancelButton = this.btnOk;
+            this.ClientSize = new System.Drawing.Size(587, 416);
+            this.Controls.Add(this.cboProduceUnit);
+            this.Controls.Add(this.cboProduceBuilding);
             this.Controls.Add(this.btnOk);
-            this.Controls.Add(this.btnChange);
             this.Controls.Add(this.btnBuy);
             this.Controls.Add(this.lstProducing);
             this.Controls.Add(this.lblProducing);
             this.Controls.Add(this.listBox2);
             this.Controls.Add(this.lblUnits);
-            this.Controls.Add(this.listBox1);
+            this.Controls.Add(this.lstBuildings);
             this.Controls.Add(this.lblBuildings);
             this.Controls.Add(this.lstEnchantments);
             this.Controls.Add(this.lstResources);
@@ -239,13 +253,14 @@
         private System.Windows.Forms.ListBox lstResources;
         private System.Windows.Forms.ListBox lstEnchantments;
         private System.Windows.Forms.Label lblBuildings;
-        private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.ListBox lstBuildings;
         private System.Windows.Forms.Label lblUnits;
         private System.Windows.Forms.ListBox listBox2;
         private System.Windows.Forms.Label lblProducing;
         private System.Windows.Forms.ListBox lstProducing;
         private System.Windows.Forms.Button btnBuy;
-        private System.Windows.Forms.Button btnChange;
         private System.Windows.Forms.Button btnOk;
+        private System.Windows.Forms.ComboBox cboProduceBuilding;
+        private System.Windows.Forms.ComboBox cboProduceUnit;
     }
 }

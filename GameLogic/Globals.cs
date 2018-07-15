@@ -31,7 +31,7 @@ namespace GameLogic
             MineralTypes = MineralTypes.Create(MineralTypesLoader.GetMineralTypes());
             UnitTypes = UnitTypes.Create(UnitTypesLoader.GetUnitTypes(MovementTypes));
             RaceTypes = RaceTypes.Create(RaceTypesLoader.GetRaceTypes());
-            BuildingTypes = BuildingTypes.Create(BuildingTypesLoader.GetBuildingTypes());
+            BuildingTypes = BuildingTypesLoader.GetBuildingTypes();
         }
 
         public int GetRandomNumber(int minValue, int maxValue)

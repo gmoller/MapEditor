@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace GameData
 {
@@ -10,23 +11,27 @@ namespace GameData
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
     public struct BuildingType
     {
-        public static readonly BuildingType Invalid = new BuildingType(-1, "None", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, new List<int>(), new List<int>());
+        public static readonly BuildingType Invalid = new BuildingType(-1, "None", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, new List<int>(), new List<int>());
 
         public int Id { get; }
         public string Name { get; }
         public float ConstructionCost { get; }
+        public float ConstructedAmount { get; }
         public float UpkeepGold { get; }
         public float UpkeepMana { get; }
         public float FoodProduced { get; }
         public float GrowthRateIncrease { get; }
-        public List<int> DependentBuildings { get; }
-        public List<int> Races { get; }
+        public List<int> DependentBuildings { get; } // TODO: don't expose this as a list
+        public List<int> Races { get; } // TODO: don't expose this as a list
 
-        private BuildingType(int id, string name, float constructionCost, float upkeepGold, float upkeepMana, float foodProduced, float growthRateIncrease, List<int> dependentBuildings, List<int> races)
+        public bool HasBeenBuilt => ConstructedAmount >= ConstructionCost;
+
+        private BuildingType(int id, string name, float constructionCost, float constructedAmount, float upkeepGold, float upkeepMana, float foodProduced, float growthRateIncrease, List<int> dependentBuildings, List<int> races)
         {
             Id = id;
             Name = name;
             ConstructionCost = constructionCost;
+            ConstructedAmount = constructedAmount;
             UpkeepGold = upkeepGold;
             UpkeepMana = upkeepMana;
             FoodProduced = foodProduced;
@@ -35,9 +40,14 @@ namespace GameData
             Races = races;
         }
 
-        public static BuildingType Create(int id, string name, float constructionCost, float upkeepGold, float upkeepMana, float foodProduced, float growthRateIncrease, List<int> dependentBuildings, List<int> races)
+        public static BuildingType Create(int id, string name, float constructionCost, float constructedAmount, float upkeepGold, float upkeepMana, float foodProduced, float growthRateIncrease, List<int> dependentBuildings, List<int> races)
         {
-            return new BuildingType(id, name, constructionCost, upkeepGold, upkeepMana, foodProduced, growthRateIncrease, dependentBuildings, races);
+            return new BuildingType(id, name, constructionCost, constructedAmount, upkeepGold, upkeepMana, foodProduced, growthRateIncrease, dependentBuildings, races);
+        }
+
+        public bool CanBeBuiltBy(int raceTypeId)
+        {
+            return Races.Contains(raceTypeId);
         }
 
         private string DebuggerDisplay => $"{{Id={Id},Name={Name}}}";
@@ -65,6 +75,11 @@ namespace GameData
             return new BuildingTypes(items);
         }
 
+        public static BuildingTypes Create(IEnumerable<BuildingType> items)
+        {
+            return new BuildingTypes(items.ToList());
+        }
+
         public int Count => _items.Count;
 
         public BuildingType this[int index]
@@ -77,6 +92,22 @@ namespace GameData
                 }
 
                 return _items[index];
+            }
+        }
+
+        public BuildingType this[string name]
+        {
+            get
+            {
+                foreach (BuildingType item in this)
+                {
+                    if (item.Name == name)
+                    {
+                        return item;
+                    }
+                }
+
+                return BuildingType.Invalid;
             }
         }
 

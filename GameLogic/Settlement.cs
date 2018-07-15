@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GameData;
 using GeneralUtilities;
 
@@ -15,6 +16,7 @@ namespace GameLogic
 
         private readonly RaceType _race;
         private readonly SettlementCitizens _citizens;
+        private readonly SettlementBuildings _buildings;
 
         public string Name { get; }
         public Point2 Location { get; }
@@ -32,6 +34,10 @@ namespace GameLogic
         public int TotalFarmers => _citizens.TotalFarmers;
         public int TotalWorkers => _citizens.TotalWorkers;
         public int TotalRebels => _citizens.TotalRebels;
+
+        public BuildingTypes BuildingThatHaveBeenBuilt => _buildings.BuildingsThatHaveBeenBuilt;
+        public BuildingTypes CanCurrentlyBuild => _buildings.CanCurrentlyBuild();
+        public BuildingType CurrentlyProducing { get; set; }
 
         public SettlementType SettlementType
         {
@@ -59,30 +65,36 @@ namespace GameLogic
             Location = location;
             Population = settlementSize * 1000;
             _citizens = new SettlementCitizens(settlementSize, raceType.FarmingRate);
+            _buildings = new SettlementBuildings(this);
+            _buildings.IncreaseProduction(Globals.Instance.BuildingTypes["Barracks"], Globals.Instance.BuildingTypes[0].ConstructionCost); // give barracks
         }
 
-        public static Settlement CreateNew(string name, RaceType raceType, Point2 location, int settlementSize)
+        public static Settlement CreateNew(string name, RaceType raceType, Point2 location)
         {
-            var settlement = new Settlement(name, raceType, location, settlementSize);
+            var settlement = new Settlement(name, raceType, location, 1);
 
             return settlement;
         }
 
         public void EndTurn()
         {
+            // increase population
             Population += GrowthRate;
             if (Population / 1000 > SettlementSize)
             {
                 _citizens.Increase();
             }
+
+            // build stuff
+            _buildings.IncreaseProduction(CurrentlyProducing, Production);
         }
 
         private int DetermineFoodProductionPerTurn()
         {
-            float farmingRate = _race.FarmingRate; // _buildings.HasBuilding("Animists Guild") ? 3 : RaceType.FarmingRate;
+            float farmingRate = _buildings.BuildingHasBeenBuilt("Animists Guild") ? 3 : _race.FarmingRate;
             float fromFarmers = TotalFarmers * farmingRate;
-            //int fromForestersGuild = _buildings.HasBuilding("Foresters Guild") ? 2 : 0;
-            float foodProductionPerTurn = fromFarmers + 0; //fromForestersGuild
+            int fromForestersGuild = _buildings.BuildingHasBeenBuilt("Foresters Guild") ? 2 : 0;
+            float foodProductionPerTurn = fromFarmers + fromForestersGuild;
             //foodProductionPerTurn = IsCityEnchantmentFamineActive ? foodProductionPerTurn / 2 : foodProductionPerTurn;
 
             int baseFoodLevel = DetermineBaseFoodLevel();
@@ -92,8 +104,8 @@ namespace GameLogic
                 foodProductionPerTurn = baseFoodLevel + excess;
             }
 
-            //foodProductionPerTurn = _buildings.HasBuilding("Granary") ? foodProductionPerTurn + 2 : foodProductionPerTurn;
-            //foodProductionPerTurn = _buildings.HasBuilding("Farmers Market") ? foodProductionPerTurn + 3 : foodProductionPerTurn;
+            foodProductionPerTurn = _buildings.BuildingHasBeenBuilt("Granary") ? foodProductionPerTurn + 2 : foodProductionPerTurn;
+            foodProductionPerTurn = _buildings.BuildingHasBeenBuilt("Farmers Market") ? foodProductionPerTurn + 3 : foodProductionPerTurn;
             foodProductionPerTurn += TerrainHelper.GetMineralFoodModifierFromTerrain(Location);
             //foodProductionPerTurn += NumberOfSharedWildGameTiles;
 
@@ -129,7 +141,7 @@ namespace GameLogic
             return baseFoodLevel > MAXIMUM_POPULATION_CAP ? MAXIMUM_POPULATION_CAP : baseFoodLevel;
         }
 
-        private int DetermineBaseFoodLevel() // BaseFoodLevel (used by Surveyor before creating a settlement)
+        private int DetermineBaseFoodLevel() // used by Surveyor
         {
             // Each city has a base food level of Food it can produce
             int baseFoodLevel = TerrainHelper.GetBaseFoodLevelFromTerrain(Location);

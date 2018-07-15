@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using GameData;
 
 namespace GameLogic
@@ -6,63 +7,67 @@ namespace GameLogic
     public class SettlementBuildings
     {
         private readonly Settlement _settlement;
-        private readonly List<BuildingType> _buildings;
+        private BuildingTypes _allBuildings;
 
-        public SettlementBuildings()
+        public BuildingTypes BuildingsThatHaveBeenBuilt => BuildingTypes.Create(from building in _allBuildings where building.HasBeenBuilt select building);
+
+        public SettlementBuildings(Settlement settlement)
         {
-            _buildings = new List<BuildingType>();
+            _settlement = settlement;
+            _allBuildings = Globals.Instance.BuildingTypes;
         }
 
-        public void AddBuilding(BuildingType building)
-        {
-            _buildings.Add(building);
-        }
-
-        public bool HasBuilding(int buildingId)
-        {
-            foreach (var item in _buildings)
-            {
-                if (item.Id == buildingId) return true;
-            }
-
-            return false;
-            //return _buildings.FirstOrDefault(item => item.Id == buildingId);
-        }
-
-        public bool HasBuilding(string buildingName)
-        {
-            foreach (var item in _buildings)
-            {
-                if (item.Name == buildingName) return true;
-            }
-
-            return false;
-            //return _buildings.FirstOrDefault(item => item.Name == buildingName);
-        }
-
-        public List<BuildingType> CanCurrentlyBuild()
+        public BuildingTypes CanCurrentlyBuild()
         {
             List<BuildingType> canCurrentlyBuild = new List<BuildingType>();
 
-            foreach (BuildingType item in Globals.Instance.BuildingTypes)
+            foreach (BuildingType building in _allBuildings)
             {
-                if (HasBuilding(item.Name)) continue; // already built - skip
+                if (building.HasBeenBuilt) continue; // already built - skip
 
-                if (!item.Races.Contains(_settlement.RaceId)) continue; // race cannot build this - skip
+                if (!building.CanBeBuiltBy(_settlement.RaceId)) continue; // race cannot build this - skip
 
-                bool hasAllBuildings = true;
-                foreach (int item2 in item.DependentBuildings)
+                bool hasAllDependentBuildings = true;
+                foreach (int item in building.DependentBuildings)
                 {
-                    hasAllBuildings = HasBuilding(item2);
+                    hasAllDependentBuildings = BuildingHasBeenBuilt(item);
                 }
 
-                if (hasAllBuildings)
+                if (hasAllDependentBuildings)
                 {
-                    canCurrentlyBuild.Add(item);
+                    canCurrentlyBuild.Add(building);
                 }
             }
 
-            return canCurrentlyBuild;
+            return BuildingTypes.Create(canCurrentlyBuild);
+        }
+
+        internal void IncreaseProduction(BuildingType currentlyProducing, float production)
+        {
+            List<BuildingType> list = new List<BuildingType>();
+            foreach (BuildingType item in _allBuildings)
+            {
+                if (item.Id == currentlyProducing.Id)
+                {
+                    list.Add(BuildingType.Create(item.Id, item.Name, item.ConstructionCost, item.ConstructedAmount + production, item.UpkeepGold, item.UpkeepMana, item.FoodProduced, item.GrowthRateIncrease, item.DependentBuildings, item.Races));
+                }
+                else
+                {
+                    list.Add(item);
+                }
+            }
+
+            _allBuildings = BuildingTypes.Create(list);
+        }
+
+        internal bool BuildingHasBeenBuilt(int buildingId)
+        {
+            return _allBuildings[buildingId].HasBeenBuilt;
+        }
+
+        internal bool BuildingHasBeenBuilt(string buildingName)
+        {
+            return _allBuildings[buildingName].HasBeenBuilt;
         }
     }
 }

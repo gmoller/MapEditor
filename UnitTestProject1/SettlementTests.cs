@@ -28,7 +28,7 @@ namespace UnitTestProject1
         public void Barbarian_settlement_of_1()
         {
             Player player = new Player();
-            player.AddSettlement("Margeritaville", Point2.Create(2, 2), 1, Globals.Instance.RaceTypes[0]); // Barbarians
+            player.AddSettlement("Margeritaville", Point2.Create(2, 2), Globals.Instance.RaceTypes[0]); // Barbarians
             Globals.Instance.GameWorld.SetPlayer(player);
 
             Settlement settlement = Globals.Instance.GameWorld.GetPlayerSettlementOnCell(Point2.Create(2, 2));
@@ -61,10 +61,10 @@ namespace UnitTestProject1
         }
 
         [TestMethod]
-        public void Darkelf_settlement_of_4()
+        public void Darkelf_settlement_of_1()
         {
             Player player = new Player();
-            player.AddSettlement("Margeritaville", Point2.Create(2, 2), 4, Globals.Instance.RaceTypes[2]); // Dark Elf
+            player.AddSettlement("Margeritaville", Point2.Create(2, 2), Globals.Instance.RaceTypes[2]); // Dark Elf
             Globals.Instance.GameWorld.SetPlayer(player);
 
             Settlement settlement = Globals.Instance.GameWorld.GetPlayerSettlementOnCell(Point2.Create(2, 2));
@@ -72,18 +72,18 @@ namespace UnitTestProject1
             Assert.AreEqual(SettlementType.Hamlet, settlement.SettlementType, "SettlementType incorrect."); // Note: SettlementType could be de-hardcoded
             Assert.AreEqual("Margeritaville", settlement.Name, "Settlement Name incorrect.");
             Assert.AreEqual("Dark Elves", settlement.RaceName, "Settlement RaceName incorrect.");
-            Assert.AreEqual(4, settlement.SettlementSize, "Settlement SettlementSize incorrect.");
-            Assert.AreEqual(4000, settlement.Population, "Settlement Population incorrect.");
-            Assert.AreEqual(90, settlement.GrowthRate, "Settlement GrowthRate incorrect.");
+            Assert.AreEqual(1, settlement.SettlementSize, "Settlement SettlementSize incorrect.");
+            Assert.AreEqual(1000, settlement.Population, "Settlement Population incorrect.");
+            Assert.AreEqual(110, settlement.GrowthRate, "Settlement GrowthRate incorrect.");
 
-            Assert.AreEqual(2, settlement.SubsistenceFarmers, "Settlement SubsistenceFarmers incorrect.");
-            Assert.AreEqual(2, settlement.AdditionalFarmers, "Settlement AdditionalFarmers incorrect.");
+            Assert.AreEqual(1, settlement.SubsistenceFarmers, "Settlement SubsistenceFarmers incorrect.");
+            Assert.AreEqual(0, settlement.AdditionalFarmers, "Settlement AdditionalFarmers incorrect.");
             Assert.AreEqual(0, settlement.TotalWorkers, "Settlement Workers incorrect.");
             Assert.AreEqual(0, settlement.TotalRebels, "Settlement Rebels incorrect.");
 
-            Assert.AreEqual(4, settlement.FoodConsumption, "Settlement FoodConsumption incorrect.");
-            Assert.AreEqual(4, settlement.FoodSurplus, "Settlement FoodSurplus incorrect.");
-            Assert.AreEqual(2, settlement.Production, "Settlement Production incorrect.");
+            Assert.AreEqual(1, settlement.FoodConsumption, "Settlement FoodConsumption incorrect.");
+            Assert.AreEqual(1, settlement.FoodSurplus, "Settlement FoodSurplus incorrect.");
+            Assert.AreEqual(0, settlement.Production, "Settlement Production incorrect.");
             //settlement.GoldUpkeep
             //settlement.GoldSurplus
             //settlement.Power

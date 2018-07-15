@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using GeneralUtilities;
 
 namespace GameData.Loaders
 {
     public static class BuildingTypesLoader
     {
-        public static List<BuildingType> GetBuildingTypes()
+        public static BuildingTypes GetBuildingTypes()
         {
             var buildingTypes = new List<BuildingType>();
 
@@ -27,11 +26,11 @@ namespace GameData.Loaders
                 List<int> dependentBuildings = GetDependentBuildings(splitLine[7]);
                 List<int> races = GetRaces(splitLine[8]);
 
-                BuildingType buildingType = BuildingType.Create(id, name, constructionCost, upkeepGold, upkeepMana, foodProduced, growthRateIncrease, dependentBuildings, races);
+                BuildingType buildingType = BuildingType.Create(id, name, constructionCost, 0.0f, upkeepGold, upkeepMana, foodProduced, growthRateIncrease, dependentBuildings, races);
                 buildingTypes.Add(buildingType);
             }
 
-            return buildingTypes;
+            return BuildingTypes.Create(buildingTypes);
         }
 
         private static List<int> GetDependentBuildings(string s)
