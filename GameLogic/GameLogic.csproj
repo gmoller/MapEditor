@@ -76,10 +76,6 @@
       <Project>{52dae17e-3240-4b33-a875-a9fe73e208c5}</Project>
       <Name>GeneralUtilities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Noise\Noise.csproj">
-      <Project>{aec160e5-c4db-4b2c-a16c-edeb6b1bd2c4}</Project>
-      <Name>Noise</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Notes.txt" />
